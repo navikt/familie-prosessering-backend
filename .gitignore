@@ -1,0 +1,8 @@
+*.iml
+target/
+.idea
+.flattened
+/prosessering/.project
+/prosessering/.factorypath
+/prosessering/.classpath
+.DS_Store
