@@ -1,0 +1,26 @@
+spring:
+  autoconfigure.exclude: org.springframework.boot.autoconfigure.web.servlet.error.ErrorMvcAutoConfiguration
+  h2:
+    console:
+      enabled: true
+  data:
+    jdbc:
+      repositories:
+        enabled: true
+  main:
+    allow-bean-definition-overriding: true
+    banner-mode: "off"
+  flyway:
+    enabled: true
+  datasource:
+    username: sa
+    password:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;CASE_INSENSITIVE_IDENTIFIERS=TRUE;MODE=POSTGRESQL
+    driver-class-name: org.h2.Driver
+
+
+    hikari:
+      maximum-pool-size: 2
+      connection-test-query: "select 1"
+      max-lifetime: 30000
+      minimum-idle: 1

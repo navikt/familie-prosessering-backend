@@ -2,21 +2,20 @@ package no.nav.familie.prosessering.rest
 
 import no.nav.familie.kontrakter.felles.Ressurs
 import no.nav.familie.prosessering.domene.Avvikstype
+import no.nav.familie.prosessering.domene.ITask
 import no.nav.familie.prosessering.domene.Status
-import no.nav.familie.prosessering.domene.Task
-import no.nav.familie.prosessering.domene.TaskRepository
+import no.nav.familie.prosessering.internal.TaskService
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.util.*
 
 @Service
-class RestTaskService(private val taskRepository: TaskRepository) {
+class RestTaskService(private val taskRepository: TaskService) {
 
-    fun hentTasks(statuses: List<Status>, saksbehandlerId: String, page: Int): Ressurs<List<Task>> {
+    fun hentTasks(statuses: List<Status>, saksbehandlerId: String, page: Int): Ressurs<List<ITask>> {
         logger.info("$saksbehandlerId henter tasker med status $statuses")
 
         return Result.runCatching {
@@ -35,7 +34,19 @@ class RestTaskService(private val taskRepository: TaskRepository) {
         logger.info("$saksbehandlerId henter tasker med status $statuses")
 
         return Result.runCatching {
-            PaginableResponse(taskRepository.finnTasksDtoTilFrontend(statuses, PageRequest.of(page, TASK_LIMIT)))
+            PaginableResponse(taskRepository.finnTasksTilFrontend(statuses, PageRequest.of(page, TASK_LIMIT)).map {
+                TaskDto(it.id,
+                        it.status,
+                        it.avvikstype,
+                        it.opprettetTid,
+                        it.triggerTid,
+                        it.type,
+                        it.metadataProperties(),
+                        it.payload,
+                        it.logg.size,
+                        it.logg.maxByOrNull { logg -> logg.opprettetTid }?.opprettetTid,
+                        it.callId)
+            })
         }
                 .fold(
                         onSuccess = { Ressurs.success(data = it) },
@@ -50,7 +61,8 @@ class RestTaskService(private val taskRepository: TaskRepository) {
         logger.info("$saksbehandlerId henter tasklogg til task=$id")
 
         return Result.runCatching {
-            taskRepository.finnTaskloggTilFrontend(id)
+            val task = taskRepository.findById(id)
+            task.logg.map { TaskloggDto(it.id, it.endretAv, it.type, it.node, it.melding, it.opprettetTid) }
         }
                 .fold(
                         onSuccess = { Ressurs.success(data = it) },
@@ -63,18 +75,13 @@ class RestTaskService(private val taskRepository: TaskRepository) {
 
     @Transactional
     fun rekjørTask(taskId: Long, saksbehandlerId: String): Ressurs<String> {
-        val task: Optional<Task> = taskRepository.findById(taskId)
+        val task: ITask = taskRepository.findById(taskId)
 
-        return when (task.isPresent) {
-            true -> {
-                taskRepository.save(task.get().copy(triggerTid = null).klarTilPlukk(saksbehandlerId))
-                logger.info("$saksbehandlerId rekjører task $taskId")
+        taskRepository.save(task.klarTilPlukk(saksbehandlerId))
+        logger.info("$saksbehandlerId rekjører task $taskId")
 
-                Ressurs.success(data = "")
-            }
+        return Ressurs.success(data = "")
 
-            false -> Ressurs.failure("Fant ikke task med task id $taskId")
-        }
     }
 
     @Transactional
@@ -83,7 +90,7 @@ class RestTaskService(private val taskRepository: TaskRepository) {
 
         return Result.runCatching {
             taskRepository.finnTasksMedStatus(listOf(status), Pageable.unpaged())
-                    .map { taskRepository.save(it.copy(triggerTid = null).klarTilPlukk(saksbehandlerId)) }
+                    .map { taskRepository.save(it.klarTilPlukk(saksbehandlerId)) }
         }
                 .fold(
                         onSuccess = { Ressurs.success(data = "") },
@@ -96,29 +103,24 @@ class RestTaskService(private val taskRepository: TaskRepository) {
 
     @Transactional
     fun avvikshåndterTask(taskId: Long, avvikstype: Avvikstype, årsak: String, saksbehandlerId: String): Ressurs<String> {
-        val task: Optional<Task> = taskRepository.findById(taskId)
+        val task: ITask = taskRepository.findById(taskId)
 
-        return when (task.isPresent) {
-            false -> Ressurs.failure("Fant ikke task med id $taskId.")
+        logger.info("$saksbehandlerId setter task $taskId til avvikshåndtert", taskId)
 
-            true -> {
-                logger.info("$saksbehandlerId setter task $taskId til avvikshåndtert", taskId)
-
-                Result.runCatching { taskRepository.save(task.get().avvikshåndter(avvikstype, årsak, saksbehandlerId)) }
-                        .fold(
-                                onSuccess = {
-                                    Ressurs.success(data = "")
-                                },
-                                onFailure = { e ->
-                                    logger.error("Avvikshåndtering av $taskId feilet", e)
-                                    Ressurs.failure(errorMessage = "Avvikshåndtering av $taskId feilet", error = e)
-                                }
-                        )
-            }
-        }
+        return Result.runCatching { taskRepository.save(task.avvikshåndter(avvikstype, årsak, saksbehandlerId)) }
+                .fold(
+                        onSuccess = {
+                            Ressurs.success(data = "")
+                        },
+                        onFailure = { e ->
+                            logger.error("Avvikshåndtering av $taskId feilet", e)
+                            Ressurs.failure(errorMessage = "Avvikshåndtering av $taskId feilet", error = e)
+                        }
+                )
     }
 
     companion object {
+
         val logger: Logger = LoggerFactory.getLogger(RestTaskService::class.java)
         const val TASK_LIMIT: Int = 100
     }
