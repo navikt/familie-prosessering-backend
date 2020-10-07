@@ -1,14 +1,14 @@
 package no.nav.familie.prosessering.internal
 
-import no.nav.familie.leader.LeaderClient
 import no.nav.familie.log.mdc.MDCConstants
-import no.nav.familie.prosessering.domene.Task
-import no.nav.familie.prosessering.domene.TaskRepository
+import no.nav.familie.prosessering.domene.ITask
+import no.nav.familie.prosessering.domene.TaskRepositoryProxy
 import org.slf4j.LoggerFactory
 import org.slf4j.MDC
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.core.task.TaskExecutor
+import org.springframework.dao.OptimisticLockingFailureException
 import org.springframework.data.domain.PageRequest
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor
@@ -23,7 +23,7 @@ class TaskStepExecutorService(@Value("\${prosessering.maxAntall:10}") private va
                               private val fixedDelayString: String,
                               private val taskWorker: TaskWorker,
                               @Qualifier("taskExecutor") private val taskExecutor: TaskExecutor,
-                              private val taskRepository: TaskRepository) {
+                              private val taskRepository: TaskRepositoryProxy) {
 
     private val secureLog = LoggerFactory.getLogger("secureLogger")
 
@@ -35,20 +35,7 @@ class TaskStepExecutorService(@Value("\${prosessering.maxAntall:10}") private va
 
         if (pollingSize > minCapacity) {
             val tasks =
-                    when (LeaderClient.isLeader()) {
-                        true -> {
-                            log.debug("Kjører som leader")
-                            taskRepository.finnAlleTasksKlareForProsesseringUtenLock(PageRequest.of(0, pollingSize))
-                        }
-                        false -> {
-                            log.debug("Er ikke leader")
-                            emptyList()
-                        }
-                        null -> {
-                            log.debug("Leader election ikke satt opp")
-                            taskRepository.finnAlleTasksKlareForProsesseringUtenLock(PageRequest.of(0, pollingSize))
-                        }
-                    }
+                            taskRepository.finnAlleTasksKlareForProsessering(PageRequest.of(0, pollingSize))
             log.trace("Pollet {} tasks med max {}", tasks.size, maxAntall)
 
             tasks.forEach(this::executeWork)
@@ -58,18 +45,25 @@ class TaskStepExecutorService(@Value("\${prosessering.maxAntall:10}") private va
         log.trace("Ferdig med polling, venter {} ms til neste kjøring.", fixedDelayString)
     }
 
-    private fun executeWork(task: Task) {
+    private fun executeWork(task: ITask) {
         val startTidspunkt = System.currentTimeMillis()
         initLogContext(task)
 
+        val plukketTask = try {
+            taskWorker.markerPlukket(task.id) ?: return
+        } catch (e: OptimisticLockingFailureException) {
+            log.info("OptimisticLockingFailureException for task ${task.id}")
+            return
+        }
+
         try {
-            taskWorker.markerPlukket(task.id!!)
-            taskWorker.doActualWork(task.id)
+            taskWorker.doActualWork(plukketTask.id)
             secureLog.info("Fullført kjøring av task '{}', kjøretid={} ms",
                            task,
                            System.currentTimeMillis() - startTidspunkt)
         } catch (e: Exception) {
-            taskWorker.doFeilhåndtering(task, e)
+            e.printStackTrace()
+            taskWorker.doFeilhåndtering(task.id, e)
             secureLog.warn("Fullført kjøring av task '{}', kjøretid={} ms, feilmelding='{}'",
                            task,
                            System.currentTimeMillis() - startTidspunkt,
@@ -81,9 +75,9 @@ class TaskStepExecutorService(@Value("\${prosessering.maxAntall:10}") private va
 
     }
 
-    private fun initLogContext(taskDetails: Task) {
+    private fun initLogContext(taskDetails: ITask) {
         MDC.put(MDCConstants.MDC_CALL_ID, taskDetails.callId)
-        LOG_CONTEXT.add("task", taskDetails.taskStepType)
+        LOG_CONTEXT.add("task", taskDetails.type)
     }
 
     private fun clearLogContext() {
@@ -100,6 +94,7 @@ class TaskStepExecutorService(@Value("\${prosessering.maxAntall:10}") private va
 
 
     companion object {
+
         private val LOG_CONTEXT = MdcExtendedLogContext.getContext("prosess")
         private val log = LoggerFactory.getLogger(TaskStepExecutorService::class.java)
     }

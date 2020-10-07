@@ -5,19 +5,18 @@ import io.micrometer.core.instrument.Metrics
 import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskFeil
 import no.nav.familie.prosessering.TaskStepBeskrivelse
+import no.nav.familie.prosessering.domene.ITask
 import no.nav.familie.prosessering.domene.Status
-import no.nav.familie.prosessering.domene.Task
-import no.nav.familie.prosessering.domene.TaskRepository
+import no.nav.familie.prosessering.domene.TaskRepositoryProxy
 import org.slf4j.LoggerFactory
 import org.springframework.aop.framework.AopProxyUtils
 import org.springframework.core.annotation.AnnotationUtils
-import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
 
 @Service
-class TaskWorker(private val taskRepository: TaskRepository, taskStepTyper: List<AsyncTaskStep>) {
+class TaskWorker(private val taskRepository: TaskRepositoryProxy, taskStepTyper: List<AsyncTaskStep>) {
 
     private val taskStepMap: Map<String, AsyncTaskStep>
 
@@ -44,25 +43,19 @@ class TaskWorker(private val taskRepository: TaskRepository, taskStepTyper: List
         }
     }
 
-
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     fun doActualWork(taskId: Long) {
 
-        val taskOptional = taskRepository.findById(taskId)
+        var task = taskRepository.findById(taskId)
 
-        if (taskOptional.isEmpty) {
-            return
-        }
-
-        val task = taskOptional.get()
         if (task.status != Status.PLUKKET) {
             return // en annen pod har startet behandling
         }
 
-        task.behandler()
-
+        task = task.behandler()
+        task = taskRepository.save(task)
         // finn tasktype
-        val taskStep = finnTaskStep(task.taskStepType)
+        val taskStep = finnTaskStep(task.type)
 
         // execute
         taskStep.preCondition(task)
@@ -70,23 +63,26 @@ class TaskWorker(private val taskRepository: TaskRepository, taskStepTyper: List
         taskStep.postCondition(task)
         taskStep.onCompletion(task)
 
-        task.ferdigstill()
+        task = task.ferdigstill()
+        taskRepository.save(task)
         secureLog.trace("Ferdigstiller task='{}'", task)
 
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    fun doFeilhåndtering(task: Task, e: Exception) {
-        val maxAntallFeil = finnMaxAntallFeil(task.taskStepType)
+    fun doFeilhåndtering(taskId: Long, e: Exception) {
+        var task = taskRepository.findById(taskId)
+        val maxAntallFeil = finnMaxAntallFeil(task.type)
         secureLog.trace("Behandler task='{}'", task)
 
-        task.feilet(TaskFeil(task, e), maxAntallFeil)
+        task = task.feilet(TaskFeil(task, e), maxAntallFeil)
         // lager metrikker på tasks som har feilet max antall ganger.
         if (task.status == Status.FEILET) {
-            finnFeilteller(task.taskStepType).increment()
-            log.error("Task ${task.id} av type ${task.taskStepType} har feilet. Sjekk familie-prosessering for detaljer")
+            finnFeilteller(task.type).increment()
+            log.error("Task ${task.id} av type ${task.type} har feilet. " +
+                      "Sjekk familie-prosessering for detaljer")
         }
-        task.triggerTid = task.triggerTid?.plusSeconds(finnTriggerTidVedFeil(task.taskStepType))
+        task = task.copy(triggerTid = task.triggerTid.plusSeconds(finnTriggerTidVedFeil(task.type)))
         taskRepository.save(task)
         secureLog.info("Feilhåndtering lagret ok {}", task)
 
@@ -110,20 +106,18 @@ class TaskWorker(private val taskRepository: TaskRepository, taskStepTyper: List
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    fun markerPlukket(id: Long) {
-        val taskOptional = taskRepository.findById(id)
+    fun markerPlukket(id: Long): ITask? {
+        var task = taskRepository.findById(id)
 
-        if (taskOptional.isEmpty) {
-            return
-        }
-
-        val task = taskOptional.get()
         if (task.status.kanPlukkes()) {
-            task.plukker()
+            task = task.plukker()
+            return taskRepository.save(task)
         }
+        return null
     }
 
     companion object {
+
         private val secureLog = LoggerFactory.getLogger("secureLogger")
         private val log = LoggerFactory.getLogger(this::class.java)
     }

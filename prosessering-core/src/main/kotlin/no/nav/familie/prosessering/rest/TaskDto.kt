@@ -18,8 +18,9 @@ data class TaskDto(val id: Long,
                    val taskStepType: String,
                    val metadata: Properties,
                    val payload: String,
-                   val antallLogger: Long,
-                   val sistKjørt: LocalDateTime?){
+                   val antallLogger: Int,
+                   val sistKjørt: LocalDateTime?) {
+
     val callId: String
         get() = this.metadata.getProperty(MDCConstants.MDC_CALL_ID)
 }

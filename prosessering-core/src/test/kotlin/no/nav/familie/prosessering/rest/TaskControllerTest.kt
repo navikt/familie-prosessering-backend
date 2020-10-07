@@ -4,7 +4,7 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
 import no.nav.familie.prosessering.domene.Status
-import no.nav.familie.prosessering.domene.TaskRepository
+import no.nav.familie.prosessering.domene.TaskRepositoryProxy
 import org.assertj.core.api.Assertions
 import org.junit.Before
 import org.junit.Test
@@ -12,10 +12,10 @@ import org.junit.Test
 
 internal class TaskControllerTest {
 
-    val taskRepository: TaskRepository = mockk()
+    private val taskRepository: TaskRepositoryProxy = mockk()
 
-    lateinit var restTaskService: RestTaskService
-    lateinit var taskController: TaskController
+    private lateinit var restTaskService: RestTaskService
+    private lateinit var taskController: TaskController
 
     @Before
     fun setup() {
