@@ -23,7 +23,7 @@
         <kontrakter.version>2.0_20201007161609_10c9230</kontrakter.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <kotlin.version>1.4.10</kotlin.version>
-        <felles.version>1.20200916153803_f78097a</felles.version>
+        <felles.version>1.20201008051000_833414d</felles.version>
         <jackson.version>2.11.2</jackson.version>
         <jakarta.version>2.2.3</jakarta.version>
         <flyway.version>6.5.5</flyway.version>
