@@ -6,10 +6,11 @@
 
     <groupId>no.nav.familie</groupId>
     <artifactId>familie-prosessering</artifactId>
+
     <name>Prosessering - Root</name>
     <version>${revision}${sha1}${changelist}</version>
     <packaging>pom</packaging>
-    <url>https://github.com/navikt/familie-felles</url>
+    <url>https://github.com/navikt/familie-prosessering-backend</url>
 
     <properties>
         <revision>1.0</revision>
@@ -326,7 +327,7 @@
         <repository>
             <id>github</id>
             <name>GitHub navikt Apache Maven Packages</name>
-            <url>https://maven.pkg.github.com/navikt/familie-felles</url>
+            <url>https://maven.pkg.github.com/navikt/familie-prosessering-backend</url>
         </repository>
     </distributionManagement>
 
