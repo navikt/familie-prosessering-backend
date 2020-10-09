@@ -7,7 +7,7 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.ObjectReader
 import com.fasterxml.jackson.databind.ObjectWriter
-import no.nav.familie.prosessering.domene.Task
+import no.nav.familie.prosessering.domene.ITask
 import java.io.IOException
 import java.io.PrintWriter
 import java.io.StringWriter
@@ -40,12 +40,12 @@ data class TaskFeil(
         var feilkode: String? = null
 ) {
 
-    constructor(taskInfo: Task, feil: Exception?) : this(taskInfo.id,
-                                                         taskInfo.taskStepType,
-                                                         feil?.cause?.javaClass?.name,
-                                                         feil?.cause?.message,
-                                                         feil?.message,
-                                                         getStacktraceAsString(feil))
+    constructor(taskInfo: ITask, feil: Exception?) : this(taskInfo.id,
+                                                          taskInfo.type,
+                                                          feil?.cause?.javaClass?.name,
+                                                          feil?.cause?.message,
+                                                          feil?.message,
+                                                          getStacktraceAsString(feil))
 
     @Throws(IOException::class)
     fun writeValueAsString(): String {
