@@ -1,6 +1,7 @@
 package no.nav.familie.prosessering.internal
 
 import no.nav.familie.prosessering.domene.ITaskLogg.Companion.BRUKERNAVN_NÅR_SIKKERHETSKONTEKST_IKKE_FINNES
+import no.nav.familie.prosessering.domene.Loggtype
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.dao.OptimisticLockingFailureException
@@ -13,20 +14,22 @@ private const val CRON_DAILY_8AM = "0 0 8 1/1 * ?"
 private const val CRON_DAILY_9AM = "0 0 9 1/1 * ?"
 
 @Service
-class ScheduledTaskService(private val taskRepository: TaskService) {
+class ScheduledTaskService(private val taskRepository: TaskService, private val taskStepService: TaskStepService) {
 
     @Scheduled(cron = CRON_DAILY_8AM)
     @Transactional
     fun retryFeilendeTask() {
         val tasks = taskRepository.finnAlleFeiledeTasks()
 
-        tasks.forEach {
-            try {
-                taskRepository.save(it.klarTilPlukk(BRUKERNAVN_NÅR_SIKKERHETSKONTEKST_IKKE_FINNES))
-            } catch (e: OptimisticLockingFailureException) {
-                logger.info("OptimisticLockingFailureException for task ${it.id}")
-            }
-        }
+        tasks
+                .filter { task -> taskStepService.finnMaxAntallFeil(task.type) > task.logg.count { it.type == Loggtype.FEILET } }
+                .forEach {
+                    try {
+                        taskRepository.save(it.klarTilPlukk(BRUKERNAVN_NÅR_SIKKERHETSKONTEKST_IKKE_FINNES))
+                    } catch (e: OptimisticLockingFailureException) {
+                        logger.info("OptimisticLockingFailureException for task ${it.id}")
+                    }
+                }
     }
 
     @Scheduled(cron = CRON_DAILY_9AM)
@@ -40,6 +43,7 @@ class ScheduledTaskService(private val taskRepository: TaskService) {
     }
 
     companion object {
+
         val logger: Logger = LoggerFactory.getLogger(ScheduledTaskService::class.java)
     }
 }

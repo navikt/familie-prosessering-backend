@@ -5,6 +5,7 @@ import no.nav.familie.prosessering.TestAppConfig
 import no.nav.familie.prosessering.domene.Status
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.domene.TaskRepository
+import no.nav.familie.prosessering.task.TaskStep1
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -42,7 +43,7 @@ class ScheduledTasksServiceTest {
     @Test
     @DirtiesContext
     fun `skal ikke slette nye tasker`() {
-        val nyTask = Task("type", "payload").ferdigstill()
+        val nyTask = Task(TaskStep1.TASK_1, "payload").ferdigstill()
         val saved = taskRepository.save(nyTask)
 
 
@@ -56,7 +57,7 @@ class ScheduledTasksServiceTest {
     @Test
     @DirtiesContext
     fun `skal sette feilede tasks klar til plukk`() {
-        var task = Task("type", "payload")
+        var task = Task(TaskStep1.TASK_1, "payload")
         task = task.feilet(TaskFeil(task, null), 0)
         val saved = taskRepository.save(task)
 
@@ -65,7 +66,6 @@ class ScheduledTasksServiceTest {
 
         assertThat(taskRepository.findByIdOrNull(saved.id)!!.status).isEqualTo(Status.KLAR_TIL_PLUKK)
     }
-
 
 
 }

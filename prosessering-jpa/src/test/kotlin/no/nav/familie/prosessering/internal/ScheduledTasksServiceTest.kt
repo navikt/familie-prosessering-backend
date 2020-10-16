@@ -4,6 +4,7 @@ import no.nav.familie.prosessering.TestAppConfig
 import no.nav.familie.prosessering.domene.Status
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.domene.TaskRepository
+import no.nav.familie.prosessering.task.TaskStep1
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -41,7 +42,7 @@ class ScheduledTasksServiceTest {
     @Test
     @DirtiesContext
     fun `skal ikke slette nye tasker`() {
-        val nyTask = Task("type", "payload")
+        val nyTask = Task(TaskStep1.TASK_1, "payload")
         nyTask.ferdigstill()
         tasksRepository.save(nyTask)
 
