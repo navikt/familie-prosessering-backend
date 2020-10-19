@@ -30,10 +30,7 @@ data class Task(
 ) : ITask() {
 
 
-    constructor(type: String, payload: String) :
-            this(type, payload, Properties())
-
-    private constructor (type: String, payload: String, properties: Properties) :
+    constructor (type: String, payload: String, properties: Properties = Properties()) :
             this(type = type,
                  payload = payload,
                  metadata = properties.apply {
