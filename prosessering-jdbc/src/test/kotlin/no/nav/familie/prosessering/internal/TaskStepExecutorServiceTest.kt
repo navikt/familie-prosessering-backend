@@ -10,7 +10,7 @@ import no.nav.familie.prosessering.domene.Status
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.domene.TaskRepository
 import no.nav.familie.prosessering.task.TaskStep2
-import no.nav.familie.prosessering.task.TaskStepFeilManuellBehandling
+import no.nav.familie.prosessering.task.TaskStepFeilManuellOppfølgning
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -89,7 +89,7 @@ class TaskStepExecutorServiceTest {
 
     @Test
     fun `settTilManuellOppfølgning=true - skal sette en task til manuell oppfølgning når den feilet 3 ganger`() {
-        val task = repository.save(Task(TaskStepFeilManuellBehandling.TASK_FEIL_1, "{'a'='b'}"))
+        val task = repository.save(Task(TaskStepFeilManuellOppfølgning.TASK_FEIL_1, "{'a'='b'}"))
         TestTransaction.flagForCommit()
         TestTransaction.end()
 

@@ -3,15 +3,13 @@ package no.nav.familie.prosessering.task
 import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskStepBeskrivelse
 import no.nav.familie.prosessering.domene.ITask
-import no.nav.familie.prosessering.domene.TaskRepository
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 
 @Service
-@TaskStepBeskrivelse(taskStepType = TaskStepFeilManuellBehandling.TASK_FEIL_1,
+@TaskStepBeskrivelse(taskStepType = TaskStepFeilManuellOppfølgning.TASK_FEIL_1,
                      beskrivelse = "Dette er task 1",
                      settTilManuellOppfølgning = true)
-class TaskStepFeilManuellBehandling : AsyncTaskStep {
+class TaskStepFeilManuellOppfølgning : AsyncTaskStep {
 
 
     override fun doTask(task: ITask) {
@@ -20,7 +18,7 @@ class TaskStepFeilManuellBehandling : AsyncTaskStep {
 
     companion object {
 
-        const val TASK_FEIL_1 = "taskFeilManuellBehandling1"
+        const val TASK_FEIL_1 = "taskFeilManuellOppfølgning1"
     }
 
 }
