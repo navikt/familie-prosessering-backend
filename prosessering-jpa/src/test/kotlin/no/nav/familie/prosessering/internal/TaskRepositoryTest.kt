@@ -13,8 +13,10 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.flyway.FlywayAutoConfiguration
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.data.domain.PageRequest
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.junit4.SpringRunner
+import java.util.*
 
 @RunWith(SpringRunner::class)
 @ContextConfiguration(classes = [TestAppConfig::class])
@@ -75,5 +77,16 @@ class TaskRepositoryTest {
         Assertions.assertThat(alleTasks.count { it.status == Status.FEILET }).isEqualTo(1)
     }
 
+    @Test
+    fun `skal håndtere properties`() {
+        val property = "PROPERTY"
+        val lagretTask = repository.save(Task(type = TaskStep1.TASK_1,
+                                              payload = "{'a'='b'}",
+                                              properties = Properties().apply {
+                                                  this[property] = property
+                                              }))
+        val task = repository.findByIdOrNull(lagretTask.id)!!
+        Assertions.assertThat(task.metadata.getProperty(property)).isEqualTo(property)
+    }
 
 }

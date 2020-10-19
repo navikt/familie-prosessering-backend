@@ -1,10 +1,10 @@
-# Familie-prosessering
+package no.nav.familie.prosessering
 
-Prosesseringsmotor for familieområdet.
+import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Configuration
+import org.springframework.data.jdbc.core.convert.JdbcCustomConversions
+import org.springframework.data.jdbc.repository.config.AbstractJdbcConfiguration
 
-## JDBC
-* Må sette opp converters, eks:
-```kotlin
 @Configuration
 class DatabaseConfiguration : AbstractJdbcConfiguration() {
 
@@ -14,8 +14,3 @@ class DatabaseConfiguration : AbstractJdbcConfiguration() {
                                             PropertiesWrapperTilStringConverter()))
     }
 }
-```
-
-## JPA
-
-![](https://github.com/navikt/familie-prosessering-backend/workflows/Build-Deploy/badge.svg)

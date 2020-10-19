@@ -1,5 +1,6 @@
 package no.nav.familie.prosessering.internal
 
+import no.nav.familie.log.mdc.MDCConstants
 import no.nav.familie.prosessering.TestAppConfig
 import no.nav.familie.prosessering.domene.Status
 import no.nav.familie.prosessering.domene.Task
@@ -12,8 +13,10 @@ import org.junit.runner.RunWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.data.jdbc.DataJdbcTest
 import org.springframework.data.domain.PageRequest
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.junit4.SpringRunner
+import java.util.*
 
 @RunWith(SpringRunner::class)
 @ContextConfiguration(classes = [TestAppConfig::class])
@@ -46,9 +49,9 @@ class TaskRepositoryTest {
 
     @Test
     fun `finnTasksMedStatus - skal hente ut alle tasker gitt en status`() {
-        val ubehandletTask = Task(type = TaskStep1.TASK_1, payload = "{'a'='b'}", status =Status.UBEHANDLET)
-        val feiletTask1 = Task(type = TaskStep2.TASK_2, payload = "{'a'='1'}", status =Status.FEILET)
-        val feiletTask2 = Task(type = TaskStep2.TASK_2, payload = "{'a'='1'}", status =Status.FEILET)
+        val ubehandletTask = Task(type = TaskStep1.TASK_1, payload = "{'a'='b'}", status = Status.UBEHANDLET)
+        val feiletTask1 = Task(type = TaskStep2.TASK_2, payload = "{'a'='1'}", status = Status.FEILET)
+        val feiletTask2 = Task(type = TaskStep2.TASK_2, payload = "{'a'='1'}", status = Status.FEILET)
 
         repository.save(ubehandletTask)
         repository.save(feiletTask1)
@@ -72,6 +75,18 @@ class TaskRepositoryTest {
         val alleTasks = repository.findByStatusIn(listOf(Status.FEILET), PageRequest.of(0, 1))
         Assertions.assertThat(alleTasks.size).isEqualTo(1)
         Assertions.assertThat(alleTasks.count { it.status == Status.FEILET }).isEqualTo(1)
+    }
+
+    @Test
+    fun `skal håndtere properties`() {
+        val property = "PROPERTY"
+        val lagretTask = repository.save(Task(type = TaskStep1.TASK_1,
+                                              payload = "{'a'='b'}",
+                                              properties = Properties().apply {
+                                                  this[property] = property
+                                              }))
+        val task = repository.findByIdOrNull(lagretTask.id)!!
+        Assertions.assertThat(task.metadata.getProperty(property)).isEqualTo(property)
     }
 
 

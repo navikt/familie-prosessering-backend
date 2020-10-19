@@ -41,7 +41,7 @@ class RestTaskService(private val taskRepository: TaskService) {
                         it.opprettetTid,
                         it.triggerTid,
                         it.type,
-                        it.metadataProperties(),
+                        it.metadata,
                         it.payload,
                         it.logg.size,
                         it.logg.maxByOrNull { logg -> logg.opprettetTid }?.opprettetTid,
