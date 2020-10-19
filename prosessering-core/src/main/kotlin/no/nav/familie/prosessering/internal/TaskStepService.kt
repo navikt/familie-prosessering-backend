@@ -16,6 +16,7 @@ class TaskStepService(taskStepTyper: List<AsyncTaskStep>) {
     private val maxAntallFeilMap: Map<String, Int>
     private val triggerTidVedFeilMap: Map<String, Long>
     private val feiltellereForTaskSteps: Map<String, Counter>
+    private val settTilManuellOppfølgningVedFeil: Map<String, Boolean>
 
     init {
         val tasksTilTaskStepBeskrivelse: Map<AsyncTaskStep, TaskStepBeskrivelse> = taskStepTyper.associateWith { task ->
@@ -34,6 +35,7 @@ class TaskStepService(taskStepTyper: List<AsyncTaskStep>) {
                                                "beskrivelse",
                                                it.beskrivelse)
         }
+        settTilManuellOppfølgningVedFeil = tasksTilTaskStepBeskrivelse.values.associate { it.taskStepType to it.settTilManuellOppfølgning }
     }
 
     internal fun finnFeilteller(taskType: String): Counter {
@@ -50,6 +52,10 @@ class TaskStepService(taskStepTyper: List<AsyncTaskStep>) {
 
     fun finnTaskStep(taskType: String): AsyncTaskStep {
         return taskStepMap[taskType] ?: error("Ukjent tasktype $taskType")
+    }
+
+    fun finnSettTilManuellOppfølgning(taskType: String): Boolean {
+        return settTilManuellOppfølgningVedFeil[taskType] ?: error("Ukjent tasktype $taskType")
     }
 
 }

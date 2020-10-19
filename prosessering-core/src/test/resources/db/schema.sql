@@ -2,7 +2,7 @@ CREATE TABLE IF NOT EXISTS task (
     id            bigint                                               NOT NULL
         CONSTRAINT henvendelse_pkey PRIMARY KEY,
     payload       text                                                 NOT NULL,
-    status        varchar(15)  DEFAULT 'UBEHANDLET'::character varying NOT NULL,
+    status        varchar(20)  DEFAULT 'UBEHANDLET'::character varying NOT NULL,
     versjon       bigint       DEFAULT 0,
     opprettet_tid timestamp(3) DEFAULT LOCALTIMESTAMP,
     type          varchar(100)                                         NOT NULL,

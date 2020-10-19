@@ -10,11 +10,13 @@ import no.nav.familie.prosessering.domene.Status
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.domene.TaskRepository
 import no.nav.familie.prosessering.task.TaskStep2
+import no.nav.familie.prosessering.task.TaskStepFeilManuellBehandling
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.data.jdbc.DataJdbcTest
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.junit4.SpringRunner
 import org.springframework.test.context.transaction.TestTransaction
@@ -33,10 +35,12 @@ class TaskStepExecutorServiceTest {
     @Autowired
     private lateinit var taskStepExecutorService: TaskStepExecutorService
 
+    @Autowired
+    private lateinit var scheduledTasksService: ScheduledTaskService
+
     @Test
     fun `skal håndtere feil`() {
-        val task = Task(TaskStep2.TASK_2, "{'a'='b'}")
-        val savedTask = repository.save(task)
+        val savedTask = repository.save(Task(TaskStep2.TASK_2, "{'a'='b'}"))
         TestTransaction.flagForCommit()
         TestTransaction.end()
 
@@ -83,5 +87,18 @@ class TaskStepExecutorServiceTest {
 
     }
 
+    @Test
+    fun `settTilManuellOppfølgning=true - skal sette en task til manuell oppfølgning når den feilet 3 ganger`() {
+        val task = repository.save(Task(TaskStepFeilManuellBehandling.TASK_FEIL_1, "{'a'='b'}"))
+        TestTransaction.flagForCommit()
+        TestTransaction.end()
 
+        repeat(2) {
+            taskStepExecutorService.pollAndExecute()
+            assertThat(repository.findByIdOrNull(task.id)!!.status).isEqualTo(Status.KLAR_TIL_PLUKK)
+        }
+
+        taskStepExecutorService.pollAndExecute()
+        assertThat(repository.findByIdOrNull(task.id)!!.status).isEqualTo(Status.MANUELL_OPPFØLGING)
+    }
 }

@@ -41,13 +41,14 @@ class TaskWorker(private val taskRepository: TaskService, private val taskStepSe
     fun doFeilhåndtering(taskId: Long, e: Exception) {
         var task = taskRepository.findById(taskId)
         val maxAntallFeil = taskStepService.finnMaxAntallFeil(task.type)
+        val settTilManuellOppfølgning = taskStepService.finnSettTilManuellOppfølgning(task.type)
         secureLog.trace("Behandler task='{}'", task)
 
-        task = task.feilet(TaskFeil(task, e), maxAntallFeil)
+        task = task.feilet(TaskFeil(task, e), maxAntallFeil, settTilManuellOppfølgning)
         // lager metrikker på tasks som har feilet max antall ganger.
-        if (task.status == Status.FEILET) {
+        if (task.status == Status.FEILET || task.status == Status.MANUELL_OPPFØLGING) {
             taskStepService.finnFeilteller(task.type).increment()
-            log.error("Task ${task.id} av type ${task.type} har feilet. " +
+            log.error("Task ${task.id} av type ${task.type} har feilet/satt til manuell oppfølgning. " +
                       "Sjekk familie-prosessering for detaljer")
         }
         task = task.medTriggerTid(task.triggerTid.plusSeconds(taskStepService.finnTriggerTidVedFeil(task.type)))
