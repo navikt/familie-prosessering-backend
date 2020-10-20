@@ -89,23 +89,12 @@ class TaskWorker(private val taskRepository: TaskService, taskStepTyper: List<As
         secureLog.info("Feilhåndtering lagret ok {}", task)
     }
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
-    fun markerPlukket(id: Long): ITask? {
-        var task = taskRepository.findById(id)
-
-        if (task.status.kanPlukkes()) {
-            task = task.plukker()
-            return taskRepository.save(task)
-        }
-        return null
+    private fun finnTriggerTidVedFeil(taskType: String): Long {
+        return triggerTidVedFeilMap[taskType] ?: 0
     }
 
     private fun finnFeilteller(taskType: String): Counter {
         return feiltellereForTaskSteps[taskType] ?: error("Ukjent tasktype $taskType")
-    }
-
-    private fun finnTriggerTidVedFeil(taskType: String): Long {
-        return triggerTidVedFeilMap[taskType] ?: 0
     }
 
     private fun finnMaxAntallFeil(taskType: String): Int {
@@ -118,6 +107,17 @@ class TaskWorker(private val taskRepository: TaskService, taskStepTyper: List<As
 
     private fun finnSettTilManuellOppfølgning(taskType: String): Boolean {
         return settTilManuellOppfølgningVedFeil[taskType] ?: error("Ukjent tasktype $taskType")
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    fun markerPlukket(id: Long): ITask? {
+        var task = taskRepository.findById(id)
+
+        if (task.status.kanPlukkes()) {
+            task = task.plukker()
+            return taskRepository.save(task)
+        }
+        return null
     }
 
     companion object {
