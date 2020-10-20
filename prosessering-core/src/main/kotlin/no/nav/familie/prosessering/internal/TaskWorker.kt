@@ -2,7 +2,7 @@ package no.nav.familie.prosessering.internal
 
 import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.Metrics
-import no.nav.familie.prosessering.AsyncTaskStep
+import no.nav.familie.prosessering.AsyncITaskStep
 import no.nav.familie.prosessering.TaskFeil
 import no.nav.familie.prosessering.TaskStepBeskrivelse
 import no.nav.familie.prosessering.domene.ITask
@@ -15,21 +15,22 @@ import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
 
 @Service
-class TaskWorker(private val taskRepository: TaskService, taskStepTyper: List<AsyncTaskStep>) {
+class TaskWorker(private val taskRepository: TaskService, taskStepTyper: List<AsyncITaskStep<out ITask>>) {
 
-    private val taskStepMap: Map<String, AsyncTaskStep>
+    private val taskStepMap: Map<String, AsyncITaskStep<ITask>>
 
     private val maxAntallFeilMap: Map<String, Int>
     private val triggerTidVedFeilMap: Map<String, Long>
     private val feiltellereForTaskSteps: Map<String, Counter>
 
     init {
-        val tasksTilTaskStepBeskrivelse: Map<AsyncTaskStep, TaskStepBeskrivelse> = taskStepTyper.associateWith { task ->
-            val aClass = AopProxyUtils.ultimateTargetClass(task)
-            val annotation = AnnotationUtils.findAnnotation(aClass, TaskStepBeskrivelse::class.java)
-            requireNotNull(annotation) { "annotasjon mangler" }
-            annotation
-        }
+        val tasksTilTaskStepBeskrivelse: Map<AsyncITaskStep<ITask>, TaskStepBeskrivelse> =
+                taskStepTyper.map { it as AsyncITaskStep<ITask> }.associateWith { task ->
+                    val aClass = AopProxyUtils.ultimateTargetClass(task)
+                    val annotation = AnnotationUtils.findAnnotation(aClass, TaskStepBeskrivelse::class.java)
+                    requireNotNull(annotation) { "annotasjon mangler" }
+                    annotation
+                }
         taskStepMap = tasksTilTaskStepBeskrivelse.entries.associate { it.value.taskStepType to it.key }
         maxAntallFeilMap = tasksTilTaskStepBeskrivelse.values.associate { it.taskStepType to it.maxAntallFeil }
         triggerTidVedFeilMap = tasksTilTaskStepBeskrivelse.values.associate { it.taskStepType to it.triggerTidVedFeilISekunder }
@@ -100,7 +101,7 @@ class TaskWorker(private val taskRepository: TaskService, taskStepTyper: List<As
         return maxAntallFeilMap[taskType] ?: error("Ukjent tasktype $taskType")
     }
 
-    private fun finnTaskStep(taskType: String): AsyncTaskStep {
+    private fun finnTaskStep(taskType: String): AsyncITaskStep<ITask> {
         return taskStepMap[taskType] ?: error("Ukjent tasktype $taskType")
     }
 

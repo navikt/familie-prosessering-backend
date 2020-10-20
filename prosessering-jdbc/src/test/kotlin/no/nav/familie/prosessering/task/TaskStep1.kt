@@ -2,7 +2,6 @@ package no.nav.familie.prosessering.task
 
 import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskStepBeskrivelse
-import no.nav.familie.prosessering.domene.ITask
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.domene.TaskRepository
 import org.springframework.beans.factory.annotation.Autowired
@@ -14,7 +13,7 @@ import java.util.concurrent.TimeUnit
 class TaskStep1 @Autowired constructor(private val taskRepository: TaskRepository) : AsyncTaskStep {
 
 
-    override fun doTask(task: ITask) {
+    override fun doTask(task: Task) {
         try {
             TimeUnit.MICROSECONDS.sleep(1)
         } catch (e: InterruptedException) {
@@ -22,13 +21,14 @@ class TaskStep1 @Autowired constructor(private val taskRepository: TaskRepositor
         }
     }
 
-    override fun onCompletion(task: ITask) {
+    override fun onCompletion(task: Task) {
         val nesteTask =
                 Task(TaskStep2.TASK_2, task.payload)
         taskRepository.save(nesteTask)
     }
 
     companion object {
+
         const val TASK_1 = "task1"
     }
 
