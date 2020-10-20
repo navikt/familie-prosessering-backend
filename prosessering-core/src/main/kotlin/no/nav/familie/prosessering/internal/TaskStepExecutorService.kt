@@ -61,7 +61,6 @@ class TaskStepExecutorService(@Value("\${prosessering.maxAntall:10}") private va
                            task,
                            System.currentTimeMillis() - startTidspunkt)
         } catch (e: Exception) {
-            e.printStackTrace()
             taskWorker.doFeilhåndtering(task.id, e)
             secureLog.warn("Fullført kjøring av task '{}', kjøretid={} ms, feilmelding='{}'",
                            task,
