@@ -5,7 +5,9 @@ import no.nav.familie.log.mdc.MDCConstants
 import no.nav.familie.prosessering.TaskFeil
 import org.slf4j.MDC
 import org.springframework.data.annotation.Id
+import org.springframework.data.annotation.Transient
 import org.springframework.data.annotation.Version
+import org.springframework.data.relational.core.mapping.Column
 import org.springframework.data.relational.core.mapping.MappedCollection
 import org.springframework.data.relational.core.mapping.Table
 import java.io.IOException
@@ -22,25 +24,25 @@ data class Task(
         override val opprettetTid: LocalDateTime = LocalDateTime.now(),
         override val triggerTid: LocalDateTime = LocalDateTime.now(),
         override val type: String,
-        override val metadata: String = "",
+        @Column("METADATA")
+        val metadataWrapper: PropertiesWrapper = PropertiesWrapper(),
         @Version
         override val versjon: Long = 0,
         @MappedCollection(idColumn = "TASK_ID", keyColumn = "ID")
         override val logg: List<TaskLogg> = arrayListOf(TaskLogg(type = Loggtype.UBEHANDLET))
 ) : ITask() {
 
+    @Transient
+    override val metadata: Properties = metadataWrapper.properties
 
-    constructor(type: String, payload: String) :
-            this(type, payload, Properties())
-
-    private constructor (type: String, payload: String, properties: Properties) :
+    constructor (type: String, payload: String, properties: Properties = Properties()) :
             this(type = type,
                  payload = payload,
-                 metadata = properties.apply {
+                 metadataWrapper = PropertiesWrapper(properties.apply {
                      this[MDCConstants.MDC_CALL_ID] =
                              MDC.get(MDCConstants.MDC_CALL_ID)
                              ?: IdUtils.generateId()
-                 }.asString())
+                 }))
 
     override fun avvikshåndter(avvikstype: Avvikstype,
                                årsak: String,

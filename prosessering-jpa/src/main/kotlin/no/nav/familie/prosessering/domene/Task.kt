@@ -24,7 +24,8 @@ data class Task(
         override val opprettetTid: LocalDateTime = LocalDateTime.now(),
         override val triggerTid: LocalDateTime = LocalDateTime.now(),
         override val type: String,
-        override val metadata: String = "",
+        @Convert(converter = PropertiesToStringConverter::class)
+        override val metadata: Properties = Properties(),
         @Version
         override val versjon: Long = 0,
         // Setter fetch til eager fordi AsyncTask ikke får lastet disse hvis ikke den er prelastet.
@@ -36,17 +37,14 @@ data class Task(
 
 ) : ITask() {
 
-    constructor(type: String, payload: String) :
-            this(type, payload, Properties())
-
-    private constructor (type: String, payload: String, properties: Properties) :
+    constructor (type: String, payload: String, properties: Properties = Properties()) :
             this(type = type,
                  payload = payload,
                  metadata = properties.apply {
                      this[MDCConstants.MDC_CALL_ID] =
                              MDC.get(MDCConstants.MDC_CALL_ID)
                              ?: IdUtils.generateId()
-                 }.asString())
+                 })
 
     override fun avvikshåndter(avvikstype: Avvikstype,
                                årsak: String,
@@ -55,8 +53,8 @@ data class Task(
         return copy(status = Status.AVVIKSHÅNDTERT,
                     avvikstype = avvikstype,
                     logg = (logg + TaskLogg(type = Loggtype.AVVIKSHÅNDTERT,
-                                           melding = årsak,
-                                           endretAv = endretAv)).toMutableList())
+                                            melding = årsak,
+                                            endretAv = endretAv)).toMutableList())
     }
 
     override fun behandler(): Task {
@@ -79,7 +77,7 @@ data class Task(
     override fun feilet(feil: TaskFeil, maxAntallFeil: Int, settTilManuellOppfølgning: Boolean): Task {
         if (this.status == Status.MANUELL_OPPFØLGING) {
             return this.copy(logg = (logg + TaskLogg(type = Loggtype.MANUELL_OPPFØLGING,
-                                                    melding = feil.writeValueAsString())).toMutableList())
+                                                     melding = feil.writeValueAsString())).toMutableList())
         }
 
         val nyStatus = nyFeiletStatus(maxAntallFeil, settTilManuellOppfølgning)

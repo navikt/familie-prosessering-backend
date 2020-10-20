@@ -3,6 +3,7 @@ package no.nav.familie.prosessering.domene
 import no.nav.familie.log.mdc.MDCConstants
 import no.nav.familie.prosessering.TaskFeil
 import java.time.LocalDateTime
+import java.util.*
 
 
 abstract class ITask {
@@ -21,14 +22,14 @@ abstract class ITask {
 
     abstract val type: String
 
-    abstract val metadata: String
+    abstract val metadata: Properties
 
     abstract val versjon: Long
 
     abstract val logg: List<ITaskLogg>
 
     val callId: String
-        get() = this.metadataProperties().getProperty(MDCConstants.MDC_CALL_ID)
+        get() = metadata.getProperty(MDCConstants.MDC_CALL_ID)
 
     abstract fun avvikshåndter(avvikstype: Avvikstype,
                                årsak: String,
@@ -50,5 +51,4 @@ abstract class ITask {
         }
     }
 
-    fun metadataProperties() = metadata.asProperties()
 }
