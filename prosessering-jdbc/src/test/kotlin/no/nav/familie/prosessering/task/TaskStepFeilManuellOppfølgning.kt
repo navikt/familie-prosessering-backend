@@ -2,7 +2,7 @@ package no.nav.familie.prosessering.task
 
 import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskStepBeskrivelse
-import no.nav.familie.prosessering.domene.ITask
+import no.nav.familie.prosessering.domene.Task
 import org.springframework.stereotype.Service
 
 @Service
@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service
 class TaskStepFeilManuellOppfølgning : AsyncTaskStep {
 
 
-    override fun doTask(task: ITask) {
+    override fun doTask(task: Task) {
         error("Feiler")
     }
 
