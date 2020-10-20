@@ -74,16 +74,13 @@ data class Task(
         return copy(status = Status.FERDIG, logg = (logg + TaskLogg(type = Loggtype.FERDIG)).toMutableList())
     }
 
-    override fun feilet(feil: TaskFeil, maxAntallFeil: Int): Task {
+    override fun feilet(feil: TaskFeil, maxAntallFeil: Int, settTilManuellOppfølgning: Boolean): Task {
         if (this.status == Status.MANUELL_OPPFØLGING) {
             return this.copy(logg = (logg + TaskLogg(type = Loggtype.MANUELL_OPPFØLGING,
                                                      melding = feil.writeValueAsString())).toMutableList())
         }
 
-        val antallFeilendeForsøk = logg
-                                           .filter { it.type == Loggtype.FEILET }
-                                           .size + 1
-        val nyStatus = if (maxAntallFeil > antallFeilendeForsøk) Status.KLAR_TIL_PLUKK else Status.FEILET
+        val nyStatus = nyFeiletStatus(maxAntallFeil, settTilManuellOppfølgning)
 
         return try {
             this.copy(status = nyStatus,

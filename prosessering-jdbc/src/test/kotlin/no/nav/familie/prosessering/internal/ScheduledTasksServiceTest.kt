@@ -57,7 +57,7 @@ class ScheduledTasksServiceTest {
     @DirtiesContext
     fun `skal sette feilede tasks klar til plukk`() {
         var task = Task("type", "payload")
-        task = task.feilet(TaskFeil(task, null), 0)
+        task = task.feilet(TaskFeil(task, null), 0, false)
         val saved = taskRepository.save(task)
 
 

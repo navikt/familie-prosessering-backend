@@ -39,7 +39,16 @@ abstract class ITask {
     abstract fun klarTilPlukk(endretAv: String): ITask
     abstract fun plukker(): ITask
     abstract fun ferdigstill(): ITask
-    abstract fun feilet(feil: TaskFeil, maxAntallFeil: Int): ITask
+    abstract fun feilet(feil: TaskFeil, maxAntallFeil: Int, settTilManuellOppfølgning: Boolean): ITask
     abstract fun medTriggerTid(plusSeconds: LocalDateTime): ITask
+
+    protected fun nyFeiletStatus(maxAntallFeil: Int, settTilManuellOppfølgning: Boolean): Status {
+        val antallFeilendeForsøk = logg.count { it.type == Loggtype.FEILET } + 1
+        return when {
+            maxAntallFeil > antallFeilendeForsøk -> Status.KLAR_TIL_PLUKK
+            settTilManuellOppfølgning -> Status.MANUELL_OPPFØLGING
+            else -> Status.FEILET
+        }
+    }
 
 }

@@ -22,6 +22,7 @@ class TaskWorker(private val taskRepository: TaskService, taskStepTyper: List<As
     private val maxAntallFeilMap: Map<String, Int>
     private val triggerTidVedFeilMap: Map<String, Long>
     private val feiltellereForTaskSteps: Map<String, Counter>
+    private val settTilManuellOppfølgningVedFeil: Map<String, Boolean>
 
     init {
         val tasksTilTaskStepBeskrivelse: Map<AsyncITaskStep<ITask>, TaskStepBeskrivelse> =
@@ -34,6 +35,7 @@ class TaskWorker(private val taskRepository: TaskService, taskStepTyper: List<As
         taskStepMap = tasksTilTaskStepBeskrivelse.entries.associate { it.value.taskStepType to it.key }
         maxAntallFeilMap = tasksTilTaskStepBeskrivelse.values.associate { it.taskStepType to it.maxAntallFeil }
         triggerTidVedFeilMap = tasksTilTaskStepBeskrivelse.values.associate { it.taskStepType to it.triggerTidVedFeilISekunder }
+        settTilManuellOppfølgningVedFeil = tasksTilTaskStepBeskrivelse.values.associate { it.taskStepType to it.settTilManuellOppfølgning }
         feiltellereForTaskSteps = tasksTilTaskStepBeskrivelse.values.associate {
             it.taskStepType to Metrics.counter("mottak.feilede.tasks",
                                                "status",
@@ -73,21 +75,20 @@ class TaskWorker(private val taskRepository: TaskService, taskStepTyper: List<As
     fun doFeilhåndtering(taskId: Long, e: Exception) {
         var task = taskRepository.findById(taskId)
         val maxAntallFeil = finnMaxAntallFeil(task.type)
+        val settTilManuellOppfølgning = finnSettTilManuellOppfølgning(task.type)
         secureLog.trace("Behandler task='{}'", task)
 
-        task = task.feilet(TaskFeil(task, e), maxAntallFeil)
+        task = task.feilet(TaskFeil(task, e), maxAntallFeil, settTilManuellOppfølgning)
         // lager metrikker på tasks som har feilet max antall ganger.
-        if (task.status == Status.FEILET) {
+        if (task.status == Status.FEILET || task.status == Status.MANUELL_OPPFØLGING) {
             finnFeilteller(task.type).increment()
-            log.error("Task ${task.id} av type ${task.type} har feilet. " +
+            log.error("Task ${task.id} av type ${task.type} har feilet/satt til manuell oppfølgning. " +
                       "Sjekk familie-prosessering for detaljer")
         }
         task = task.medTriggerTid(task.triggerTid.plusSeconds(finnTriggerTidVedFeil(task.type)))
         taskRepository.save(task)
         secureLog.info("Feilhåndtering lagret ok {}", task)
-
     }
-
 
     private fun finnTriggerTidVedFeil(taskType: String): Long {
         return triggerTidVedFeilMap[taskType] ?: 0
@@ -103,6 +104,10 @@ class TaskWorker(private val taskRepository: TaskService, taskStepTyper: List<As
 
     private fun finnTaskStep(taskType: String): AsyncITaskStep<ITask> {
         return taskStepMap[taskType] ?: error("Ukjent tasktype $taskType")
+    }
+
+    private fun finnSettTilManuellOppfølgning(taskType: String): Boolean {
+        return settTilManuellOppfølgningVedFeil[taskType] ?: error("Ukjent tasktype $taskType")
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
