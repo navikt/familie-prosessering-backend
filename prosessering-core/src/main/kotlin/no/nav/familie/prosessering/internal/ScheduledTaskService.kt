@@ -13,16 +13,16 @@ private const val CRON_DAILY_8AM = "0 0 8 1/1 * ?"
 private const val CRON_DAILY_9AM = "0 0 9 1/1 * ?"
 
 @Service
-class ScheduledTaskService(private val taskRepository: TaskService) {
+class ScheduledTaskService(private val taskService: TaskService) {
 
     @Scheduled(cron = CRON_DAILY_8AM)
     @Transactional
     fun retryFeilendeTask() {
-        val tasks = taskRepository.finnAlleFeiledeTasks()
+        val tasks = taskService.finnAlleFeiledeTasks()
 
         tasks.forEach {
             try {
-                taskRepository.save(it.klarTilPlukk(BRUKERNAVN_NÅR_SIKKERHETSKONTEKST_IKKE_FINNES))
+                taskService.save(it.klarTilPlukk(BRUKERNAVN_NÅR_SIKKERHETSKONTEKST_IKKE_FINNES))
             } catch (e: OptimisticLockingFailureException) {
                 logger.info("OptimisticLockingFailureException for task ${it.id}")
             }
@@ -32,10 +32,10 @@ class ScheduledTaskService(private val taskRepository: TaskService) {
     @Scheduled(cron = CRON_DAILY_9AM)
     @Transactional
     fun slettTasksKlarForSletting() {
-        val klarForSletting = taskRepository.finnTasksKlarForSletting(LocalDateTime.now().minusWeeks(2))
+        val klarForSletting = taskService.finnTasksKlarForSletting(LocalDateTime.now().minusWeeks(2))
         klarForSletting.forEach {
             logger.info("Task klar for sletting. {} {} {} {}", it.id, it.callId, it.triggerTid, it.status)
-            taskRepository.delete(it)
+            taskService.delete(it)
         }
     }
 

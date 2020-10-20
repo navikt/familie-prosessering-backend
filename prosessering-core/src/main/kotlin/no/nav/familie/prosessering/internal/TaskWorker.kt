@@ -15,7 +15,7 @@ import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
 
 @Service
-class TaskWorker(private val taskRepository: TaskService, taskStepTyper: List<AsyncITaskStep<out ITask>>) {
+class TaskWorker(private val taskService: TaskService, taskStepTyper: List<AsyncITaskStep<out ITask>>) {
 
     private val taskStepMap: Map<String, AsyncITaskStep<ITask>>
 
@@ -48,14 +48,14 @@ class TaskWorker(private val taskRepository: TaskService, taskStepTyper: List<As
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     fun doActualWork(taskId: Long) {
 
-        var task = taskRepository.findById(taskId)
+        var task = taskService.findById(taskId)
 
         if (task.status != Status.PLUKKET) {
             return // en annen pod har startet behandling
         }
 
         task = task.behandler()
-        task = taskRepository.save(task)
+        task = taskService.save(task)
         // finn tasktype
         val taskStep = finnTaskStep(task.type)
 
@@ -66,14 +66,14 @@ class TaskWorker(private val taskRepository: TaskService, taskStepTyper: List<As
         taskStep.onCompletion(task)
 
         task = task.ferdigstill()
-        taskRepository.save(task)
+        taskService.save(task)
         secureLog.trace("Ferdigstiller task='{}'", task)
 
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     fun doFeilhåndtering(taskId: Long, e: Exception) {
-        var task = taskRepository.findById(taskId)
+        var task = taskService.findById(taskId)
         val maxAntallFeil = finnMaxAntallFeil(task.type)
         val settTilManuellOppfølgning = finnSettTilManuellOppfølgning(task.type)
         secureLog.trace("Behandler task='{}'", task)
@@ -86,7 +86,7 @@ class TaskWorker(private val taskRepository: TaskService, taskStepTyper: List<As
                       "Sjekk familie-prosessering for detaljer")
         }
         task = task.medTriggerTid(task.triggerTid.plusSeconds(finnTriggerTidVedFeil(task.type)))
-        taskRepository.save(task)
+        taskService.save(task)
         secureLog.info("Feilhåndtering lagret ok {}", task)
     }
 
@@ -112,11 +112,11 @@ class TaskWorker(private val taskRepository: TaskService, taskStepTyper: List<As
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     fun markerPlukket(id: Long): ITask? {
-        var task = taskRepository.findById(id)
+        var task = taskService.findById(id)
 
         if (task.status.kanPlukkes()) {
             task = task.plukker()
-            return taskRepository.save(task)
+            return taskService.save(task)
         }
         return null
     }
