@@ -32,7 +32,7 @@ data class Task(
         @OneToMany(fetch = FetchType.EAGER,
                    cascade = [CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH],
                    orphanRemoval = true)
-        @JoinColumn(name = "task_id")
+        @JoinColumn(name = "task_id", nullable = false)
         override val logg: MutableList<TaskLogg> = mutableListOf(TaskLogg(type = Loggtype.UBEHANDLET))
 
 ) : ITask() {
