@@ -13,13 +13,13 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
-class RestTaskService(private val taskRepository: TaskService) {
+class RestTaskService(private val taskService: TaskService) {
 
     fun hentTasks(statuses: List<Status>, saksbehandlerId: String, page: Int): Ressurs<List<ITask>> {
         logger.info("$saksbehandlerId henter tasker med status $statuses")
 
         return Result.runCatching {
-            taskRepository.finnTasksMedStatus(statuses, PageRequest.of(page, TASK_LIMIT))
+            taskService.finnTasksMedStatus(statuses, PageRequest.of(page, TASK_LIMIT))
         }
                 .fold(
                         onSuccess = { Ressurs.success(data = it) },
@@ -34,7 +34,7 @@ class RestTaskService(private val taskRepository: TaskService) {
         logger.info("$saksbehandlerId henter tasker med status $statuses")
 
         return Result.runCatching {
-            PaginableResponse(taskRepository.finnTasksTilFrontend(statuses, PageRequest.of(page, TASK_LIMIT)).map {
+            PaginableResponse(taskService.finnTasksTilFrontend(statuses, PageRequest.of(page, TASK_LIMIT)).map {
                 TaskDto(it.id,
                         it.status,
                         it.avvikstype,
@@ -61,7 +61,7 @@ class RestTaskService(private val taskRepository: TaskService) {
         logger.info("$saksbehandlerId henter tasklogg til task=$id")
 
         return Result.runCatching {
-            val task = taskRepository.findById(id)
+            val task = taskService.findById(id)
             task.logg.map { TaskloggDto(it.id, it.endretAv, it.type, it.node, it.melding, it.opprettetTid) }
         }
                 .fold(
@@ -75,9 +75,9 @@ class RestTaskService(private val taskRepository: TaskService) {
 
     @Transactional
     fun rekjørTask(taskId: Long, saksbehandlerId: String): Ressurs<String> {
-        val task: ITask = taskRepository.findById(taskId)
+        val task: ITask = taskService.findById(taskId)
 
-        taskRepository.save(task.klarTilPlukk(saksbehandlerId))
+        taskService.save(task.klarTilPlukk(saksbehandlerId))
         logger.info("$saksbehandlerId rekjører task $taskId")
 
         return Ressurs.success(data = "")
@@ -89,8 +89,8 @@ class RestTaskService(private val taskRepository: TaskService) {
         logger.info("$saksbehandlerId rekjører alle tasks med status $status")
 
         return Result.runCatching {
-            taskRepository.finnTasksMedStatus(listOf(status), Pageable.unpaged())
-                    .map { taskRepository.save(it.klarTilPlukk(saksbehandlerId)) }
+            taskService.finnTasksMedStatus(listOf(status), Pageable.unpaged())
+                    .map { taskService.save(it.klarTilPlukk(saksbehandlerId)) }
         }
                 .fold(
                         onSuccess = { Ressurs.success(data = "") },
@@ -103,11 +103,11 @@ class RestTaskService(private val taskRepository: TaskService) {
 
     @Transactional
     fun avvikshåndterTask(taskId: Long, avvikstype: Avvikstype, årsak: String, saksbehandlerId: String): Ressurs<String> {
-        val task: ITask = taskRepository.findById(taskId)
+        val task: ITask = taskService.findById(taskId)
 
         logger.info("$saksbehandlerId setter task $taskId til avvikshåndtert", taskId)
 
-        return Result.runCatching { taskRepository.save(task.avvikshåndter(avvikstype, årsak, saksbehandlerId)) }
+        return Result.runCatching { taskService.save(task.avvikshåndter(avvikstype, årsak, saksbehandlerId)) }
                 .fold(
                         onSuccess = {
                             Ressurs.success(data = "")

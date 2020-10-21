@@ -22,7 +22,7 @@ class TaskStepExecutorService(@Value("\${prosessering.maxAntall:10}") private va
                               private val fixedDelayString: String,
                               private val taskWorker: TaskWorker,
                               @Qualifier("taskExecutor") private val taskExecutor: TaskExecutor,
-                              private val taskRepository: TaskService) {
+                              private val taskService: TaskService) {
 
     private val secureLog = LoggerFactory.getLogger("secureLogger")
 
@@ -33,8 +33,7 @@ class TaskStepExecutorService(@Value("\${prosessering.maxAntall:10}") private va
         val pollingSize = calculatePollingSize(maxAntall)
 
         if (pollingSize > minCapacity) {
-            val tasks =
-                            taskRepository.finnAlleTasksKlareForProsessering(PageRequest.of(0, pollingSize))
+            val tasks = taskService.finnAlleTasksKlareForProsessering(PageRequest.of(0, pollingSize))
             log.trace("Pollet {} tasks med max {}", tasks.size, maxAntall)
 
             tasks.forEach(this::executeWork)
