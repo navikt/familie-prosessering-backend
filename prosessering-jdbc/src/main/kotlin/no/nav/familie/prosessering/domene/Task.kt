@@ -28,8 +28,8 @@ data class Task(
         val metadataWrapper: PropertiesWrapper = PropertiesWrapper(),
         @Version
         override val versjon: Long = 0,
-        @MappedCollection(idColumn = "TASK_ID", keyColumn = "ID")
-        override val logg: List<TaskLogg> = arrayListOf(TaskLogg(type = Loggtype.UBEHANDLET))
+        @MappedCollection(idColumn = "TASK_ID")
+        override val logg: Set<TaskLogg> = setOf(TaskLogg(type = Loggtype.UBEHANDLET))
 ) : ITask() {
 
     @Transient
