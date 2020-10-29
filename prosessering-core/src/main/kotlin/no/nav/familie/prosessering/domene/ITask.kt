@@ -26,7 +26,7 @@ abstract class ITask {
 
     abstract val versjon: Long
 
-    abstract val logg: List<ITaskLogg>
+    abstract val logg: Collection<ITaskLogg>
 
     val callId: String
         get() = metadata.getProperty(MDCConstants.MDC_CALL_ID)

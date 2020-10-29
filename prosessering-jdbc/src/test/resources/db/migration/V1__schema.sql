@@ -15,7 +15,7 @@ CREATE INDEX IF NOT EXISTS henvendelse_status_idx
     ON task (status);
 
 CREATE TABLE IF NOT EXISTS task_logg (
-    id            BIGINT,
+    id            BIGSERIAL PRIMARY KEY,
     task_id       BIGINT       NOT NULL
         CONSTRAINT henvendelse_logg_henvendelse_id_fkey REFERENCES task,
     type          VARCHAR(15)  NOT NULL,
