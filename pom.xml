@@ -29,7 +29,7 @@
         <flyway.version>6.5.7</flyway.version>
         <spring.version>5.2.9.RELEASE</spring.version>
         <spring.boot.version>2.3.4.RELEASE</spring.boot.version>
-        <spring.data.jdbc.version>2.0.4.RELEASE</spring.data.jdbc.version>
+        <spring.data.jdbc.version>2.1.0</spring.data.jdbc.version>
         <junit.version>4.12</junit.version>
         <mockk.version>1.10.2</mockk.version>
         <micrometer.version>1.5.5</micrometer.version>
