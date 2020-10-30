@@ -25,7 +25,11 @@ data class Task(
         override val triggerTid: LocalDateTime = LocalDateTime.now(),
         override val type: String,
         @Column("metadata")
-        val metadataWrapper: PropertiesWrapper = PropertiesWrapper(),
+        val metadataWrapper: PropertiesWrapper = PropertiesWrapper(Properties().apply {
+            this[MDCConstants.MDC_CALL_ID] =
+                    MDC.get(MDCConstants.MDC_CALL_ID)
+                    ?: IdUtils.generateId()
+        }),
         @Version
         override val versjon: Long = 0,
         @MappedCollection(idColumn = "task_id")
