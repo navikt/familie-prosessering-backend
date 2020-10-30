@@ -7,12 +7,14 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.springframework.aop.framework.AopProxyUtils
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.autoconfigure.flyway.FlywayAutoConfiguration
 import org.springframework.boot.test.autoconfigure.data.jdbc.DataJdbcTest
+import org.springframework.boot.test.autoconfigure.jdbc.TestDatabaseAutoConfiguration
 import org.springframework.core.annotation.AnnotationUtils
 import org.springframework.test.context.junit4.SpringRunner
 
 @RunWith(SpringRunner::class)
-@DataJdbcTest
+@DataJdbcTest(excludeAutoConfiguration = [TestDatabaseAutoConfiguration::class])
 class AsyncTaskStepTest {
 
     @Autowired

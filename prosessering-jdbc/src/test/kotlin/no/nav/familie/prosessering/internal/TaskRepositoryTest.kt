@@ -12,6 +12,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.data.jdbc.DataJdbcTest
+import org.springframework.boot.test.autoconfigure.jdbc.TestDatabaseAutoConfiguration
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.test.context.ContextConfiguration
@@ -20,7 +21,7 @@ import java.util.*
 
 @RunWith(SpringRunner::class)
 @ContextConfiguration(classes = [TestAppConfig::class])
-@DataJdbcTest
+@DataJdbcTest(excludeAutoConfiguration = [TestDatabaseAutoConfiguration::class])
 class TaskRepositoryTest {
 
     @Autowired
