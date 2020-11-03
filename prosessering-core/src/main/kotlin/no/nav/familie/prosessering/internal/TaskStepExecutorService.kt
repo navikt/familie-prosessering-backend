@@ -31,10 +31,14 @@ class TaskStepExecutorService(@Value("\${prosessering.maxAntall:10}") private va
         log.debug("Poller etter nye tasks")
         val pollingSize = calculatePollingSize(maxAntall)
 
-        val tasks = taskService.finnAlleTasksKlareForProsessering(PageRequest.of(0, pollingSize))
-        log.trace("Pollet {} tasks med max {}", tasks.size, maxAntall)
+        if (pollingSize != 0) {
+            val tasks = taskService.finnAlleTasksKlareForProsessering(PageRequest.of(0, pollingSize))
+            log.trace("Pollet {} tasks med max {}", tasks.size, maxAntall)
 
-        tasks.forEach(this::executeWork)
+            tasks.forEach(this::executeWork)
+        } else {
+            log.trace("Ingen tasks til prosessering.")
+        }
         log.trace("Ferdig med polling, venter {} ms til neste kjøring.", fixedDelayString)
     }
 
