@@ -9,26 +9,34 @@ import no.nav.familie.prosessering.domene.TaskRepository
 import no.nav.familie.prosessering.task.TaskStep1
 import no.nav.familie.prosessering.task.TaskStep2
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.data.jdbc.DataJdbcTest
+import org.springframework.boot.test.autoconfigure.jdbc.TestDatabaseAutoConfiguration
 import org.springframework.http.HttpStatus
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.junit4.SpringRunner
 
 @RunWith(SpringRunner::class)
 @ContextConfiguration(classes = [TestAppConfig::class])
-@DataJdbcTest
+@DataJdbcTest(excludeAutoConfiguration = [TestDatabaseAutoConfiguration::class])
 internal class TaskControllerIntegrasjonTest {
 
     @Autowired
     lateinit var restTaskService: RestTaskService
+
     @Autowired
     lateinit var repository: TaskRepository
 
     lateinit var taskController: TaskController
+
+    @After
+    fun clear() {
+        repository.deleteAll()
+    }
 
     @Before
     fun setup() {

@@ -14,7 +14,7 @@ import java.io.IOException
 import java.time.LocalDateTime
 import java.util.*
 
-@Table("TASK")
+@Table("task")
 data class Task(
         @Id
         override val id: Long = 0L,
@@ -24,11 +24,15 @@ data class Task(
         override val opprettetTid: LocalDateTime = LocalDateTime.now(),
         override val triggerTid: LocalDateTime = LocalDateTime.now(),
         override val type: String,
-        @Column("METADATA")
-        val metadataWrapper: PropertiesWrapper = PropertiesWrapper(),
+        @Column("metadata")
+        val metadataWrapper: PropertiesWrapper = PropertiesWrapper(Properties().apply {
+            this[MDCConstants.MDC_CALL_ID] =
+                    MDC.get(MDCConstants.MDC_CALL_ID)
+                    ?: IdUtils.generateId()
+        }),
         @Version
         override val versjon: Long = 0,
-        @MappedCollection(idColumn = "TASK_ID")
+        @MappedCollection(idColumn = "task_id")
         override val logg: Set<TaskLogg> = setOf(TaskLogg(type = Loggtype.UBEHANDLET))
 ) : ITask() {
 

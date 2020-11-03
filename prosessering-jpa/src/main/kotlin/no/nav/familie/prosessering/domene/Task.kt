@@ -25,7 +25,11 @@ data class Task(
         override val triggerTid: LocalDateTime = LocalDateTime.now(),
         override val type: String,
         @Convert(converter = PropertiesToStringConverter::class)
-        override val metadata: Properties = Properties(),
+        override val metadata: Properties = Properties().apply {
+            this[MDCConstants.MDC_CALL_ID] =
+                    MDC.get(MDCConstants.MDC_CALL_ID)
+                    ?: IdUtils.generateId()
+        },
         @Version
         override val versjon: Long = 0,
         // Setter fetch til eager fordi AsyncTask ikke får lastet disse hvis ikke den er prelastet.

@@ -12,10 +12,12 @@ import no.nav.familie.prosessering.domene.TaskRepository
 import no.nav.familie.prosessering.task.TaskStep2
 import no.nav.familie.prosessering.task.TaskStepFeilManuellOppfølgning
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.After
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.data.jdbc.DataJdbcTest
+import org.springframework.boot.test.autoconfigure.jdbc.TestDatabaseAutoConfiguration
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.junit4.SpringRunner
@@ -23,7 +25,7 @@ import org.springframework.test.context.transaction.TestTransaction
 
 @RunWith(SpringRunner::class)
 @ContextConfiguration(classes = [TestAppConfig::class])
-@DataJdbcTest
+@DataJdbcTest(excludeAutoConfiguration = [TestDatabaseAutoConfiguration::class])
 class TaskStepExecutorServiceTest {
 
     @Autowired
@@ -35,8 +37,10 @@ class TaskStepExecutorServiceTest {
     @Autowired
     private lateinit var taskStepExecutorService: TaskStepExecutorService
 
-    @Autowired
-    private lateinit var scheduledTasksService: ScheduledTaskService
+    @After
+    fun clear() {
+        repository.deleteAll()
+    }
 
     @Test
     fun `skal håndtere feil`() {
@@ -79,6 +83,7 @@ class TaskStepExecutorServiceTest {
             launch.join()
             launch2.join()
         }
+
         val findAll = repository.findAll()
         findAll.filter { it.status != Status.FERDIG || it.logg.size > 4 }.forEach {
             assertThat(it.status).isEqualTo(Status.FERDIG)

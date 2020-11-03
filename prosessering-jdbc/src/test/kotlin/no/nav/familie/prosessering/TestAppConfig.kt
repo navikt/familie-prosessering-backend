@@ -13,7 +13,6 @@ import org.springframework.data.jdbc.repository.config.JdbcRepositoryConfigExten
 @ComponentScan("no.nav.familie")
 class TestAppConfig : JdbcRepositoryConfigExtension() {
 
-
     @Bean
     fun tokenValidationContextHolder(): TokenValidationContextHolder {
         return object : TokenValidationContextHolder {
