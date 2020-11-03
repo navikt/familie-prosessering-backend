@@ -17,7 +17,6 @@ import kotlin.math.min
 
 @Service
 class TaskStepExecutorService(@Value("\${prosessering.maxAntall:10}") private val maxAntall: Int,
-                              @Value("\${prosessering.minCapacity:2}") private val minCapacity: Int,
                               @Value("\${prosessering.fixedDelayString.in.milliseconds:30000}")
                               private val fixedDelayString: String,
                               private val taskWorker: TaskWorker,
@@ -32,14 +31,10 @@ class TaskStepExecutorService(@Value("\${prosessering.maxAntall:10}") private va
         log.debug("Poller etter nye tasks")
         val pollingSize = calculatePollingSize(maxAntall)
 
-        if (pollingSize > minCapacity) {
-            val tasks = taskService.finnAlleTasksKlareForProsessering(PageRequest.of(0, pollingSize))
-            log.trace("Pollet {} tasks med max {}", tasks.size, maxAntall)
+        val tasks = taskService.finnAlleTasksKlareForProsessering(PageRequest.of(0, pollingSize))
+        log.trace("Pollet {} tasks med max {}", tasks.size, maxAntall)
 
-            tasks.forEach(this::executeWork)
-        } else {
-            log.trace("Pollet ingen tasks siden kapasiteten var {} < {}", pollingSize, minCapacity)
-        }
+        tasks.forEach(this::executeWork)
         log.trace("Ferdig med polling, venter {} ms til neste kjøring.", fixedDelayString)
     }
 
