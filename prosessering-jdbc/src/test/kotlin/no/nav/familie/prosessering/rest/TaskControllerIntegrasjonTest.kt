@@ -9,6 +9,7 @@ import no.nav.familie.prosessering.domene.TaskRepository
 import no.nav.familie.prosessering.task.TaskStep1
 import no.nav.familie.prosessering.task.TaskStep2
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -26,10 +27,16 @@ internal class TaskControllerIntegrasjonTest {
 
     @Autowired
     lateinit var restTaskService: RestTaskService
+
     @Autowired
     lateinit var repository: TaskRepository
 
     lateinit var taskController: TaskController
+
+    @After
+    fun clear() {
+        repository.deleteAll()
+    }
 
     @Before
     fun setup() {

@@ -12,6 +12,7 @@ import no.nav.familie.prosessering.domene.TaskRepository
 import no.nav.familie.prosessering.task.TaskStep2
 import no.nav.familie.prosessering.task.TaskStepFeilManuellOppfølgning
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.After
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -36,8 +37,10 @@ class TaskStepExecutorServiceTest {
     @Autowired
     private lateinit var taskStepExecutorService: TaskStepExecutorService
 
-    @Autowired
-    private lateinit var scheduledTasksService: ScheduledTaskService
+    @After
+    fun clear() {
+        repository.deleteAll()
+    }
 
     @Test
     fun `skal håndtere feil`() {

@@ -1,6 +1,5 @@
 package no.nav.familie.prosessering.internal
 
-import no.nav.familie.log.mdc.MDCConstants
 import no.nav.familie.prosessering.TestAppConfig
 import no.nav.familie.prosessering.domene.Status
 import no.nav.familie.prosessering.domene.Task
@@ -8,6 +7,7 @@ import no.nav.familie.prosessering.domene.TaskRepository
 import no.nav.familie.prosessering.task.TaskStep1
 import no.nav.familie.prosessering.task.TaskStep2
 import org.assertj.core.api.Assertions
+import org.junit.After
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -27,6 +27,10 @@ class TaskRepositoryTest {
     @Autowired
     private lateinit var repository: TaskRepository
 
+    @After
+    fun clear() {
+        repository.deleteAll()
+    }
 
     @Test
     fun `finnTasksMedStatus - skal hente ut alle tasker uavhengig av status`() {

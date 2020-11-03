@@ -6,6 +6,7 @@ import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.domene.TaskRepository
 import no.nav.familie.prosessering.task.TaskStep1
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.After
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -26,6 +27,11 @@ class TaskWorkerTest {
 
     @Autowired
     private lateinit var worker: TaskWorker
+
+    @After
+    fun clear() {
+        repository.deleteAll()
+    }
 
     @Test
     fun `skal behandle task`() {

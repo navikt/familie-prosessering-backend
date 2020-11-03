@@ -6,10 +6,10 @@ import no.nav.familie.prosessering.domene.Status
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.domene.TaskRepository
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.After
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.autoconfigure.flyway.FlywayAutoConfiguration
 import org.springframework.boot.test.autoconfigure.data.jdbc.DataJdbcTest
 import org.springframework.boot.test.autoconfigure.jdbc.TestDatabaseAutoConfiguration
 import org.springframework.data.repository.findByIdOrNull
@@ -29,6 +29,11 @@ class ScheduledTasksServiceTest {
 
     @Autowired
     private lateinit var taskRepository: TaskRepository
+
+    @After
+    fun clear() {
+        taskRepository.deleteAll()
+    }
 
     @Test
     @Sql("classpath:sql-testdata/gamle_tasker_med_logg.sql")
@@ -67,7 +72,6 @@ class ScheduledTasksServiceTest {
 
         assertThat(taskRepository.findByIdOrNull(saved.id)!!.status).isEqualTo(Status.KLAR_TIL_PLUKK)
     }
-
 
 
 }
