@@ -6,8 +6,8 @@ import io.mockk.slot
 import no.nav.familie.prosessering.domene.Status
 import no.nav.familie.prosessering.internal.TaskService
 import org.assertj.core.api.Assertions
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 
 
 internal class TaskControllerTest {
@@ -17,7 +17,7 @@ internal class TaskControllerTest {
     private lateinit var restTaskService: RestTaskService
     private lateinit var taskController: TaskController
 
-    @Before
+    @BeforeEach
     fun setup() {
         restTaskService = RestTaskService(taskService)
         taskController = TaskController(restTaskService, mockk())
