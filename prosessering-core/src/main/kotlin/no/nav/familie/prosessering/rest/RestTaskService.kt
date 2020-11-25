@@ -4,11 +4,13 @@ import no.nav.familie.kontrakter.felles.Ressurs
 import no.nav.familie.prosessering.domene.Avvikstype
 import no.nav.familie.prosessering.domene.ITask
 import no.nav.familie.prosessering.domene.Status
+import no.nav.familie.prosessering.domene.asString
 import no.nav.familie.prosessering.internal.TaskService
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
+import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -34,7 +36,8 @@ class RestTaskService(private val taskService: TaskService) {
         logger.info("$saksbehandlerId henter tasker med status $statuses")
 
         return Result.runCatching {
-            PaginableResponse(taskService.finnTasksTilFrontend(statuses, PageRequest.of(page, TASK_LIMIT)).map {
+            val pageRequest = PageRequest.of(page, TASK_LIMIT, Sort.Direction.DESC, "opprettetTid")
+            PaginableResponse(taskService.finnTasksTilFrontend(statuses, pageRequest).map {
                 TaskDto(it.id,
                         it.status,
                         it.avvikstype,
