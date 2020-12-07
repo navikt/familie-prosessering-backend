@@ -6,7 +6,8 @@ import org.springframework.data.repository.PagingAndSortingRepository
 import java.time.LocalDateTime
 
 @NoRepositoryBean
-interface ITaskRepostitory<T: ITask> : PagingAndSortingRepository<T, Long> {
+interface ITaskRepostitory<T : ITask> : PagingAndSortingRepository<T, Long> {
+
     fun findByStatusInAndTriggerTidBeforeOrderByOpprettetTidDesc(status: List<Status>,
                                                                  triggerTid: LocalDateTime,
                                                                  page: Pageable): List<T>
