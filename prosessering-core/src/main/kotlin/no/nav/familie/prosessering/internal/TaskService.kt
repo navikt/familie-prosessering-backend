@@ -30,6 +30,10 @@ class TaskService(val taskRepository: TaskRepository)  {
         return taskRepository.findByStatus(Status.FEILET)
     }
 
+    fun finnAllePlukkedeTasks(): List<ITask> {
+        return taskRepository.findByStatus(Status.PLUKKET)
+    }
+
     fun finnTasksMedStatus(status: List<Status>, page: Pageable): List<ITask> {
         return taskRepository.findByStatusIn(status, page)
     }

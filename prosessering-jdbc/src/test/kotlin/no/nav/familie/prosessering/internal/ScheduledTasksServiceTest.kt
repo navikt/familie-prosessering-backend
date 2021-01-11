@@ -17,6 +17,7 @@ import org.springframework.test.annotation.DirtiesContext
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.jdbc.Sql
 import org.springframework.test.context.junit.jupiter.SpringExtension
+import java.time.LocalDateTime
 
 @ExtendWith(SpringExtension::class)
 @ContextConfiguration(classes = [TestAppConfig::class])
@@ -67,11 +68,32 @@ class ScheduledTasksServiceTest {
         task = task.feilet(TaskFeil(task, null), 0, false)
         val saved = taskRepository.save(task)
 
-
         scheduledTasksService.retryFeilendeTask()
 
         assertThat(taskRepository.findByIdOrNull(saved.id)!!.status).isEqualTo(Status.KLAR_TIL_PLUKK)
     }
 
+    @Test
+    @DirtiesContext
+    fun `skal sette tasker som har vært plukket i mer enn en time klar til plukk`() {
+        var task = Task("type", "payload").plukker()
+        task = task.copy(logg = setOf(task.logg.last().copy(opprettetTid = LocalDateTime.now().minusMinutes(61))))
+        val saved = taskRepository.save(task)
 
+        scheduledTasksService.settPermanentPlukketTilKlarTilPlukk()
+
+        assertThat(taskRepository.findByIdOrNull(saved.id)!!.status).isEqualTo(Status.KLAR_TIL_PLUKK)
+    }
+
+    @Test
+    @DirtiesContext
+    fun `skal ikke gjøre noe med tasker som har vært plukket i mindre enn en time`() {
+        var task = Task("type", "payload").plukker()
+        task = task.copy(logg = setOf(task.logg.last().copy(opprettetTid = LocalDateTime.now().minusMinutes(59))))
+        val saved = taskRepository.save(task)
+
+        scheduledTasksService.settPermanentPlukketTilKlarTilPlukk()
+
+        assertThat(taskRepository.findByIdOrNull(saved.id)!!.status).isEqualTo(Status.PLUKKET)
+    }
 }
