@@ -22,6 +22,7 @@ class ScheduledTaskService(private val taskService: TaskService) {
     @Transactional
     fun retryFeilendeTask() {
         val tasks = taskService.finnAlleFeiledeTasks()
+        logger.info("Rekjører ${tasks.size} tasks")
 
         tasks.forEach {
             try {
@@ -36,8 +37,11 @@ class ScheduledTaskService(private val taskService: TaskService) {
     @Transactional
     fun settPermanentPlukketTilKlarTilPlukk() {
         val tasks = taskService.finnAllePlukkedeTasks()
+        val filtrertTasks = tasks.filter { værtPlukketMinstEnTime(it) }
 
-        tasks.filter { værtPlukketMinstEnTime(it) }
+        logger.info("Fant ${tasks.size} tasks som er plukket. ${filtrertTasks.size} tasks er plukket minst en time siden")
+
+        filtrertTasks
                 .forEach {
                     try {
                         taskService.save(it.klarTilPlukk(BRUKERNAVN_NÅR_SIKKERHETSKONTEKST_IKKE_FINNES))
@@ -58,6 +62,7 @@ class ScheduledTaskService(private val taskService: TaskService) {
     @Transactional
     fun slettTasksKlarForSletting() {
         val klarForSletting = taskService.finnTasksKlarForSletting(LocalDateTime.now().minusWeeks(2))
+        logger.info("Sletter ${klarForSletting.size} tasks")
         klarForSletting.forEach {
             logger.info("Task klar for sletting. {} {} {} {}", it.id, it.callId, it.triggerTid, it.status)
             taskService.delete(it)
