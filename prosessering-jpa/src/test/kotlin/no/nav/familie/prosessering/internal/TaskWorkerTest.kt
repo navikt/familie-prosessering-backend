@@ -6,6 +6,7 @@ import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.domene.TaskRepository
 import no.nav.familie.prosessering.task.TaskStep1
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -26,6 +27,11 @@ class TaskWorkerTest {
 
     @Autowired
     private lateinit var worker: TaskWorker
+
+    @AfterEach
+    fun resetDatabaseInnhold() {
+        repository.deleteAll()
+    }
 
     @Test
     fun `skal behandle task`() {

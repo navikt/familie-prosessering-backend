@@ -7,6 +7,7 @@ import no.nav.familie.prosessering.domene.TaskRepository
 import no.nav.familie.prosessering.task.TaskStep1
 import no.nav.familie.prosessering.task.TaskStep2
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -27,6 +28,12 @@ class TaskRepositoryTest {
 
     @Autowired
     private lateinit var repository: TaskRepository
+
+
+    @AfterEach
+    fun resetDatabaseInnhold() {
+        repository.deleteAll()
+    }
 
 
     @Test
