@@ -11,14 +11,14 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
 
-private const val CRON_DAILY_0800 = "0 0 8 1/1 * ?"
+private const val CRON_DAILY_0700 = "0 0 7 1/1 * ?"
 private const val CRON_DAILY_0900 = "0 0 9 1/1 * ?"
 private const val CRON_DAILY_1000 = "0 0 10 1/1 * ?"
 
 @Service
 class ScheduledTaskService(private val taskService: TaskService) {
 
-    @Scheduled(cron = CRON_DAILY_0800)
+    @Scheduled(cron = CRON_DAILY_0700)
     @Transactional
     fun retryFeilendeTask() {
         val tasks = taskService.finnAlleFeiledeTasks()
