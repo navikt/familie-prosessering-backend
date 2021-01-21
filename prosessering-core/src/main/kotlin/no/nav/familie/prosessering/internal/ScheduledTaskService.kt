@@ -18,7 +18,7 @@ private const val CRON_DAILY_1000 = "0 0 10 1/1 * ?"
 @Service
 class ScheduledTaskService(private val taskService: TaskService) {
 
-    @Scheduled(cron = CRON_DAILY_0700)
+    @Scheduled(cron = "\${prosessering.cronRetryTasks:${CRON_DAILY_0700}}")
     @Transactional
     fun retryFeilendeTask() {
         val tasks = taskService.finnAlleFeiledeTasks()
