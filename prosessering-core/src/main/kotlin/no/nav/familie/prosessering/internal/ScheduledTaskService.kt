@@ -5,20 +5,21 @@ import no.nav.familie.prosessering.domene.ITaskLogg.Companion.BRUKERNAVN_NÅR_SI
 import no.nav.familie.prosessering.domene.Loggtype
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.dao.OptimisticLockingFailureException
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
 
-private const val CRON_DAILY_0605_AND_0705 = "0 5 6,7 1/1 * ?"
+private const val CRON_DAILY_0700 = "0 0 7 1/1 * ?"
 private const val CRON_DAILY_0900 = "0 0 9 1/1 * ?"
 private const val CRON_DAILY_1000 = "0 0 10 1/1 * ?"
 
 @Service
 class ScheduledTaskService(private val taskService: TaskService) {
 
-    @Scheduled(cron = CRON_DAILY_0605_AND_0705)
+    @Scheduled(cron = "\${prosessering.cronRetryTasks:${CRON_DAILY_0700}}")
     @Transactional
     fun retryFeilendeTask() {
         val tasks = taskService.finnAlleFeiledeTasks()
