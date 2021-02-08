@@ -5,6 +5,7 @@ import no.nav.familie.prosessering.domene.ITaskLogg.Companion.BRUKERNAVN_NÅR_SI
 import no.nav.familie.prosessering.domene.Loggtype
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.dao.OptimisticLockingFailureException
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
@@ -16,7 +17,7 @@ private const val CRON_DAILY_0900 = "0 0 9 1/1 * ?"
 private const val CRON_DAILY_1000 = "0 0 10 1/1 * ?"
 
 @Service
-class ScheduledTaskService(private val taskService: TaskService) {
+class ScheduledTaskService(private val taskService: TaskService, @Value("\${prosessering.delete.after.weeks:2}") private val deleteTasksAfterWeeks: Long) {
 
     @Scheduled(cron = "\${prosessering.cronRetryTasks:${CRON_DAILY_0700}}")
     @Transactional
@@ -61,7 +62,7 @@ class ScheduledTaskService(private val taskService: TaskService) {
     @Scheduled(cron = CRON_DAILY_0900)
     @Transactional
     fun slettTasksKlarForSletting() {
-        val klarForSletting = taskService.finnTasksKlarForSletting(LocalDateTime.now().minusWeeks(2))
+        val klarForSletting = taskService.finnTasksKlarForSletting(LocalDateTime.now().minusWeeks(deleteTasksAfterWeeks))
         logger.info("Sletter ${klarForSletting.size} tasks")
         klarForSletting.forEach {
             logger.info("Task klar for sletting. {} {} {} {}", it.id, it.callId, it.triggerTid, it.status)
