@@ -38,7 +38,6 @@ class ScheduledTasksServiceTest {
 
     @Test
     @Sql("classpath:sql-testdata/gamle_tasker_med_logg.sql")
-    @DirtiesContext
     fun `skal slette gamle tasker med status FERDIG`() {
         scheduledTasksService.slettTasksKlarForSletting()
 
@@ -48,7 +47,6 @@ class ScheduledTasksServiceTest {
     }
 
     @Test
-    @DirtiesContext
     fun `skal ikke slette nye tasker`() {
         val nyTask = Task("type", "payload").ferdigstill()
         val saved = taskRepository.save(nyTask)
@@ -62,7 +60,6 @@ class ScheduledTasksServiceTest {
     }
 
     @Test
-    @DirtiesContext
     fun `skal sette feilede tasks klar til plukk`() {
         var task = Task("type", "payload")
         task = task.feilet(TaskFeil(task, null), 0, false)
@@ -74,7 +71,6 @@ class ScheduledTasksServiceTest {
     }
 
     @Test
-    @DirtiesContext
     fun `skal sette tasker som har vært plukket i mer enn en time klar til plukk`() {
         var task = Task("type", "payload").plukker()
         task = task.copy(logg = setOf(task.logg.last().copy(opprettetTid = LocalDateTime.now().minusMinutes(61))))
@@ -86,7 +82,6 @@ class ScheduledTasksServiceTest {
     }
 
     @Test
-    @DirtiesContext
     fun `skal ikke gjøre noe med tasker som har vært plukket i mindre enn en time`() {
         var task = Task("type", "payload").plukker()
         task = task.copy(logg = setOf(task.logg.last().copy(opprettetTid = LocalDateTime.now().minusMinutes(59))))

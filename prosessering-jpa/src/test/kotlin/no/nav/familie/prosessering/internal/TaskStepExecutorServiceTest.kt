@@ -11,6 +11,7 @@ import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.domene.TaskRepository
 import no.nav.familie.prosessering.task.TaskStep2
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -34,6 +35,11 @@ class TaskStepExecutorServiceTest {
 
     @Autowired
     private lateinit var taskStepExecutorService: TaskStepExecutorService
+
+    @AfterEach
+    fun clear() {
+        repository.deleteAll()
+    }
 
     @Test
     fun `skal håndtere feil`() {
