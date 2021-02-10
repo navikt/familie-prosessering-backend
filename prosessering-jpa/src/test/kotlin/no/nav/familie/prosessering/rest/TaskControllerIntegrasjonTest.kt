@@ -44,6 +44,11 @@ internal class TaskControllerIntegrasjonTest {
 
     }
 
+    @AfterEach
+    fun resetDatabaseInnhold() {
+        repository.deleteAll()
+    }
+
     @Test
     fun `skal bare rekjøre tasker status FEILET`() {
         var ubehandletTask = Task(type = TaskStep1.TASK_1, payload = "{'a'='b'}", status = Status.UBEHANDLET)

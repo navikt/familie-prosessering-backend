@@ -34,6 +34,12 @@ class TaskRepositoryTest {
         repository.deleteAll()
     }
 
+    @AfterEach
+    fun resetDatabaseInnhold() {
+        repository.deleteAll()
+    }
+
+
     @Test
     fun `finnTasksMedStatus - skal hente ut alle tasker uavhengig av status`() {
         val preCount = repository.findByStatusIn(Status.values().toList(), PageRequest.of(0, 1000))
