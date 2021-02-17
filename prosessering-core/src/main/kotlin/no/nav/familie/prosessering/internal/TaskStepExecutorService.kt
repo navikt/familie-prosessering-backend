@@ -2,6 +2,7 @@ package no.nav.familie.prosessering.internal
 
 import no.nav.familie.log.mdc.MDCConstants
 import no.nav.familie.prosessering.domene.ITask
+import no.nav.familie.prosessering.error.RekjørSenereException
 import org.slf4j.LoggerFactory
 import org.slf4j.MDC
 import org.springframework.beans.factory.annotation.Qualifier
@@ -58,6 +59,8 @@ class TaskStepExecutorService(@Value("\${prosessering.maxAntall:10}") private va
             secureLog.info("Fullført kjøring av task '{}', kjøretid={} ms",
                            task,
                            System.currentTimeMillis() - startTidspunkt)
+        } catch(e: RekjørSenereException) {
+            taskWorker.rekjørSenere(task.id, e)
         } catch (e: Exception) {
             taskWorker.doFeilhåndtering(task.id, e)
             secureLog.warn("Fullført kjøring av task '{}', kjøretid={} ms, feilmelding='{}'",

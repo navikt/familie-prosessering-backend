@@ -95,8 +95,8 @@ data class Task(
         }
     }
 
-    override fun medTriggerTid(plusSeconds: LocalDateTime): Task {
-        return this.copy(triggerTid = plusSeconds)
+    override fun medTriggerTid(triggerTid: LocalDateTime): Task {
+        return this.copy(triggerTid = triggerTid)
     }
 
 }
