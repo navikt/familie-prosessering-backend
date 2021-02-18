@@ -29,7 +29,7 @@ class TaskWorkerTest {
     private lateinit var worker: TaskWorker
 
     @AfterEach
-    fun resetDatabaseInnhold() {
+    fun clear() {
         repository.deleteAll()
     }
 
