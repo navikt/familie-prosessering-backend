@@ -17,22 +17,7 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class RestTaskService(private val taskService: TaskService) {
 
-    fun hentTasks(statuses: List<Status>, saksbehandlerId: String, page: Int): Ressurs<List<ITask>> {
-        logger.info("$saksbehandlerId henter tasker med status $statuses")
-
-        return Result.runCatching {
-            taskService.finnTasksMedStatus(statuses, PageRequest.of(page, TASK_LIMIT))
-        }
-                .fold(
-                        onSuccess = { Ressurs.success(data = it) },
-                        onFailure = { e ->
-                            logger.error("Henting av tasker feilet", e)
-                            Ressurs.failure(errorMessage = "Henting av tasker med status '$statuses', feilet.", error = e)
-                        }
-                )
-    }
-
-    fun hentTasks2(statuses: List<Status>, saksbehandlerId: String, page: Int): Ressurs<PaginableResponse<TaskDto>> {
+    fun hentTasks(statuses: List<Status>, saksbehandlerId: String, page: Int): Ressurs<PaginableResponse<TaskDto>> {
         logger.info("$saksbehandlerId henter tasker med status $statuses")
 
         return Result.runCatching {

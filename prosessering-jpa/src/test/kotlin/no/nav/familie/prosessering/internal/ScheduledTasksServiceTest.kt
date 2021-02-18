@@ -5,6 +5,7 @@ import no.nav.familie.prosessering.domene.Status
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.domene.TaskRepository
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -29,9 +30,13 @@ class ScheduledTasksServiceTest {
     @Autowired
     private lateinit var taskRepository: TaskRepository
 
+    @AfterEach
+    fun clear() {
+        taskRepository.deleteAll()
+    }
+
     @Test
     @Sql("classpath:sql-testdata/gamle_tasker_med_logg.sql")
-    @DirtiesContext
     fun `skal slette gamle tasker med status FERDIG`() {
         scheduledTasksService.slettTasksKlarForSletting()
 
@@ -41,7 +46,6 @@ class ScheduledTasksServiceTest {
     }
 
     @Test
-    @DirtiesContext
     fun `skal ikke slette nye tasker`() {
         val nyTask = Task("type", "payload")
         nyTask.ferdigstill()
@@ -57,7 +61,6 @@ class ScheduledTasksServiceTest {
     }
 
     @Test
-    @DirtiesContext
     fun `skal sette tasker som har vært plukket i mer enn en time klar til plukk`() {
         var task = Task("type", "payload").plukker()
         task = task.copy(logg = mutableListOf(task.logg.last().copy(opprettetTid = LocalDateTime.now().minusMinutes(61))))
@@ -69,7 +72,6 @@ class ScheduledTasksServiceTest {
     }
 
     @Test
-    @DirtiesContext
     fun `skal ikke gjøre noe med tasker som har vært plukket i mindre enn en time`() {
         var task = Task("type", "payload").plukker()
         task = task.copy(logg = mutableListOf(task.logg.last().copy(opprettetTid = LocalDateTime.now().minusMinutes(59))))

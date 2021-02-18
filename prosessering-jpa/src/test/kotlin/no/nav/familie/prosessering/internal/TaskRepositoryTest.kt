@@ -29,6 +29,10 @@ class TaskRepositoryTest {
     @Autowired
     private lateinit var repository: TaskRepository
 
+    @AfterEach
+    fun clear() {
+        repository.deleteAll()
+    }
 
     @AfterEach
     fun resetDatabaseInnhold() {

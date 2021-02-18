@@ -32,6 +32,11 @@ internal class TaskControllerIntegrasjonTest {
 
     lateinit var taskController: TaskController
 
+    @AfterEach
+    fun clear() {
+        repository.deleteAll()
+    }
+
     @BeforeEach
     fun setup() {
         taskController = TaskController(restTaskService, mockk())

@@ -5,7 +5,7 @@ import io.mockk.mockk
 import io.mockk.slot
 import no.nav.familie.prosessering.domene.Status
 import no.nav.familie.prosessering.internal.TaskService
-import org.assertj.core.api.Assertions
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
@@ -28,18 +28,18 @@ internal class TaskControllerTest {
     @Test
     fun `skal hente task basert på alle statuser`() {
         val statusSlot = slot<List<Status>>()
-        every { taskService.finnTasksMedStatus(capture(statusSlot), any()) } returns emptyList()
+        every { taskService.finnTasksTilFrontend(capture(statusSlot), any()) } returns emptyList()
 
-        taskController.task(null, null)
-        Assertions.assertThat(statusSlot.captured).isEqualTo(Status.values().toList())
+        taskController.task2(null, null)
+        assertThat(statusSlot.captured).isEqualTo(Status.values().toList())
     }
 
     @Test
     fun `skal hente task basert på en status`() {
         val statusSlot = slot<List<Status>>()
-        every { taskService.finnTasksMedStatus(capture(statusSlot), any()) } returns emptyList()
+        every { taskService.finnTasksTilFrontend(capture(statusSlot), any()) } returns emptyList()
 
-        taskController.task(Status.FEILET, null)
-        Assertions.assertThat(statusSlot.captured).isEqualTo(listOf(Status.FEILET))
+        taskController.task2(Status.FEILET, null)
+        assertThat(statusSlot.captured).isEqualTo(listOf(Status.FEILET))
     }
 }

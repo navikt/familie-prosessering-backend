@@ -40,7 +40,7 @@ class TaskStepExecutorServiceTest {
     private lateinit var taskStepExecutorService: TaskStepExecutorService
 
     @AfterEach
-    fun resetDatabaseInnhold() {
+    fun clear() {
         repository.deleteAll()
     }
 
