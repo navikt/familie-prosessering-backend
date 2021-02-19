@@ -7,6 +7,7 @@ import no.nav.familie.prosessering.TaskFeil
 import no.nav.familie.prosessering.TaskStepBeskrivelse
 import no.nav.familie.prosessering.domene.ITask
 import no.nav.familie.prosessering.domene.Status
+import no.nav.familie.prosessering.error.RekjørSenereException
 import org.slf4j.LoggerFactory
 import org.springframework.aop.framework.AopProxyUtils
 import org.springframework.core.annotation.AnnotationUtils
@@ -78,6 +79,14 @@ class TaskWorker(private val taskService: TaskService, taskStepTyper: List<Async
         secureLog.trace("Ferdigstiller task='{}'", task)
 
         finnFullførtteller(task.type).increment()
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    fun rekjørSenere(taskId: Long, e: RekjørSenereException) {
+        log.info("Rekjører task=$taskId senere, triggerTid=${e.triggerTid}")
+        secureLog.info("Rekjører task=$taskId senere, årsak=${e.årsak}", e)
+        val taskMedNyTriggerTid = taskService.findById(taskId).medTriggerTid(e.triggerTid)
+        taskService.save(taskMedNyTriggerTid)
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)

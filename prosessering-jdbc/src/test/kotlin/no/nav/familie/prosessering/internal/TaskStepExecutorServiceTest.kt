@@ -11,6 +11,7 @@ import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.domene.TaskRepository
 import no.nav.familie.prosessering.task.TaskStep2
 import no.nav.familie.prosessering.task.TaskStepFeilManuellOppfølgning
+import no.nav.familie.prosessering.task.TaskStepRekjørSenere
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
@@ -22,6 +23,8 @@ import org.springframework.data.repository.findByIdOrNull
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.context.transaction.TestTransaction
+import java.time.LocalDate
+import java.util.*
 
 @ExtendWith(SpringExtension::class)
 @ContextConfiguration(classes = [TestAppConfig::class])
@@ -105,5 +108,15 @@ class TaskStepExecutorServiceTest {
 
         taskStepExecutorService.pollAndExecute()
         assertThat(repository.findByIdOrNull(task.id)!!.status).isEqualTo(Status.MANUELL_OPPFØLGING)
+    }
+
+    @Test
+    internal fun `rekjørSenere - skal rekjøre tasks som kaster RekjørSenereException`() {
+        val task = repository.save(Task(TaskStepRekjørSenere.TYPE, UUID.randomUUID().toString()))
+        TestTransaction.flagForCommit()
+        TestTransaction.end()
+
+        taskStepExecutorService.pollAndExecute()
+        assertThat(repository.findByIdOrNull(task.id)!!.triggerTid).isEqualTo(LocalDate.of(1988, 1,1).atStartOfDay())
     }
 }
