@@ -63,9 +63,9 @@ data class Task(
         return copy(status = Status.BEHANDLER, logg = logg + TaskLogg(type = Loggtype.BEHANDLER))
     }
 
-    override fun klarTilPlukk(endretAv: String): Task {
+    override fun klarTilPlukk(endretAv: String, melding: String?): Task {
         return copy(status = Status.KLAR_TIL_PLUKK,
-                    logg = logg + TaskLogg(type = Loggtype.KLAR_TIL_PLUKK, endretAv = endretAv))
+                    logg = logg + TaskLogg(type = Loggtype.KLAR_TIL_PLUKK, endretAv = endretAv, melding = melding))
     }
 
     override fun plukker(): Task {
