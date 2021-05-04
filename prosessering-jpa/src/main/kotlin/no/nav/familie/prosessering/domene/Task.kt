@@ -65,9 +65,11 @@ data class Task(
         return copy(status = Status.BEHANDLER, logg = (logg + TaskLogg(type = Loggtype.BEHANDLER)).toMutableList())
     }
 
-    override fun klarTilPlukk(endretAv: String): Task {
+    override fun klarTilPlukk(endretAv: String, melding: String?): Task {
         return copy(status = Status.KLAR_TIL_PLUKK,
-                    logg = (logg + TaskLogg(type = Loggtype.KLAR_TIL_PLUKK, endretAv = endretAv)).toMutableList())
+                    logg = (logg + TaskLogg(type = Loggtype.KLAR_TIL_PLUKK,
+                                            endretAv = endretAv,
+                                            melding = melding)).toMutableList())
     }
 
     override fun plukker(): Task {

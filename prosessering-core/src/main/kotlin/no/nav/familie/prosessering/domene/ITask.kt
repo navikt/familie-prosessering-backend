@@ -36,7 +36,7 @@ abstract class ITask {
                                endretAv: String): ITask
 
     abstract fun behandler(): ITask
-    abstract fun klarTilPlukk(endretAv: String): ITask
+    abstract fun klarTilPlukk(endretAv: String, melding: String? = null): ITask
     abstract fun plukker(): ITask
     abstract fun ferdigstill(): ITask
     abstract fun feilet(feil: TaskFeil, maxAntallFeil: Int, settTilManuellOppfølgning: Boolean): ITask
