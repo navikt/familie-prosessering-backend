@@ -63,7 +63,7 @@ class TaskStepExecutorService(@Value("\${prosessering.maxAntall:10}") private va
             taskWorker.rekjørSenere(task.id, e)
         } catch (e: Exception) {
             taskWorker.doFeilhåndtering(task.id, e)
-            secureLog.warn("Fullført kjøring av task '{}', kjøretid={} ms, feilmelding='{}'",
+            secureLog.warn("Fullført kjøring av task '{}', kjøretid={} ms med feil",
                            task,
                            System.currentTimeMillis() - startTidspunkt,
                            e)

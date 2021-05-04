@@ -14,7 +14,7 @@ import java.util.concurrent.TimeUnit
 class TaskStepRekjørSenere : AsyncTaskStep {
 
     override fun doTask(task: Task) {
-        throw RekjørSenereException("årsak", LocalDate.of(1988,1,1).atStartOfDay())
+        throw RekjørSenereException("årsak", LocalDate.of(2088,1,1).atStartOfDay())
     }
 
     override fun onCompletion(task: Task) {}

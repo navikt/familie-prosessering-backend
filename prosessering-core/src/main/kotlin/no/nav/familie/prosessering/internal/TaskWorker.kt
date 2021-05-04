@@ -6,6 +6,7 @@ import no.nav.familie.prosessering.AsyncITaskStep
 import no.nav.familie.prosessering.TaskFeil
 import no.nav.familie.prosessering.TaskStepBeskrivelse
 import no.nav.familie.prosessering.domene.ITask
+import no.nav.familie.prosessering.domene.ITaskLogg
 import no.nav.familie.prosessering.domene.Status
 import no.nav.familie.prosessering.error.RekjørSenereException
 import org.slf4j.LoggerFactory
@@ -85,8 +86,11 @@ class TaskWorker(private val taskService: TaskService, taskStepTyper: List<Async
     fun rekjørSenere(taskId: Long, e: RekjørSenereException) {
         log.info("Rekjører task=$taskId senere, triggerTid=${e.triggerTid}")
         secureLog.info("Rekjører task=$taskId senere, årsak=${e.årsak}", e)
-        val taskMedNyTriggerTid = taskService.findById(taskId).medTriggerTid(e.triggerTid)
+        val taskMedNyTriggerTid = taskService.findById(taskId)
+                .medTriggerTid(e.triggerTid)
+                .klarTilPlukk(ITaskLogg.BRUKERNAVN_NÅR_SIKKERHETSKONTEKST_IKKE_FINNES)
         taskService.save(taskMedNyTriggerTid)
+        log.info("Lagret")
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
