@@ -6,8 +6,21 @@ import no.nav.familie.prosessering.TaskFeil
 import org.slf4j.MDC
 import java.io.IOException
 import java.time.LocalDateTime
-import java.util.*
-import javax.persistence.*
+import java.util.Properties
+import javax.persistence.CascadeType
+import javax.persistence.Convert
+import javax.persistence.Entity
+import javax.persistence.EnumType
+import javax.persistence.Enumerated
+import javax.persistence.FetchType
+import javax.persistence.GeneratedValue
+import javax.persistence.GenerationType
+import javax.persistence.Id
+import javax.persistence.JoinColumn
+import javax.persistence.OneToMany
+import javax.persistence.SequenceGenerator
+import javax.persistence.Table
+import javax.persistence.Version
 
 @Entity
 @Table(name = "TASK")
@@ -99,6 +112,10 @@ data class Task(
 
     override fun medTriggerTid(triggerTid: LocalDateTime): Task {
         return this.copy(triggerTid = triggerTid)
+    }
+
+    override fun toString(): String {
+        return "Task(id=$id, status=$status, opprettetTid=$opprettetTid, triggerTid=$triggerTid, type='$type', versjon=$versjon)"
     }
 
 }
