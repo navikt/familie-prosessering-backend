@@ -11,4 +11,9 @@ data class TaskLogg(@Id
                     override val type: Loggtype,
                     override val node: String = "node1",
                     override val melding: String? = null,
-                    override val opprettetTid: LocalDateTime = LocalDateTime.now()) : ITaskLogg()
+                    override val opprettetTid: LocalDateTime = LocalDateTime.now()) : ITaskLogg() {
+
+    override fun toString(): String {
+        return "TaskLogg(id=$id, type=$type, opprettetTid=$opprettetTid)"
+    }
+}

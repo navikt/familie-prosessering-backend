@@ -3,6 +3,7 @@ package no.nav.familie.prosessering.internal
 import no.nav.familie.log.mdc.MDCConstants
 import no.nav.familie.prosessering.domene.ITask
 import no.nav.familie.prosessering.error.RekjørSenereException
+import no.nav.familie.prosessering.util.isOptimisticLocking
 import org.slf4j.LoggerFactory
 import org.slf4j.MDC
 import org.springframework.beans.factory.annotation.Qualifier
@@ -49,8 +50,13 @@ class TaskStepExecutorService(@Value("\${prosessering.maxAntall:10}") private va
 
         val plukketTask = try {
             taskWorker.markerPlukket(task.id) ?: return
-        } catch (e: OptimisticLockingFailureException) {
-            log.info("OptimisticLockingFailureException for task ${task.id}")
+        } catch (e: Exception) {
+            if(isOptimisticLocking(e)) {
+                log.info("OptimisticLockingFailureException metode=executeWork for task=${task.id}")
+            } else {
+                log.error("Feilet metode=executeWork task=${task.id}. Se secure logs")
+                secureLog.info("Feilet metode=executeWork task=${task.id}", e)
+            }
             return
         }
 

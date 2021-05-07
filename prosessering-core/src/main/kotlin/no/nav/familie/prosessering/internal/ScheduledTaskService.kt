@@ -3,6 +3,7 @@ package no.nav.familie.prosessering.internal
 import no.nav.familie.prosessering.domene.ITask
 import no.nav.familie.prosessering.domene.ITaskLogg.Companion.BRUKERNAVN_NÅR_SIKKERHETSKONTEKST_IKKE_FINNES
 import no.nav.familie.prosessering.domene.Loggtype
+import no.nav.familie.prosessering.util.isOptimisticLocking
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
@@ -28,8 +29,14 @@ class ScheduledTaskService(private val taskService: TaskService, @Value("\${pros
         tasks.forEach {
             try {
                 taskService.save(it.klarTilPlukk(BRUKERNAVN_NÅR_SIKKERHETSKONTEKST_IKKE_FINNES))
-            } catch (e: OptimisticLockingFailureException) {
-                logger.info("OptimisticLockingFailureException for task ${it.id}")
+            } catch (e: Exception) {
+                if(isOptimisticLocking(e)) {
+                    logger.info("OptimisticLockingFailureException metode=retryFeilendeTask for task=${it.id}")
+                } else {
+                    logger.error("Feilet metode=retryFeilendeTask task=${it.id}. Se secure logs")
+                    secureLog.info("Feilet metode=retryFeilendeTask task=${it.id}", e)
+                }
+                return
             }
         }
     }
@@ -47,7 +54,13 @@ class ScheduledTaskService(private val taskService: TaskService, @Value("\${pros
                     try {
                         taskService.save(it.klarTilPlukk(BRUKERNAVN_NÅR_SIKKERHETSKONTEKST_IKKE_FINNES))
                     } catch (e: OptimisticLockingFailureException) {
-                        logger.info("OptimisticLockingFailureException for task ${it.id}")
+                        if(isOptimisticLocking(e)) {
+                            logger.info("OptimisticLockingFailureException metode=settPermanentPlukketTilKlarTilPlukk for task=${it.id}")
+                        } else {
+                            logger.error("Feilet metode=settPermanentPlukketTilKlarTilPlukk task=${it.id}. Se secure logs")
+                            secureLog.info("Feilet metode=settPermanentPlukketTilKlarTilPlukk task=${it.id}", e)
+                        }
+                        return
                     }
                 }
     }
@@ -73,5 +86,6 @@ class ScheduledTaskService(private val taskService: TaskService, @Value("\${pros
     companion object {
 
         val logger: Logger = LoggerFactory.getLogger(ScheduledTaskService::class.java)
+        val secureLog: Logger = LoggerFactory.getLogger("secureLogger")
     }
 }

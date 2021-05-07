@@ -36,6 +36,8 @@ data class Task(
         override val logg: Set<TaskLogg> = setOf(TaskLogg(type = Loggtype.UBEHANDLET))
 ) : ITask() {
 
+
+
     @Transient
     override val metadata: Properties = metadataWrapper.properties
 
@@ -95,6 +97,10 @@ data class Task(
 
     override fun medTriggerTid(triggerTid: LocalDateTime): Task {
         return this.copy(triggerTid = triggerTid)
+    }
+
+    override fun toString(): String {
+        return "Task(id=$id, status=$status, opprettetTid=$opprettetTid, triggerTid=$triggerTid, type='$type', versjon=$versjon)"
     }
 
 }
