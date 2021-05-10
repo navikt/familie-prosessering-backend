@@ -6,7 +6,6 @@ import no.nav.familie.prosessering.AsyncITaskStep
 import no.nav.familie.prosessering.TaskFeil
 import no.nav.familie.prosessering.TaskStepBeskrivelse
 import no.nav.familie.prosessering.domene.ITask
-import no.nav.familie.prosessering.domene.ITaskLogg
 import no.nav.familie.prosessering.domene.ITaskLogg.Companion.BRUKERNAVN_NÅR_SIKKERHETSKONTEKST_IKKE_FINNES
 import no.nav.familie.prosessering.domene.Status
 import no.nav.familie.prosessering.error.RekjørSenereException

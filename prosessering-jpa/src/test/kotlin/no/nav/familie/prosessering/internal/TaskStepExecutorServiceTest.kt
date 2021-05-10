@@ -105,7 +105,7 @@ class TaskStepExecutorServiceTest {
         taskStepExecutorService.pollAndExecute()
 
         val lagretTask = repository.findByIdOrNull(task.id)!!
-        assertThat(lagretTask.triggerTid).isEqualTo(LocalDate.of(1988, 1, 1).atStartOfDay())
+        assertThat(lagretTask.triggerTid).isEqualTo(LocalDate.of(2088, 1, 1).atStartOfDay())
         assertThat(lagretTask.status).isEqualTo(Status.KLAR_TIL_PLUKK)
     }
 
