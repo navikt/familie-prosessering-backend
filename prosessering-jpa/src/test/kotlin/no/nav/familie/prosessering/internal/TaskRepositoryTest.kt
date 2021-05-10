@@ -6,7 +6,9 @@ import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.domene.TaskRepository
 import no.nav.familie.prosessering.task.TaskStep1
 import no.nav.familie.prosessering.task.TaskStep2
+import no.nav.familie.prosessering.util.isOptimisticLocking
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.catchThrowable
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -18,8 +20,9 @@ import org.springframework.data.domain.Sort
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.junit.jupiter.SpringExtension
+import org.springframework.test.context.transaction.TestTransaction
 import java.time.LocalDateTime
-import java.util.*
+import java.util.Properties
 
 @ExtendWith(SpringExtension::class)
 @ContextConfiguration(classes = [TestAppConfig::class])
@@ -115,6 +118,20 @@ class TaskRepositoryTest {
                                               }))
         val task = repository.findByIdOrNull(lagretTask.id)!!
         assertThat(task.metadata.getProperty(property)).isEqualTo(property)
+    }
+
+    @Test
+    internal fun `skal håndtere optimistic locking`() {
+        val task = repository.save(Task(TaskStep1.TASK_1, "{'a'='b'}"))
+        TestTransaction.flagForCommit()
+        TestTransaction.end()
+        TestTransaction.start()
+        repository.save(task.copy(status = Status.KLAR_TIL_PLUKK))
+        TestTransaction.flagForCommit()
+        TestTransaction.end()
+        TestTransaction.start()
+        assertThat(catchThrowable { repository.save(task.copy(status = Status.KLAR_TIL_PLUKK)) })
+                .matches { isOptimisticLocking(it as Exception) }
     }
 
 }
