@@ -1,17 +1,15 @@
 package no.nav.familie.prosessering.internal
 
 import com.ninjasquad.springmockk.SpykBean
-import io.mockk.Runs
 import io.mockk.every
-import io.mockk.justRun
-import kotlinx.coroutines.async
-import kotlinx.coroutines.runBlocking
 import no.nav.familie.prosessering.TestAppConfig
 import no.nav.familie.prosessering.domene.Status
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.domene.TaskRepository
 import no.nav.familie.prosessering.task.TaskStep1
+import no.nav.familie.prosessering.util.isOptimisticLocking
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.catchThrowable
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -23,7 +21,6 @@ import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.context.transaction.TestTransaction
 import java.util.concurrent.atomic.AtomicBoolean
-import java.util.concurrent.atomic.AtomicInteger
 
 @ExtendWith(SpringExtension::class)
 @ContextConfiguration(classes = [TestAppConfig::class])
@@ -62,29 +59,24 @@ class TaskWorkerTest {
         TestTransaction.end()
 
         every { repository.save(any()) } answers {
-            println("Yolo")
-            if(called.compareAndSet(false, true)){
-                println("sleep")
-                Thread.sleep(500)
-                println("sleep done")
-            } else {
-                println("do not sleep")
+            if (called.compareAndSet(false, true)) {
+                Thread.sleep(1000)
             }
             callOriginal()
         }
-        runBlocking {
-            val update1 = async {
-                println("1")
-                worker.markerPlukket(task.id)
-                println("1 - done")
-            }
-            val update2 = async {
-                println("2")
-                worker.markerPlukket(task.id)
-                println("2 - done")
-            }
-            update1.await()
-            update2.await()
+        val first = Thread {
+            val exception = catchThrowable { worker.markerPlukket(task.id) } as Exception
+            assertThat(isOptimisticLocking(exception)).isTrue
         }
+
+        val second = Thread {
+            Thread.sleep(200)
+            worker.markerPlukket(task.id)
+        }
+        first.start()
+        second.start()
+        first.join()
+        second.join()
     }
+
 }
