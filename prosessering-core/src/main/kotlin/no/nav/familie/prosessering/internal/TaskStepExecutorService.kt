@@ -9,7 +9,6 @@ import org.slf4j.MDC
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.core.task.TaskExecutor
-import org.springframework.dao.OptimisticLockingFailureException
 import org.springframework.data.domain.PageRequest
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor
@@ -23,7 +22,7 @@ class TaskStepExecutorService(@Value("\${prosessering.maxAntall:10}") private va
                               private val fixedDelayString: String,
                               private val taskWorker: TaskWorker,
                               @Qualifier("taskExecutor") private val taskExecutor: TaskExecutor,
-                              private val taskService: TaskService) {
+                              private val internalTaskService: InternalTaskService) {
 
     private val secureLog = LoggerFactory.getLogger("secureLogger")
 
@@ -34,7 +33,7 @@ class TaskStepExecutorService(@Value("\${prosessering.maxAntall:10}") private va
         val pollingSize = calculatePollingSize(maxAntall)
 
         if (pollingSize != 0) {
-            val tasks = taskService.finnAlleTasksKlareForProsessering(PageRequest.of(0, pollingSize))
+            val tasks = internalTaskService.finnAlleTasksKlareForProsessering(PageRequest.of(0, pollingSize))
             log.trace("Pollet {} tasks med max {}", tasks.size, maxAntall)
 
             tasks.forEach { task -> taskExecutor.execute { executeWork(task) } }
@@ -44,7 +43,7 @@ class TaskStepExecutorService(@Value("\${prosessering.maxAntall:10}") private va
         log.trace("Ferdig med polling, venter {} ms til neste kjøring.", fixedDelayString)
     }
 
-    private fun executeWork(task: ITask) {
+    fun executeWork(task: ITask) {
         val startTidspunkt = System.currentTimeMillis()
         initLogContext(task)
 

@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component
 import java.time.LocalDateTime
 
 @Component
-class TaskService(val taskRepository: TaskRepository)  {
+class InternalTaskService(val taskRepository: TaskRepository)  {
 
     fun findById(id: Long): ITask {
         return taskRepository.findByIdOrNull(id) ?: error("Task med id: $id ikke funnet.")

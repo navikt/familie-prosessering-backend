@@ -17,7 +17,7 @@ import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
 
 @Service
-class TaskWorker(private val taskService: TaskService, taskStepTyper: List<AsyncITaskStep<out ITask>>) {
+class TaskWorker(private val internalTaskService: InternalTaskService, taskStepTyper: List<AsyncITaskStep<out ITask>>) {
 
     private val taskStepMap: Map<String, AsyncITaskStep<ITask>>
 
@@ -58,14 +58,14 @@ class TaskWorker(private val taskService: TaskService, taskStepTyper: List<Async
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     fun doActualWork(taskId: Long) {
 
-        var task = taskService.findById(taskId)
+        var task = internalTaskService.findById(taskId)
 
         if (task.status != Status.PLUKKET) {
             return // en annen pod har startet behandling
         }
 
         task = task.behandler()
-        task = taskService.save(task)
+        task = internalTaskService.save(task)
         // finn tasktype
         val taskStep = finnTaskStep(task.type)
 
@@ -76,7 +76,7 @@ class TaskWorker(private val taskService: TaskService, taskStepTyper: List<Async
         taskStep.onCompletion(task)
 
         task = task.ferdigstill()
-        taskService.save(task)
+        internalTaskService.save(task)
         secureLog.trace("Ferdigstiller task='{}'", task)
 
         finnFullførtteller(task.type).increment()
@@ -86,16 +86,16 @@ class TaskWorker(private val taskService: TaskService, taskStepTyper: List<Async
     fun rekjørSenere(taskId: Long, e: RekjørSenereException) {
         log.info("Rekjører task=$taskId senere, triggerTid=${e.triggerTid}")
         secureLog.info("Rekjører task=$taskId senere, årsak=${e.årsak}", e)
-        val taskMedNyTriggerTid = taskService.findById(taskId)
+        val taskMedNyTriggerTid = internalTaskService.findById(taskId)
                 .medTriggerTid(e.triggerTid)
                 .klarTilPlukk(endretAv = BRUKERNAVN_NÅR_SIKKERHETSKONTEKST_IKKE_FINNES,
                               melding = e.årsak)
-        taskService.save(taskMedNyTriggerTid)
+        internalTaskService.save(taskMedNyTriggerTid)
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     fun doFeilhåndtering(taskId: Long, e: Exception) {
-        var task = taskService.findById(taskId)
+        var task = internalTaskService.findById(taskId)
         val maxAntallFeil = finnMaxAntallFeil(task.type)
         val settTilManuellOppfølgning = finnSettTilManuellOppfølgning(task.type)
         secureLog.trace("Behandler task='{}'", task)
@@ -108,7 +108,7 @@ class TaskWorker(private val taskService: TaskService, taskStepTyper: List<Async
                       "Sjekk familie-prosessering for detaljer")
         }
         task = task.medTriggerTid(task.triggerTid.plusSeconds(finnTriggerTidVedFeil(task.type)))
-        taskService.save(task)
+        internalTaskService.save(task)
         secureLog.info("Feilhåndtering lagret ok {}", task)
     }
 
@@ -138,11 +138,11 @@ class TaskWorker(private val taskService: TaskService, taskStepTyper: List<Async
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     fun markerPlukket(id: Long): ITask? {
-        var task = taskService.findById(id)
+        var task = internalTaskService.findById(id)
 
         if (task.status.kanPlukkes()) {
             task = task.plukker()
-            return taskService.save(task)
+            return internalTaskService.save(task)
         }
         return null
     }

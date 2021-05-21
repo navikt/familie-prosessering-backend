@@ -4,8 +4,7 @@ import no.nav.familie.kontrakter.felles.Ressurs
 import no.nav.familie.prosessering.domene.Avvikstype
 import no.nav.familie.prosessering.domene.ITask
 import no.nav.familie.prosessering.domene.Status
-import no.nav.familie.prosessering.domene.asString
-import no.nav.familie.prosessering.internal.TaskService
+import no.nav.familie.prosessering.internal.InternalTaskService
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.data.domain.PageRequest
@@ -15,14 +14,14 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
-class RestTaskService(private val taskService: TaskService) {
+class RestTaskService(private val internalTaskService: InternalTaskService) {
 
     fun hentTasks(statuses: List<Status>, saksbehandlerId: String, page: Int): Ressurs<PaginableResponse<TaskDto>> {
         logger.info("$saksbehandlerId henter tasker med status $statuses")
 
         return Result.runCatching {
             val pageRequest = PageRequest.of(page, TASK_LIMIT, Sort.Direction.DESC, "opprettetTid")
-            PaginableResponse(taskService.finnTasksTilFrontend(statuses, pageRequest).map {
+            PaginableResponse(internalTaskService.finnTasksTilFrontend(statuses, pageRequest).map {
                 TaskDto(it.id,
                         it.status,
                         it.avvikstype,
@@ -49,7 +48,7 @@ class RestTaskService(private val taskService: TaskService) {
         logger.info("$saksbehandlerId henter tasklogg til task=$id")
 
         return Result.runCatching {
-            val task = taskService.findById(id)
+            val task = internalTaskService.findById(id)
             task.logg.map { TaskloggDto(it.id, it.endretAv, it.type, it.node, it.melding, it.opprettetTid) }
         }
                 .fold(
@@ -63,9 +62,9 @@ class RestTaskService(private val taskService: TaskService) {
 
     @Transactional
     fun rekjørTask(taskId: Long, saksbehandlerId: String): Ressurs<String> {
-        val task: ITask = taskService.findById(taskId)
+        val task: ITask = internalTaskService.findById(taskId)
 
-        taskService.save(task.klarTilPlukk(saksbehandlerId))
+        internalTaskService.save(task.klarTilPlukk(saksbehandlerId))
         logger.info("$saksbehandlerId rekjører task $taskId")
 
         return Ressurs.success(data = "")
@@ -77,8 +76,8 @@ class RestTaskService(private val taskService: TaskService) {
         logger.info("$saksbehandlerId rekjører alle tasks med status $status")
 
         return Result.runCatching {
-            taskService.finnTasksMedStatus(listOf(status), Pageable.unpaged())
-                    .map { taskService.save(it.klarTilPlukk(saksbehandlerId)) }
+            internalTaskService.finnTasksMedStatus(listOf(status), Pageable.unpaged())
+                    .map { internalTaskService.save(it.klarTilPlukk(saksbehandlerId)) }
         }
                 .fold(
                         onSuccess = { Ressurs.success(data = "") },
@@ -91,11 +90,11 @@ class RestTaskService(private val taskService: TaskService) {
 
     @Transactional
     fun avvikshåndterTask(taskId: Long, avvikstype: Avvikstype, årsak: String, saksbehandlerId: String): Ressurs<String> {
-        val task: ITask = taskService.findById(taskId)
+        val task: ITask = internalTaskService.findById(taskId)
 
         logger.info("$saksbehandlerId setter task $taskId til avvikshåndtert", taskId)
 
-        return Result.runCatching { taskService.save(task.avvikshåndter(avvikstype, årsak, saksbehandlerId)) }
+        return Result.runCatching { internalTaskService.save(task.avvikshåndter(avvikstype, årsak, saksbehandlerId)) }
                 .fold(
                         onSuccess = {
                             Ressurs.success(data = "")

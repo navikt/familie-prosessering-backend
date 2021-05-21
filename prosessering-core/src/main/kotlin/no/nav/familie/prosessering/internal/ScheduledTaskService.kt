@@ -18,17 +18,17 @@ private const val CRON_DAILY_0900 = "0 0 9 1/1 * ?"
 private const val CRON_DAILY_1000 = "0 0 10 1/1 * ?"
 
 @Service
-class ScheduledTaskService(private val taskService: TaskService, @Value("\${prosessering.delete.after.weeks:2}") private val deleteTasksAfterWeeks: Long) {
+class ScheduledTaskService(private val internalTaskService: InternalTaskService, @Value("\${prosessering.delete.after.weeks:2}") private val deleteTasksAfterWeeks: Long) {
 
     @Scheduled(cron = "\${prosessering.cronRetryTasks:${CRON_DAILY_0700}}")
     @Transactional
     fun retryFeilendeTask() {
-        val tasks = taskService.finnAlleFeiledeTasks()
+        val tasks = internalTaskService.finnAlleFeiledeTasks()
         logger.info("Rekjører ${tasks.size} tasks")
 
         tasks.forEach {
             try {
-                taskService.save(it.klarTilPlukk(BRUKERNAVN_NÅR_SIKKERHETSKONTEKST_IKKE_FINNES))
+                internalTaskService.save(it.klarTilPlukk(BRUKERNAVN_NÅR_SIKKERHETSKONTEKST_IKKE_FINNES))
             } catch (e: Exception) {
                 if(isOptimisticLocking(e)) {
                     logger.info("OptimisticLockingFailureException metode=retryFeilendeTask for task=${it.id}")
@@ -44,7 +44,7 @@ class ScheduledTaskService(private val taskService: TaskService, @Value("\${pros
     @Scheduled(cron = CRON_DAILY_1000)
     @Transactional
     fun settPermanentPlukketTilKlarTilPlukk() {
-        val tasks = taskService.finnAllePlukkedeTasks()
+        val tasks = internalTaskService.finnAllePlukkedeTasks()
         val filtrertTasks = tasks.filter { værtPlukketMinstEnTime(it) }
 
         logger.info("Fant ${tasks.size} tasks som er plukket. ${filtrertTasks.size} tasks er plukket minst en time siden")
@@ -52,7 +52,7 @@ class ScheduledTaskService(private val taskService: TaskService, @Value("\${pros
         filtrertTasks
                 .forEach {
                     try {
-                        taskService.save(it.klarTilPlukk(BRUKERNAVN_NÅR_SIKKERHETSKONTEKST_IKKE_FINNES))
+                        internalTaskService.save(it.klarTilPlukk(BRUKERNAVN_NÅR_SIKKERHETSKONTEKST_IKKE_FINNES))
                     } catch (e: OptimisticLockingFailureException) {
                         if(isOptimisticLocking(e)) {
                             logger.info("OptimisticLockingFailureException metode=settPermanentPlukketTilKlarTilPlukk for task=${it.id}")
@@ -75,11 +75,11 @@ class ScheduledTaskService(private val taskService: TaskService, @Value("\${pros
     @Scheduled(cron = CRON_DAILY_0900)
     @Transactional
     fun slettTasksKlarForSletting() {
-        val klarForSletting = taskService.finnTasksKlarForSletting(LocalDateTime.now().minusWeeks(deleteTasksAfterWeeks))
+        val klarForSletting = internalTaskService.finnTasksKlarForSletting(LocalDateTime.now().minusWeeks(deleteTasksAfterWeeks))
         logger.info("Sletter ${klarForSletting.size} tasks")
         klarForSletting.forEach {
             logger.info("Task klar for sletting. {} {} {} {}", it.id, it.callId, it.triggerTid, it.status)
-            taskService.delete(it)
+            internalTaskService.delete(it)
         }
     }
 
