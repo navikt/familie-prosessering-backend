@@ -33,15 +33,9 @@ class TaskRepositoryTest {
     private lateinit var repository: TaskRepository
 
     @AfterEach
-    fun clear() {
-        repository.deleteAll()
-    }
-
-    @AfterEach
     fun resetDatabaseInnhold() {
         repository.deleteAll()
     }
-
 
     @Test
     fun `finnTasksMedStatus - skal hente ut alle tasker uavhengig av status`() {
@@ -129,7 +123,6 @@ class TaskRepositoryTest {
         repository.save(task.copy(status = Status.KLAR_TIL_PLUKK))
         TestTransaction.flagForCommit()
         TestTransaction.end()
-        TestTransaction.start()
         assertThat(catchThrowable { repository.save(task.copy(status = Status.KLAR_TIL_PLUKK)) })
                 .matches { isOptimisticLocking(it as Exception) }
     }

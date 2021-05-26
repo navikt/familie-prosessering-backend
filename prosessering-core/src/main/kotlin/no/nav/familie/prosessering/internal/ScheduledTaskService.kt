@@ -18,7 +18,8 @@ private const val CRON_DAILY_0900 = "0 0 9 1/1 * ?"
 private const val CRON_DAILY_1000 = "0 0 10 1/1 * ?"
 
 @Service
-class ScheduledTaskService(private val taskService: TaskService, @Value("\${prosessering.delete.after.weeks:2}") private val deleteTasksAfterWeeks: Long) {
+class ScheduledTaskService(private val taskService: TaskService,
+                           @Value("\${prosessering.delete.after.weeks:2}") private val deleteTasksAfterWeeks: Long) {
 
     @Scheduled(cron = "\${prosessering.cronRetryTasks:${CRON_DAILY_0700}}")
     @Transactional
@@ -30,12 +31,7 @@ class ScheduledTaskService(private val taskService: TaskService, @Value("\${pros
             try {
                 taskService.save(it.klarTilPlukk(BRUKERNAVN_NÅR_SIKKERHETSKONTEKST_IKKE_FINNES))
             } catch (e: Exception) {
-                if(isOptimisticLocking(e)) {
-                    logger.info("OptimisticLockingFailureException metode=retryFeilendeTask for task=${it.id}")
-                } else {
-                    logger.error("Feilet metode=retryFeilendeTask task=${it.id}. Se secure logs")
-                    secureLog.info("Feilet metode=retryFeilendeTask task=${it.id}", e)
-                }
+                loggFeil(e, it, "retryFeilendeTask")
                 return
             }
         }
@@ -54,12 +50,7 @@ class ScheduledTaskService(private val taskService: TaskService, @Value("\${pros
                     try {
                         taskService.save(it.klarTilPlukk(BRUKERNAVN_NÅR_SIKKERHETSKONTEKST_IKKE_FINNES))
                     } catch (e: OptimisticLockingFailureException) {
-                        if(isOptimisticLocking(e)) {
-                            logger.info("OptimisticLockingFailureException metode=settPermanentPlukketTilKlarTilPlukk for task=${it.id}")
-                        } else {
-                            logger.error("Feilet metode=settPermanentPlukketTilKlarTilPlukk task=${it.id}. Se secure logs")
-                            secureLog.info("Feilet metode=settPermanentPlukketTilKlarTilPlukk task=${it.id}", e)
-                        }
+                        loggFeil(e, it, "settPermanentPlukketTilKlarTilPlukk")
                         return
                     }
                 }
@@ -79,7 +70,20 @@ class ScheduledTaskService(private val taskService: TaskService, @Value("\${pros
         logger.info("Sletter ${klarForSletting.size} tasks")
         klarForSletting.forEach {
             logger.info("Task klar for sletting. {} {} {} {}", it.id, it.callId, it.triggerTid, it.status)
-            taskService.delete(it)
+            try {
+                taskService.delete(it)
+            } catch (e: Exception) {
+                loggFeil(e, it, "slettTasksKlarForSletting")
+            }
+        }
+    }
+
+    private fun loggFeil(e: Exception, it: ITask, metode: String) {
+        if (isOptimisticLocking(e)) {
+            logger.info("OptimisticLockingFailureException metode=$metode for task=${it.id}")
+        } else {
+            logger.error("Feilet metode=$metode task=${it.id}. Se secure logs")
+            secureLog.info("Feilet metode=$metode task=${it.id}", e)
         }
     }
 
