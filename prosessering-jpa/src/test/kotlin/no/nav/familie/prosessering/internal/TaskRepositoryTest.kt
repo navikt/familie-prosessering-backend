@@ -33,15 +33,9 @@ class TaskRepositoryTest {
     private lateinit var repository: TaskRepository
 
     @AfterEach
-    fun clear() {
-        repository.deleteAll()
-    }
-
-    @AfterEach
     fun resetDatabaseInnhold() {
         repository.deleteAll()
     }
-
 
     @Test
     fun `finnTasksMedStatus - skal hente ut alle tasker uavhengig av status`() {
