@@ -1,15 +1,19 @@
 package no.nav.familie.prosessering.internal
 
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.kotlin.readValue
 import com.ninjasquad.springmockk.MockkBean
 import io.mockk.every
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import no.nav.familie.prosessering.TaskFeil
 import no.nav.familie.prosessering.TestAppConfig
 import no.nav.familie.prosessering.domene.Status
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.domene.TaskRepository
 import no.nav.familie.prosessering.task.TaskStep2
+import no.nav.familie.prosessering.task.TaskStepExceptionUtenStackTrace
 import no.nav.familie.prosessering.task.TaskStepFeilManuellOppfølgning
 import no.nav.familie.prosessering.task.TaskStepRekjørSenere
 import org.assertj.core.api.Assertions.assertThat
@@ -107,7 +111,10 @@ class TaskStepExecutorServiceTest {
         }
 
         taskStepExecutorService.pollAndExecute()
-        assertThat(repository.findByIdOrNull(task.id)!!.status).isEqualTo(Status.MANUELL_OPPFØLGING)
+
+        val feiletTask = repository.findByIdOrNull(task.id)!!
+        assertThat(feiletTask.status).isEqualTo(Status.MANUELL_OPPFØLGING)
+        assertThat(om.readValue<TaskFeil>(feiletTask.logg.last().melding!!).stackTrace).isNotNull
     }
 
     @Test
@@ -121,5 +128,25 @@ class TaskStepExecutorServiceTest {
         val lagretTask = repository.findByIdOrNull(task.id)!!
         assertThat(lagretTask.triggerTid).isEqualTo(LocalDate.of(2088, 1, 1).atStartOfDay())
         assertThat(lagretTask.status).isEqualTo(Status.KLAR_TIL_PLUKK)
+    }
+
+    @Test
+    internal fun `skal ikke lagre stack trace hvis det ikke trengs`() {
+        val task = repository.save(Task(TaskStepExceptionUtenStackTrace.TYPE, UUID.randomUUID().toString()))
+        TestTransaction.flagForCommit()
+        TestTransaction.end()
+
+        taskStepExecutorService.pollAndExecute()
+
+        val oppdatertTask = repository.findByIdOrNull(task.id)!!
+
+        assertThat(oppdatertTask.logg).hasSize(3)
+        val melding = om.readValue<TaskFeil>(oppdatertTask.logg.toList()[2].melding!!)
+        assertThat(melding.feilmelding).isEqualTo("feilmelding")
+        assertThat(melding.stackTrace).isEqualTo(null)
+    }
+
+    companion object {
+        val om = ObjectMapper()
     }
 }
