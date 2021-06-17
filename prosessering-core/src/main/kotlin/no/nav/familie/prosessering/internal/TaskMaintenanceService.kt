@@ -11,8 +11,8 @@ import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
 
 @Service
-class JobTaskService(private val taskService: TaskService,
-                     @Value("\${prosessering.delete.after.weeks:2}") private val deleteTasksAfterWeeks: Long) {
+class TaskMaintenanceService(private val taskService: TaskService,
+                             @Value("\${prosessering.delete.after.weeks:2}") private val deleteTasksAfterWeeks: Long) {
 
     @Transactional
     fun retryFeilendeTask() {
@@ -55,7 +55,7 @@ class JobTaskService(private val taskService: TaskService,
 
     companion object {
 
-        val logger: Logger = LoggerFactory.getLogger(ScheduledTaskService::class.java)
+        val logger: Logger = LoggerFactory.getLogger(TaskScheduler::class.java)
     }
 
 }

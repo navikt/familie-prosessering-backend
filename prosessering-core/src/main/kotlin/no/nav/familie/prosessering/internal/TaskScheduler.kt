@@ -11,12 +11,12 @@ private const val CRON_DAILY_0900 = "0 0 9 1/1 * ?"
 private const val CRON_DAILY_1000 = "0 0 10 1/1 * ?"
 
 @Service
-class ScheduledTaskService(private val jobTaskService: JobTaskService) {
+class TaskScheduler(private val taskMaintenanceService: TaskMaintenanceService) {
 
     @Scheduled(cron = "\${prosessering.cronRetryTasks:${CRON_DAILY_0700}}")
     fun retryFeilendeTask() {
         try {
-            jobTaskService.retryFeilendeTask()
+            taskMaintenanceService.retryFeilendeTask()
         } catch (e: Exception) {
             if (isOptimisticLocking(e)) {
                 loggFeil(e, "retryFeilendeTask")
@@ -27,7 +27,7 @@ class ScheduledTaskService(private val jobTaskService: JobTaskService) {
     @Scheduled(cron = CRON_DAILY_1000)
     fun settPermanentPlukketTilKlarTilPlukk() {
         try {
-            jobTaskService.settPermanentPlukketTilKlarTilPlukk()
+            taskMaintenanceService.settPermanentPlukketTilKlarTilPlukk()
         } catch (e: Exception) {
             if (isOptimisticLocking(e)) {
                 loggFeil(e, "settPermanentPlukketTilKlarTilPlukk")
@@ -38,7 +38,7 @@ class ScheduledTaskService(private val jobTaskService: JobTaskService) {
     @Scheduled(cron = CRON_DAILY_0900)
     fun slettTasksKlarForSletting() {
         try {
-            jobTaskService.slettTasksKlarForSletting()
+            taskMaintenanceService.slettTasksKlarForSletting()
         } catch (e: Exception) {
             loggFeil(e, "slettTasksKlarForSletting")
         }
@@ -55,7 +55,7 @@ class ScheduledTaskService(private val jobTaskService: JobTaskService) {
 
     companion object {
 
-        val logger: Logger = LoggerFactory.getLogger(ScheduledTaskService::class.java)
+        val logger: Logger = LoggerFactory.getLogger(TaskScheduler::class.java)
         val secureLog: Logger = LoggerFactory.getLogger("secureLogger")
     }
 }
