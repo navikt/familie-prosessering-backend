@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.ObjectReader
 import com.fasterxml.jackson.databind.ObjectWriter
 import no.nav.familie.prosessering.domene.ITask
+import no.nav.familie.prosessering.error.TaskExceptionUtenStackTrace
 import java.io.IOException
 import java.io.PrintWriter
 import java.io.StringWriter
@@ -64,7 +65,7 @@ data class TaskFeil(
         }
 
         private fun getStacktraceAsString(cause: Throwable?): String? {
-            if (cause == null) {
+            if (cause == null || cause is TaskExceptionUtenStackTrace) {
                 return null
             }
             val sw = StringWriter(4096)
