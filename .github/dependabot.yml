@@ -1,0 +1,39 @@
+version: 2
+registries:
+  maven-repository-maven-pkg-github-com-navikt-fp-felles:
+    type: maven-repository
+    url: https://maven.pkg.github.com/navikt/fp-felles/
+    username: x-access-token
+    password: "${{secrets.MAVEN_REPOSITORY_MAVEN_PKG_GITHUB_COM_NAVIKT_FP_FELLES_PASSWORD}}"
+
+updates:
+- package-ecosystem: maven
+  directory: "/"
+  schedule:
+    interval: weekly
+    time: "04:00"
+  open-pull-requests-limit: 10
+  ignore:
+  - dependency-name: org.springframework.data:spring-data-jdbc
+    versions:
+    - 2.1.5
+    - 2.1.6
+    - 2.1.7
+  - dependency-name: io.micrometer:micrometer-core
+    versions:
+    - 1.6.4
+    - 1.6.5
+  - dependency-name: org.springframework.boot:spring-boot-dependencies
+    versions:
+    - 2.4.3
+    - 2.4.4
+  - dependency-name: no.nav.familie.kontrakter:felles
+    versions:
+    - 2.0_20210225150823_36d3519
+    - 2.0_20210305131536_dd4cd5d
+    - 2.0_20210317125829_2bee9c0
+  - dependency-name: io.mockk:mockk
+    versions:
+    - 1.10.6
+  registries:
+  - maven-repository-maven-pkg-github-com-navikt-fp-felles
