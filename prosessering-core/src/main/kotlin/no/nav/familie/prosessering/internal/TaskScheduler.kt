@@ -18,9 +18,7 @@ class TaskScheduler(private val taskMaintenanceService: TaskMaintenanceService) 
         try {
             taskMaintenanceService.retryFeilendeTask()
         } catch (e: Exception) {
-            if (isOptimisticLocking(e)) {
-                loggFeil(e, "retryFeilendeTask")
-            }
+            loggFeil(e, "retryFeilendeTask")
         }
     }
 
@@ -29,9 +27,7 @@ class TaskScheduler(private val taskMaintenanceService: TaskMaintenanceService) 
         try {
             taskMaintenanceService.settPermanentPlukketTilKlarTilPlukk()
         } catch (e: Exception) {
-            if (isOptimisticLocking(e)) {
-                loggFeil(e, "settPermanentPlukketTilKlarTilPlukk")
-            }
+            loggFeil(e, "settPermanentPlukketTilKlarTilPlukk")
         }
     }
 
