@@ -4,7 +4,7 @@ import no.nav.familie.kontrakter.felles.Ressurs
 import no.nav.familie.prosessering.domene.Avvikstype
 import no.nav.familie.prosessering.domene.ITask
 import no.nav.familie.prosessering.domene.Status
-import no.nav.familie.prosessering.domene.asString
+import no.nav.familie.prosessering.domene.TaskStatistikkRepository
 import no.nav.familie.prosessering.internal.TaskService
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
-class RestTaskService(private val taskService: TaskService) {
+class RestTaskService(private val taskService: TaskService, private val taskStatistikkRepository: TaskStatistikkRepository) {
 
     fun hentTasks(statuses: List<Status>, saksbehandlerId: String, page: Int): Ressurs<PaginableResponse<TaskDto>> {
         logger.info("$saksbehandlerId henter tasker med status $statuses")
@@ -105,6 +105,10 @@ class RestTaskService(private val taskService: TaskService) {
                             Ressurs.failure(errorMessage = "Avvikshåndtering av $taskId feilet", error = e)
                         }
                 )
+    }
+
+    fun hentStatusStatistikk(): Map<Status, Int> {
+        return taskStatistikkRepository.hentStatus()
     }
 
     companion object {
