@@ -55,7 +55,6 @@ internal class TaskControllerIntegrasjonTest {
 
         val response = taskController.rekjørTasks(Status.FEILET)
 
-        assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
         assertThat(repository.findById(taskSomSkalRekjøres.id).get().status).isEqualTo(Status.KLAR_TIL_PLUKK)
         assertThat(repository.findById(ubehandletTask.id).get().status).isEqualTo(Status.UBEHANDLET)
         assertThat(repository.findById(avvikshåndtert.id).get().status).isEqualTo(Status.AVVIKSHÅNDTERT)
