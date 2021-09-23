@@ -15,7 +15,7 @@ import org.springframework.scheduling.config.ScheduledTaskRegistrar
 @Configuration
 @EnableAsync
 class ProsesseringConfig(@Value("\${prosessering.queue.capacity:20}") private val køstørrelse: Int,
-                         @Value("\${prosessering.pool.size:4}") private val poolSize: Int): SchedulingConfigurer {
+                         @Value("\${prosessering.pool.size:4}") private val poolSize: Int) : SchedulingConfigurer {
 
     private val log = LoggerFactory.getLogger(javaClass)
     private val secureLog = LoggerFactory.getLogger("secureLogger")
@@ -35,12 +35,18 @@ class ProsesseringConfig(@Value("\${prosessering.queue.capacity:20}") private va
 
     @Bean
     fun threadPoolTaskScheduler(): ThreadPoolTaskScheduler {
-        val executor = ThreadPoolTaskScheduler()
+        val executor = object : ThreadPoolTaskScheduler() {
+            override fun destroy() {
+                this.scheduledThreadPoolExecutor.executeExistingDelayedTasksAfterShutdownPolicy = false
+                super.destroy()
+            }
+        }
         executor.threadNamePrefix = "TaskScheduler-"
         executor.setWaitForTasksToCompleteOnShutdown(true)
         executor.setAwaitTerminationSeconds(20)
         executor.setErrorHandler { e ->
-            log.error("TaskScheduler feilet, se secureLogs")
+            log.error("TaskScheduler feilet, se secureLogs. exception=${e.javaClass.simpleName}" +
+                      " cause=${e.cause?.javaClass?.simpleName}")
             secureLog.error("TaskScheduler feilet", e)
         }
         executor.initialize()
