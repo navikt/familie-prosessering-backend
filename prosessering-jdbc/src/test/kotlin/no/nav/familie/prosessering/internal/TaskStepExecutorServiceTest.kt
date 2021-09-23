@@ -2,8 +2,6 @@ package no.nav.familie.prosessering.internal
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
-import com.ninjasquad.springmockk.MockkBean
-import io.mockk.every
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -12,9 +10,11 @@ import no.nav.familie.prosessering.TestAppConfig
 import no.nav.familie.prosessering.domene.Status
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.domene.TaskRepository
+import no.nav.familie.prosessering.task.TaskStep1
 import no.nav.familie.prosessering.task.TaskStep2
 import no.nav.familie.prosessering.task.TaskStepExceptionUtenStackTrace
 import no.nav.familie.prosessering.task.TaskStepFeilManuellOppfølgning
+import no.nav.familie.prosessering.task.TaskStepMedFeil
 import no.nav.familie.prosessering.task.TaskStepRekjørSenere
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
@@ -24,12 +24,15 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.data.jdbc.DataJdbcTest
 import org.springframework.boot.test.autoconfigure.jdbc.TestDatabaseAutoConfiguration
 import org.springframework.data.repository.findByIdOrNull
+import org.springframework.scheduling.annotation.EnableScheduling
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.context.transaction.TestTransaction
 import java.time.LocalDate
-import java.util.*
+import java.util.UUID
 
+
+@EnableScheduling
 @ExtendWith(SpringExtension::class)
 @ContextConfiguration(classes = [TestAppConfig::class])
 @DataJdbcTest(excludeAutoConfiguration = [TestDatabaseAutoConfiguration::class])
@@ -37,9 +40,6 @@ class TaskStepExecutorServiceTest {
 
     @Autowired
     private lateinit var repository: TaskRepository
-
-    @MockkBean(relaxUnitFun = true)
-    lateinit var taskStep: TaskStep2
 
     @Autowired
     private lateinit var taskStepExecutorService: TaskStepExecutorService
@@ -51,12 +51,11 @@ class TaskStepExecutorServiceTest {
 
     @Test
     fun `skal håndtere feil`() {
-        val savedTask = repository.save(Task(TaskStep2.TASK_2, "{'a'='b'}"))
+        val savedTask = repository.save(Task(TaskStepMedFeil.TYPE, "{'a'='b'}"))
         TestTransaction.flagForCommit()
         TestTransaction.end()
 
         assertThat(savedTask.status).isEqualTo(Status.UBEHANDLET)
-        every { taskStep.doTask(any()) } throws (IllegalStateException())
 
         taskStepExecutorService.pollAndExecute()
         val taskKlarTilPlukk = repository.findById(savedTask.id).orElseThrow()
@@ -146,7 +145,21 @@ class TaskStepExecutorServiceTest {
         assertThat(melding.stackTrace).isEqualTo(null)
     }
 
+    @Test
+    internal fun `skal kjøre task 2 direkte når pollAndExecute er ferdig`() {
+        val task = repository.save(Task(TaskStep1.TASK_1, UUID.randomUUID().toString()))
+        TestTransaction.flagForCommit()
+        TestTransaction.end()
+
+        taskStepExecutorService.pollAndExecute()
+
+        val tasks = repository.findAll()
+        val task2 = tasks.single { it.id != task.id }
+        assertThat(task2.status).isEqualTo(Status.FERDIG)
+    }
+
     companion object {
+
         val om = ObjectMapper()
     }
 }

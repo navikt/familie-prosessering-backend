@@ -1,7 +1,5 @@
 package no.nav.familie.prosessering.internal
 
-import com.ninjasquad.springmockk.MockkBean
-import io.mockk.every
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -9,7 +7,9 @@ import no.nav.familie.prosessering.TestAppConfig
 import no.nav.familie.prosessering.domene.Status
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.domene.TaskRepository
+import no.nav.familie.prosessering.task.TaskStep1
 import no.nav.familie.prosessering.task.TaskStep2
+import no.nav.familie.prosessering.task.TaskStepMedFeil
 import no.nav.familie.prosessering.task.TaskStepRekjørSenere
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
@@ -23,7 +23,7 @@ import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.context.transaction.TestTransaction
 import java.time.LocalDate
-import java.util.*
+import java.util.UUID
 
 @ExtendWith(SpringExtension::class)
 @ContextConfiguration(classes = [TestAppConfig::class])
@@ -32,9 +32,6 @@ class TaskStepExecutorServiceTest {
 
     @Autowired
     private lateinit var repository: TaskRepository
-
-    @MockkBean(relaxUnitFun = true)
-    lateinit var taskStep: TaskStep2
 
     @Autowired
     private lateinit var taskStepExecutorService: TaskStepExecutorService
@@ -46,13 +43,12 @@ class TaskStepExecutorServiceTest {
 
     @Test
     fun `skal håndtere feil`() {
-        var task2 = Task(TaskStep2.TASK_2, "{'a'='b'}")
+        var task2 = Task(TaskStepMedFeil.TYPE, "{'a'='b'}")
         repository.save(task2)
         TestTransaction.flagForCommit()
         TestTransaction.end()
 
         assertThat(task2.status).isEqualTo(Status.UBEHANDLET)
-        every { taskStep.doTask(any()) } throws (IllegalStateException())
 
         taskStepExecutorService.pollAndExecute()
         task2 = repository.findById(task2.id).orElseThrow()
@@ -107,6 +103,19 @@ class TaskStepExecutorServiceTest {
         val lagretTask = repository.findByIdOrNull(task.id)!!
         assertThat(lagretTask.triggerTid).isEqualTo(LocalDate.of(2088, 1, 1).atStartOfDay())
         assertThat(lagretTask.status).isEqualTo(Status.KLAR_TIL_PLUKK)
+    }
+
+    @Test
+    internal fun `skal kjøre task 2 direkte når pollAndExecute er ferdig`() {
+        val task = repository.save(Task(TaskStep1.TASK_1, UUID.randomUUID().toString()))
+        TestTransaction.flagForCommit()
+        TestTransaction.end()
+
+        taskStepExecutorService.pollAndExecute()
+
+        val tasks = repository.findAll()
+        val task2 = tasks.single { it.id != task.id }
+        assertThat(task2.status).isEqualTo(Status.FERDIG)
     }
 
 }

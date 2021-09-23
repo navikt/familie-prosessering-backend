@@ -8,28 +8,59 @@ import org.slf4j.LoggerFactory
 import org.slf4j.MDC
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.context.ApplicationListener
+import org.springframework.context.event.ContextClosedEvent
 import org.springframework.core.task.TaskExecutor
-import org.springframework.dao.OptimisticLockingFailureException
 import org.springframework.data.domain.PageRequest
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor
 import org.springframework.stereotype.Service
+import java.util.concurrent.CompletableFuture
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.TimeoutException
 import kotlin.math.min
 
-
+/**
+ * @param [rerunEnabled] hvis true så kjører man tasks direkt på nytt etter att man behandlet tasks
+ */
 @Service
 class TaskStepExecutorService(@Value("\${prosessering.maxAntall:10}") private val maxAntall: Int,
-                              @Value("\${prosessering.fixedDelayString.in.milliseconds:30000}")
+                              @Value("\${prosessering.rerun.enabled:true}") private val rerunEnabled: Boolean,
+                              @Value("\${prosessering.fixedDelayString.in.milliseconds:1000}")
                               private val fixedDelayString: String,
                               private val taskWorker: TaskWorker,
                               @Qualifier("taskExecutor") private val taskExecutor: TaskExecutor,
-                              private val taskService: TaskService) {
+                              private val taskService: TaskService) : ApplicationListener<ContextClosedEvent> {
 
     private val secureLog = LoggerFactory.getLogger("secureLogger")
 
+    /**
+     * Denne settes til true når appen fått SIGTERM
+     *
+     * Pga [ThreadPoolTaskExecutor.setWaitForTasksToCompleteOnShutdown] som settes til true for å håndtere att tasker
+     * har mulighet til å kjøre klart, så er også fortsatt mulig å legge til flere tasks, som vi ikke ønsker
+     */
+    @Volatile private var isShuttingDown = false
+
+    override fun onApplicationEvent(event: ContextClosedEvent) {
+        isShuttingDown = true
+    }
 
     @Scheduled(fixedDelayString = "\${prosessering.fixedDelayString.in.milliseconds:30000}")
     fun pollAndExecute() {
+        while (true) {
+            if (isShuttingDown) {
+                log.info("Shutting down, does not start new pollAndExecuteTasks")
+                return
+            }
+            if (!pollAndExecuteTasks()) return
+        }
+    }
+
+    /**
+     * @return if it should continue to run or not
+     */
+    private fun pollAndExecuteTasks(): Boolean {
         log.debug("Poller etter nye tasks")
         val pollingSize = calculatePollingSize(maxAntall)
 
@@ -37,11 +68,30 @@ class TaskStepExecutorService(@Value("\${prosessering.maxAntall:10}") private va
             val tasks = taskService.finnAlleTasksKlareForProsessering(PageRequest.of(0, pollingSize))
             log.trace("Pollet {} tasks med max {}", tasks.size, maxAntall)
 
-            tasks.forEach { task -> taskExecutor.execute { executeWork(task) } }
+            if (tasks.isNotEmpty()) {
+                return executeTasks(tasks)
+            }
         } else {
             log.trace("Ingen tasks til prosessering.")
         }
         log.trace("Ferdig med polling, venter {} ms til neste kjøring.", fixedDelayString)
+        return false
+    }
+
+    private fun executeTasks(tasks: List<ITask>): Boolean {
+        if (!rerunEnabled) {
+            tasks.forEach { executeWork(it) }
+            return false
+        }
+        val futures = tasks.map { task ->
+            CompletableFuture.runAsync({ executeWork(task) }, taskExecutor)
+        }
+        try {
+            CompletableFuture.allOf(*futures.toTypedArray()).get(2, TimeUnit.MINUTES)
+        } catch (e: TimeoutException) {
+            log.warn("En av taskene av ${tasks.map(ITask::id)} klarte ikke å fullføre innen timeout")
+        }
+        return true
     }
 
     private fun executeWork(task: ITask) {
@@ -51,7 +101,7 @@ class TaskStepExecutorService(@Value("\${prosessering.maxAntall:10}") private va
         val plukketTask = try {
             taskWorker.markerPlukket(task.id) ?: return
         } catch (e: Exception) {
-            if(isOptimisticLocking(e)) {
+            if (isOptimisticLocking(e)) {
                 log.info("OptimisticLockingFailureException metode=executeWork for task=${task.id}")
             } else {
                 log.error("Feilet metode=executeWork task=${task.id}. Se secure logs")
