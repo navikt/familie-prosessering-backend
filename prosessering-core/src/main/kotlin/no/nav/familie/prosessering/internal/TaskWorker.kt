@@ -19,9 +19,7 @@ import org.springframework.transaction.annotation.Transactional
 
 @Service
 class TaskWorker(private val taskService: TaskService,
-                 taskStepTyper: List<AsyncITaskStep<out ITask>>,
-                 @Value("\${prosessering.triggertidvedfeilisekunder:15}")
-                 private val triggerTidVedFeilISekunder: Long) {
+                 taskStepTyper: List<AsyncITaskStep<out ITask>>) {
 
     private val taskStepMap: Map<String, AsyncITaskStep<ITask>>
 
@@ -117,7 +115,7 @@ class TaskWorker(private val taskService: TaskService,
     }
 
     private fun finnTriggerTidVedFeil(taskType: String): Long {
-        return triggerTidVedFeilMap[taskType] ?: triggerTidVedFeilISekunder
+        return triggerTidVedFeilMap[taskType] ?: error("Ukjent tasktype $taskType")
     }
 
     private fun finnFeilteller(taskType: String): Counter {

@@ -4,12 +4,14 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import no.nav.familie.prosessering.TestAppConfig
+import no.nav.familie.prosessering.domene.Loggtype
 import no.nav.familie.prosessering.domene.Status
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.domene.TaskRepository
 import no.nav.familie.prosessering.task.TaskStep1
 import no.nav.familie.prosessering.task.TaskStep2
 import no.nav.familie.prosessering.task.TaskStepMedFeil
+import no.nav.familie.prosessering.task.TaskStepMedFeilMedTriggerTid0
 import no.nav.familie.prosessering.task.TaskStepRekjørSenere
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
@@ -43,25 +45,34 @@ class TaskStepExecutorServiceTest {
 
     @Test
     fun `skal håndtere feil`() {
-        var task2 = Task(TaskStepMedFeil.TYPE, "{'a'='b'}")
-        repository.save(task2)
+        var savedTask = Task(TaskStepMedFeil.TYPE, "{'a'='b'}")
+        repository.save(savedTask)
         TestTransaction.flagForCommit()
         TestTransaction.end()
 
-        assertThat(task2.status).isEqualTo(Status.UBEHANDLET)
+        assertThat(savedTask.status).isEqualTo(Status.UBEHANDLET)
 
         taskStepExecutorService.pollAndExecute()
-        task2 = repository.findById(task2.id).orElseThrow()
-        assertThat(task2.status).isEqualTo(Status.KLAR_TIL_PLUKK)
-        assertThat(task2.logg).hasSize(3)
+
+        savedTask = repository.findById(savedTask.id).orElseThrow()
+        assertThat(savedTask.status).isEqualTo(Status.KLAR_TIL_PLUKK)
+        assertThat(savedTask.logg.filter { it.type == Loggtype.FEILET }).hasSize(1)
+    }
+
+    @Test
+    fun `kommer rekjøre tasker som har 0 i triggerTidVedFeilISekunder direkte`() {
+        var savedTask = Task(TaskStepMedFeilMedTriggerTid0.TYPE, "{'a'='b'}")
+        repository.save(savedTask)
+        TestTransaction.flagForCommit()
+        TestTransaction.end()
+
+        assertThat(savedTask.status).isEqualTo(Status.UBEHANDLET)
 
         taskStepExecutorService.pollAndExecute()
-        task2 = repository.findById(task2.id).orElseThrow()
-        assertThat(task2.status).isEqualTo(Status.KLAR_TIL_PLUKK)
 
-        taskStepExecutorService.pollAndExecute()
-        task2 = repository.findById(task2.id).orElseThrow()
-        assertThat(task2.status).isEqualTo(Status.FEILET)
+        savedTask = repository.findById(savedTask.id).orElseThrow()
+        assertThat(savedTask.status).isEqualTo(Status.FEILET)
+        assertThat(savedTask.logg.filter { it.type == Loggtype.FEILET }).hasSize(3)
     }
 
     @Test

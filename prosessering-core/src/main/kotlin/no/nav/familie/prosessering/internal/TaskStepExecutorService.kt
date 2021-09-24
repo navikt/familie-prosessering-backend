@@ -21,11 +21,12 @@ import java.util.concurrent.TimeoutException
 import kotlin.math.min
 
 /**
- * @param [rerunEnabled] hvis true så kjører man tasks direkt på nytt etter att man behandlet tasks
+ * @param [continuousRunningEnabled] hvis true så kjører man tasks direkt på nytt etter att man behandlet tasks
  */
 @Service
 class TaskStepExecutorService(@Value("\${prosessering.maxAntall:10}") private val maxAntall: Int,
-                              @Value("\${prosessering.rerun.enabled:true}") private val rerunEnabled: Boolean,
+                              @Value("\${prosessering.continuousRunning.enabled:false}")
+                              private val continuousRunningEnabled: Boolean,
                               @Value("\${prosessering.fixedDelayString.in.milliseconds:1000}")
                               private val fixedDelayString: String,
                               private val taskWorker: TaskWorker,
@@ -79,7 +80,7 @@ class TaskStepExecutorService(@Value("\${prosessering.maxAntall:10}") private va
     }
 
     private fun executeTasks(tasks: List<ITask>): Boolean {
-        if (!rerunEnabled) {
+        if (!continuousRunningEnabled) {
             tasks.forEach { executeWork(it) }
             return false
         }

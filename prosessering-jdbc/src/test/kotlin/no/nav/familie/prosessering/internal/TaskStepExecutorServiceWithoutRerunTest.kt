@@ -38,7 +38,7 @@ import java.util.UUID
 @ExtendWith(SpringExtension::class)
 @ContextConfiguration(classes = [TestAppConfig::class], )
 @DataJdbcTest(excludeAutoConfiguration = [TestDatabaseAutoConfiguration::class])
-class TaskStepExecutorServiceTest {
+class TaskStepExecutorServiceWithoutRerunTest {
 
     @Autowired
     private lateinit var repository: TaskRepository
