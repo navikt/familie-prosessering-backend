@@ -36,7 +36,7 @@ import java.util.UUID
 
 @EnableScheduling
 @ExtendWith(SpringExtension::class)
-@ContextConfiguration(classes = [TestAppConfig::class], )
+@ContextConfiguration(classes = [TestAppConfig::class])
 @DataJdbcTest(excludeAutoConfiguration = [TestDatabaseAutoConfiguration::class])
 class TaskStepExecutorServiceTest {
 
