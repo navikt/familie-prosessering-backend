@@ -6,20 +6,17 @@ import no.nav.familie.prosessering.domene.Task
 import org.springframework.stereotype.Service
 
 @Service
-@TaskStepBeskrivelse(taskStepType = TaskStepFeilManuellOppfølgning.TASK_FEIL_1,
-                     beskrivelse = "Dette er task 1",
-                     settTilManuellOppfølgning = true,
+@TaskStepBeskrivelse(taskStepType = TaskStepMedFeilMedTriggerTid0.TYPE,
+                     beskrivelse = "Task med feil",
                      triggerTidVedFeilISekunder = 0)
-class TaskStepFeilManuellOppfølgning : AsyncTaskStep {
-
+class TaskStepMedFeilMedTriggerTid0 : AsyncTaskStep {
 
     override fun doTask(task: Task) {
-        error("Feiler")
+        error("Feil")
     }
 
     companion object {
 
-        const val TASK_FEIL_1 = "taskFeilManuellOppfølgning1"
+        const val TYPE = "taskMedFeilMedTriggerTid0"
     }
-
 }

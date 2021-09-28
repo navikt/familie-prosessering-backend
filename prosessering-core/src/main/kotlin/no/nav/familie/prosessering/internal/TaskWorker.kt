@@ -11,13 +11,15 @@ import no.nav.familie.prosessering.domene.Status
 import no.nav.familie.prosessering.error.RekjørSenereException
 import org.slf4j.LoggerFactory
 import org.springframework.aop.framework.AopProxyUtils
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.core.annotation.AnnotationUtils
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
 
 @Service
-class TaskWorker(private val taskService: TaskService, taskStepTyper: List<AsyncITaskStep<out ITask>>) {
+class TaskWorker(private val taskService: TaskService,
+                 taskStepTyper: List<AsyncITaskStep<out ITask>>) {
 
     private val taskStepMap: Map<String, AsyncITaskStep<ITask>>
 
@@ -113,7 +115,7 @@ class TaskWorker(private val taskService: TaskService, taskStepTyper: List<Async
     }
 
     private fun finnTriggerTidVedFeil(taskType: String): Long {
-        return triggerTidVedFeilMap[taskType] ?: 0
+        return triggerTidVedFeilMap[taskType] ?: error("Ukjent tasktype $taskType")
     }
 
     private fun finnFeilteller(taskType: String): Counter {

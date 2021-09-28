@@ -2,19 +2,21 @@ package no.nav.familie.prosessering.internal
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
-import com.ninjasquad.springmockk.MockkBean
-import io.mockk.every
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import no.nav.familie.prosessering.TaskFeil
 import no.nav.familie.prosessering.TestAppConfig
+import no.nav.familie.prosessering.domene.Loggtype
 import no.nav.familie.prosessering.domene.Status
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.domene.TaskRepository
+import no.nav.familie.prosessering.task.TaskStep1
 import no.nav.familie.prosessering.task.TaskStep2
 import no.nav.familie.prosessering.task.TaskStepExceptionUtenStackTrace
 import no.nav.familie.prosessering.task.TaskStepFeilManuellOppfølgning
+import no.nav.familie.prosessering.task.TaskStepMedFeil
+import no.nav.familie.prosessering.task.TaskStepMedFeilMedTriggerTid0
 import no.nav.familie.prosessering.task.TaskStepRekjørSenere
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
@@ -24,12 +26,15 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.data.jdbc.DataJdbcTest
 import org.springframework.boot.test.autoconfigure.jdbc.TestDatabaseAutoConfiguration
 import org.springframework.data.repository.findByIdOrNull
+import org.springframework.scheduling.annotation.EnableScheduling
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.context.transaction.TestTransaction
 import java.time.LocalDate
-import java.util.*
+import java.util.UUID
 
+
+@EnableScheduling
 @ExtendWith(SpringExtension::class)
 @ContextConfiguration(classes = [TestAppConfig::class])
 @DataJdbcTest(excludeAutoConfiguration = [TestDatabaseAutoConfiguration::class])
@@ -37,9 +42,6 @@ class TaskStepExecutorServiceTest {
 
     @Autowired
     private lateinit var repository: TaskRepository
-
-    @MockkBean(relaxUnitFun = true)
-    lateinit var taskStep: TaskStep2
 
     @Autowired
     private lateinit var taskStepExecutorService: TaskStepExecutorService
@@ -51,23 +53,32 @@ class TaskStepExecutorServiceTest {
 
     @Test
     fun `skal håndtere feil`() {
-        val savedTask = repository.save(Task(TaskStep2.TASK_2, "{'a'='b'}"))
+        var savedTask = repository.save(Task(TaskStepMedFeil.TYPE, "{'a'='b'}"))
         TestTransaction.flagForCommit()
         TestTransaction.end()
 
         assertThat(savedTask.status).isEqualTo(Status.UBEHANDLET)
-        every { taskStep.doTask(any()) } throws (IllegalStateException())
 
         taskStepExecutorService.pollAndExecute()
-        val taskKlarTilPlukk = repository.findById(savedTask.id).orElseThrow()
-        assertThat(taskKlarTilPlukk.status).isEqualTo(Status.KLAR_TIL_PLUKK)
-        assertThat(taskKlarTilPlukk.logg).hasSize(3)
+
+        savedTask = repository.findById(savedTask.id).orElseThrow()
+        assertThat(savedTask.status).isEqualTo(Status.KLAR_TIL_PLUKK)
+        assertThat(savedTask.logg.filter { it.type == Loggtype.FEILET }).hasSize(1)
+    }
+
+    @Test
+    fun `kommer rekjøre tasker som har 0 i triggerTidVedFeilISekunder direkte`() {
+        var savedTask = repository.save(Task(TaskStepMedFeilMedTriggerTid0.TYPE, "{'a'='b'}"))
+        TestTransaction.flagForCommit()
+        TestTransaction.end()
+
+        assertThat(savedTask.status).isEqualTo(Status.UBEHANDLET)
 
         taskStepExecutorService.pollAndExecute()
-        assertThat(repository.findById(savedTask.id).orElseThrow().status).isEqualTo(Status.KLAR_TIL_PLUKK)
 
-        taskStepExecutorService.pollAndExecute()
-        assertThat(repository.findById(savedTask.id).orElseThrow().status).isEqualTo(Status.FEILET)
+        savedTask = repository.findById(savedTask.id).orElseThrow()
+        assertThat(savedTask.status).isEqualTo(Status.FEILET)
+        assertThat(savedTask.logg.filter { it.type == Loggtype.FEILET }).hasSize(3)
     }
 
     @Test
@@ -105,11 +116,6 @@ class TaskStepExecutorServiceTest {
         TestTransaction.flagForCommit()
         TestTransaction.end()
 
-        repeat(2) {
-            taskStepExecutorService.pollAndExecute()
-            assertThat(repository.findByIdOrNull(task.id)!!.status).isEqualTo(Status.KLAR_TIL_PLUKK)
-        }
-
         taskStepExecutorService.pollAndExecute()
 
         val feiletTask = repository.findByIdOrNull(task.id)!!
@@ -146,7 +152,21 @@ class TaskStepExecutorServiceTest {
         assertThat(melding.stackTrace).isEqualTo(null)
     }
 
+    @Test
+    internal fun `skal kjøre task 2 direkte når pollAndExecute er ferdig`() {
+        val task = repository.save(Task(TaskStep1.TASK_1, UUID.randomUUID().toString()))
+        TestTransaction.flagForCommit()
+        TestTransaction.end()
+
+        taskStepExecutorService.pollAndExecute()
+
+        val tasks = repository.findAll()
+        val task2 = tasks.single { it.id != task.id }
+        assertThat(task2.status).isEqualTo(Status.FERDIG)
+    }
+
     companion object {
+
         val om = ObjectMapper()
     }
 }
