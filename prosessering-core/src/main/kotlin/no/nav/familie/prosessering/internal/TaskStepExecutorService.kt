@@ -81,7 +81,7 @@ class TaskStepExecutorService(@Value("\${prosessering.maxAntall:10}") private va
 
     private fun executeTasks(tasks: List<ITask>): Boolean {
         if (!continuousRunningEnabled) {
-            tasks.forEach { executeWork(it) }
+            tasks.forEach { taskExecutor.execute { executeWork(it) } }
             return false
         }
         val futures = tasks.map { task ->
