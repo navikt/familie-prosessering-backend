@@ -27,6 +27,8 @@ import kotlin.math.min
 class TaskStepExecutorService(@Value("\${prosessering.maxAntall:10}") private val maxAntall: Int,
                               @Value("\${prosessering.continuousRunning.enabled:false}")
                               private val continuousRunningEnabled: Boolean,
+                              @Value("\${prosessering.enabled:true}")
+                              private val enabled: Boolean,
                               @Value("\${prosessering.fixedDelayString.in.milliseconds:1000}")
                               private val fixedDelayString: String,
                               private val taskWorker: TaskWorker,
@@ -34,6 +36,10 @@ class TaskStepExecutorService(@Value("\${prosessering.maxAntall:10}") private va
                               private val taskService: TaskService) : ApplicationListener<ContextClosedEvent> {
 
     private val secureLog = LoggerFactory.getLogger("secureLogger")
+
+    init {
+        log.info("Prosessering enabled=$enabled")
+    }
 
     /**
      * Denne settes til true når appen fått SIGTERM
@@ -49,6 +55,8 @@ class TaskStepExecutorService(@Value("\${prosessering.maxAntall:10}") private va
 
     @Scheduled(fixedDelayString = "\${prosessering.fixedDelayString.in.milliseconds:30000}")
     fun pollAndExecute() {
+        if (!enabled) return
+
         while (true) {
             if (isShuttingDown) {
                 log.info("Shutting down, does not start new pollAndExecuteTasks")
