@@ -127,6 +127,7 @@ class TaskStepExecutorService(@Value("\${prosessering.maxAntall:10}") private va
         } catch (e: RekjørSenereException) {
             taskWorker.rekjørSenere(task.id, e)
         } catch (e: Exception) {
+            secureLog.info("Feilhåndterer task=${task.id} message=${e.message}")
             taskWorker.doFeilhåndtering(task.id, e)
             secureLog.warn("Fullført kjøring av task '{}', kjøretid={} ms med feil",
                            task,
