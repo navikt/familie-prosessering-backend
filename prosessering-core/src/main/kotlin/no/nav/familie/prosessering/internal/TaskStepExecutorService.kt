@@ -33,7 +33,6 @@ class TaskStepExecutorService(@Value("\${prosessering.maxAntall:10}") private va
                               @Value("\${prosessering.fixedDelayString.in.milliseconds:1000}")
                               private val fixedDelayString: String,
                               private val taskWorker: TaskWorker,
-                              private val threadPoolTaskScheduler: ThreadPoolTaskScheduler,
                               @Qualifier("taskExecutor") private val taskExecutor: TaskExecutor,
                               private val taskService: TaskService) : ApplicationListener<ContextClosedEvent> {
 
