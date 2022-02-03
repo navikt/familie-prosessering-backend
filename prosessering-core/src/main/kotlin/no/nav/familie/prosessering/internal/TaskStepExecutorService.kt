@@ -14,6 +14,7 @@ import org.springframework.core.task.TaskExecutor
 import org.springframework.data.domain.PageRequest
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler
 import org.springframework.stereotype.Service
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.TimeUnit
@@ -32,6 +33,7 @@ class TaskStepExecutorService(@Value("\${prosessering.maxAntall:10}") private va
                               @Value("\${prosessering.fixedDelayString.in.milliseconds:1000}")
                               private val fixedDelayString: String,
                               private val taskWorker: TaskWorker,
+                              private val threadPoolTaskScheduler: ThreadPoolTaskScheduler,
                               @Qualifier("taskExecutor") private val taskExecutor: TaskExecutor,
                               private val taskService: TaskService) : ApplicationListener<ContextClosedEvent> {
 

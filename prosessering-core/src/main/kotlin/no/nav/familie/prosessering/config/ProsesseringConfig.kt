@@ -35,15 +35,9 @@ class ProsesseringConfig(@Value("\${prosessering.queue.capacity:20}") private va
 
     @Bean
     fun threadPoolTaskScheduler(): ThreadPoolTaskScheduler {
-        val executor = object : ThreadPoolTaskScheduler() {
-            override fun destroy() {
-                this.scheduledThreadPoolExecutor.executeExistingDelayedTasksAfterShutdownPolicy = false
-                super.destroy()
-            }
-        }
+        val executor = object : ThreadPoolTaskScheduler() {}
         executor.threadNamePrefix = "TaskScheduler-"
-        executor.setWaitForTasksToCompleteOnShutdown(true)
-        executor.setAwaitTerminationSeconds(20)
+        executor.setExecuteExistingDelayedTasksAfterShutdownPolicy(false)
         executor.setErrorHandler { e ->
             log.error("TaskScheduler feilet, se secureLogs. exception=${e.javaClass.simpleName}" +
                       " cause=${e.cause?.javaClass?.simpleName}")
