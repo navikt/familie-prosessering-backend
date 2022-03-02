@@ -13,6 +13,7 @@ import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDateTime
 
 @Service
 class RestTaskService(private val taskService: TaskService) {
@@ -65,7 +66,7 @@ class RestTaskService(private val taskService: TaskService) {
     fun rekjørTask(taskId: Long, saksbehandlerId: String): Ressurs<String> {
         val task: ITask = taskService.findById(taskId)
 
-        taskService.save(task.klarTilPlukk(saksbehandlerId))
+        taskService.save(task.klarTilPlukk(saksbehandlerId).medTriggerTid(LocalDateTime.now()))
         logger.info("$saksbehandlerId rekjører task $taskId")
 
         return Ressurs.success(data = "")
@@ -78,7 +79,7 @@ class RestTaskService(private val taskService: TaskService) {
 
         return Result.runCatching {
             taskService.finnTasksMedStatus(listOf(status), Pageable.unpaged())
-                    .map { taskService.save(it.klarTilPlukk(saksbehandlerId)) }
+                    .map { taskService.save(it.klarTilPlukk(saksbehandlerId).medTriggerTid(LocalDateTime.now())) }
         }
                 .fold(
                         onSuccess = { Ressurs.success(data = "") },
