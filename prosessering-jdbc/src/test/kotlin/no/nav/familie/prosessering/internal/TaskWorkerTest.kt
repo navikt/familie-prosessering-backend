@@ -23,7 +23,7 @@ import org.springframework.test.context.transaction.TestTransaction
 @DataJdbcTest(excludeAutoConfiguration = [TestDatabaseAutoConfiguration::class])
 class TaskWorkerTest {
 
-    @SpykBean
+    @Autowired
     private lateinit var repository: TaskRepository
 
     @Autowired
