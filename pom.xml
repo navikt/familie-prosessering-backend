@@ -23,14 +23,14 @@
         <kontrakter.version>2.0_20220222213922_64795e8</kontrakter.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <kotlin.version>1.6.10</kotlin.version>
-        <felles.version>1.20211123111608_c4e75eb</felles.version>
-        <spring.version>5.3.13</spring.version>
+        <felles.version>1.20220221162703_957e034</felles.version>
+        <spring.version>5.3.16</spring.version>
         <spring.boot.version>2.6.4</spring.boot.version>
-        <spring.data.version>2.6.0</spring.data.version>
+        <spring.data.version>2.6.2</spring.data.version>
         <spring.data.jdbc.version>2.3.2</spring.data.jdbc.version>
-        <mockk.version>1.12.2</mockk.version>
+        <mockk.version>1.12.3</mockk.version>
         <micrometer.version>1.8.3</micrometer.version>
-        <nav.security.token.version>1.3.9</nav.security.token.version>
+        <nav.security.token.version>2.0.7</nav.security.token.version>
 
         <!--suppress UnresolvedMavenProperty  Ligger som secret i github-->
         <sonar.projectKey>${SONAR_PROJECTKEY}</sonar.projectKey>
@@ -122,7 +122,7 @@
             <dependency>
                 <groupId>com.ninja-squad</groupId>
                 <artifactId>springmockk</artifactId>
-                <version>3.0.1</version>
+                <version>3.1.1</version>
                 <scope>test</scope>
             </dependency>
 
@@ -152,7 +152,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-jar-plugin</artifactId>
-                    <version>3.2.0</version>
+                    <version>3.2.2</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -176,7 +176,7 @@
                 <plugin>
                     <groupId>org.sonatype.plugins</groupId>
                     <artifactId>nexus-staging-maven-plugin</artifactId>
-                    <version>1.6.8</version>
+                    <version>1.6.12</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
