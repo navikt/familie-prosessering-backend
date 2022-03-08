@@ -18,6 +18,18 @@ import java.time.LocalDateTime
 @Service
 class RestTaskService(private val taskService: TaskService) {
 
+    fun finnAntallTaskerSomKreverOppfølging(): Ressurs<Long> {
+        return Result.runCatching {
+            taskService.antallTaskerTilOppfølging()
+        }.fold(
+                onSuccess = { Ressurs.success(it) },
+                onFailure = { e ->
+                    logger.error("Henting av antall tasker som krever oppfølging feilet", e)
+                    Ressurs.failure(errorMessage = "Henting av antall tasker som krever oppfølging feilet.", error = e)
+                }
+        )
+    }
+
     fun hentTasks(statuses: List<Status>, saksbehandlerId: String, page: Int): Ressurs<PaginableResponse<TaskDto>> {
         logger.info("$saksbehandlerId henter tasker med status $statuses")
 

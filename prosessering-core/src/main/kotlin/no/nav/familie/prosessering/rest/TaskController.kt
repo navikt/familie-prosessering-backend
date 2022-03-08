@@ -23,6 +23,11 @@ class TaskController(private val restTaskService: RestTaskService, private val o
         return ResponseEntity.ok(restTaskService.hentTasks(statuser, hentBrukernavn(), page ?: 0))
     }
 
+    @GetMapping(path = ["/task/antall-til-oppfolging"])
+    fun antallTilOppfølging(): ResponseEntity<Ressurs<Long>> {
+        return ResponseEntity.ok(restTaskService.finnAntallTaskerSomKreverOppfølging())
+    }
+
     @GetMapping(path = ["/task/logg/{id}"])
     fun tasklogg(@PathVariable id: Long,
                  @RequestParam(required = false) page: Int?): ResponseEntity<Ressurs<List<TaskloggDto>>> {

@@ -50,4 +50,8 @@ class TaskService(val taskRepository: TaskRepository)  {
         taskRepository.delete(it)
     }
 
+    fun antallTaskerTilOppfølging(): Long {
+        return taskRepository.countByStatusIn(listOf(Status.MANUELL_OPPFØLGING, Status.FEILET))
+    }
+
 }

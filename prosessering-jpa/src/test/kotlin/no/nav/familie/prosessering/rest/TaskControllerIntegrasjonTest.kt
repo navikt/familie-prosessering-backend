@@ -61,5 +61,26 @@ internal class TaskControllerIntegrasjonTest {
         assertThat(repository.findById(avvikshåndtert.id).get().status).isEqualTo(Status.AVVIKSHÅNDTERT)
     }
 
+    @Test
+    fun `skal finne riktig antall tasker for oppfølging`() {
+        val ubehandletTask = Task(type = TaskStep1.TASK_1, payload = "{'a'='b'}", status = Status.UBEHANDLET)
+        val feiletTask = Task(type = TaskStep2.TASK_2, payload = "{'a'='1'}", status = Status.FEILET)
+        val avvikshåndtertTask = Task(type = TaskStep2.TASK_2, payload = "{'a'='1'}", status = Status.AVVIKSHÅNDTERT)
+        val manuellOppfølgingTask = Task(type = TaskStep2.TASK_2, payload = "{'a'='1'}", status = Status.MANUELL_OPPFØLGING)
+        val ferdigTask = Task(type = TaskStep2.TASK_2, payload = "{'a'='1'}", status = Status.FERDIG)
+        val klarTilPlukkTask = Task(type = TaskStep2.TASK_2, payload = "{'a'='1'}", status = Status.KLAR_TIL_PLUKK)
+        repository.save(ubehandletTask)
+        repository.save(feiletTask)
+        repository.save(avvikshåndtertTask)
+        repository.save(manuellOppfølgingTask)
+        repository.save(ferdigTask)
+        repository.save(klarTilPlukkTask)
+
+        val response = taskController.antallTilOppfølging()
+
+        assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
+        assertThat(response.body.data).isEqualTo(2)
+    }
+
 
 }
