@@ -23,7 +23,7 @@
         <kontrakter.version>2.0_20220222213922_64795e8</kontrakter.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <kotlin.version>1.6.10</kotlin.version>
-        <felles.version>1.20211123111608_c4e75eb</felles.version>
+        <felles.version>1.20220310100515_c0dcfc1</felles.version>
         <spring.version>5.3.13</spring.version>
         <spring.boot.version>2.6.4</spring.boot.version>
         <spring.data.version>2.6.0</spring.data.version>
