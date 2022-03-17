@@ -8,7 +8,7 @@ import java.time.LocalDateTime
 @NoRepositoryBean
 interface ITaskRepostitory<T : ITask> : PagingAndSortingRepository<T, Long> {
 
-    fun findByStatusInAndTriggerTidBeforeOrderByOpprettetTidDesc(status: List<Status>,
+    fun findByStatusInAndTriggerTidBeforeOrderByOpprettetTid(status: List<Status>,
                                                                  triggerTid: LocalDateTime,
                                                                  page: Pageable): List<T>
 

@@ -20,7 +20,7 @@ class TaskService(val taskRepository: TaskRepository)  {
     }
 
     fun finnAlleTasksKlareForProsessering(page: Pageable): List<ITask> {
-        return taskRepository.findByStatusInAndTriggerTidBeforeOrderByOpprettetTidDesc(listOf(Status.KLAR_TIL_PLUKK,
+        return taskRepository.findByStatusInAndTriggerTidBeforeOrderByOpprettetTid(listOf(Status.KLAR_TIL_PLUKK,
                                                                                               Status.UBEHANDLET),
                                                                                        LocalDateTime.now(),
                                                                                        page)
