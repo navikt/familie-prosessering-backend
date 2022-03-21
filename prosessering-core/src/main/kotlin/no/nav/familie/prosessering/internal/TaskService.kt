@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component
 import java.time.LocalDateTime
 
 @Component
-class TaskService(val taskRepository: TaskRepository)  {
+class TaskService(val taskRepository: TaskRepository) {
 
     fun findById(id: Long): ITask {
         return taskRepository.findByIdOrNull(id) ?: error("Task med id: $id ikke funnet.")
@@ -20,10 +20,14 @@ class TaskService(val taskRepository: TaskRepository)  {
     }
 
     fun finnAlleTasksKlareForProsessering(page: Pageable): List<ITask> {
-        return taskRepository.findByStatusInAndTriggerTidBeforeOrderByOpprettetTidDesc(listOf(Status.KLAR_TIL_PLUKK,
-                                                                                              Status.UBEHANDLET),
-                                                                                       LocalDateTime.now(),
-                                                                                       page)
+        return taskRepository.findByStatusInAndTriggerTidBeforeOrderByOpprettetTid(
+            listOf(
+                Status.KLAR_TIL_PLUKK,
+                Status.UBEHANDLET
+            ),
+            LocalDateTime.now(),
+            page
+        )
     }
 
     fun finnAlleFeiledeTasks(): List<ITask> {

@@ -102,6 +102,34 @@ class TaskRepositoryTest {
     }
 
     @Test
+    fun `findByStatusInAndTriggerTidBeforeOrderByOpprettetTid - skal returnere tasks sortert etter opprettet_tid - eldst først`() {
+        val task1 = Task(type = TaskStep1.TASK_1, payload = "task med opprettetTid nå", opprettetTid = LocalDateTime.now())
+        val task2 = Task(
+            type = TaskStep2.TASK_2,
+            payload = "task med tidligst oppprettetTid",
+            opprettetTid = LocalDateTime.now().minusDays(1)
+        )
+        val task3 =
+            Task(type = TaskStep2.TASK_2, payload = "task med senest oppettetTid", opprettetTid = LocalDateTime.now().plusDays(1))
+
+        repository.save(task1)
+        repository.save(task2)
+        repository.save(task3)
+
+        val message = repository.findByStatusInAndTriggerTidBeforeOrderByOpprettetTid(
+            listOf(Status.UBEHANDLET),
+            LocalDateTime.now(),
+            PageRequest.of(0, 5)
+        )
+
+        assertThat(message.map { it.payload }).containsExactly(
+            "task med tidligst oppprettetTid",
+            "task med opprettetTid nå",
+            "task med senest oppettetTid"
+        )
+    }
+
+    @Test
     fun `skal håndtere properties`() {
         val property = "PROPERTY"
         val lagretTask = repository.save(Task(type = TaskStep1.TASK_1,
