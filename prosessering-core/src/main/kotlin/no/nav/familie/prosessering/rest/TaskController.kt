@@ -18,9 +18,10 @@ class TaskController(private val restTaskService: RestTaskService, private val o
 
     @GetMapping(path = ["/v2/task", "task/v2"])
     fun task2(@RequestParam status: Status?,
-              @RequestParam(required = false) page: Int?): ResponseEntity<Ressurs<PaginableResponse<TaskDto>>> {
+              @RequestParam(required = false) page: Int?,
+              @RequestParam(required = false) type: String? = null): ResponseEntity<Ressurs<PaginableResponse<TaskDto>>> {
         val statuser: List<Status> = status?.let { listOf(it) } ?: Status.values().toList()
-        return ResponseEntity.ok(restTaskService.hentTasks(statuser, hentBrukernavn(), page ?: 0))
+        return ResponseEntity.ok(restTaskService.hentTasks(statuser, hentBrukernavn(), page ?: 0, type))
     }
 
     @GetMapping(path = ["/task/antall-til-oppfolging"])

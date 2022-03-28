@@ -83,6 +83,25 @@ internal class TaskControllerIntegrasjonTest {
         assertThat(response.body.data).isEqualTo(2)
     }
 
+    @Test
+    fun `skal hente tasker av angitt type`() {
+        val ubehandletTask = Task(type = TaskStep1.TASK_1, payload = "{'a'='b'}", status = Status.UBEHANDLET)
+        val feiletTask = Task(type = TaskStep2.TASK_2, payload = "{'a'='1'}", status = Status.FEILET)
+        val avvikshåndtertTask = Task(type = TaskStep2.TASK_2, payload = "{'a'='1'}", status = Status.AVVIKSHÅNDTERT)
+        val manuellOppfølgingTask = Task(type = TaskStep2.TASK_2, payload = "{'a'='1'}", status = Status.MANUELL_OPPFØLGING)
+        val ferdigTask = Task(type = TaskStep1.TASK_1, payload = "{'a'='1'}", status = Status.FERDIG)
+        val klarTilPlukkTask = Task(type = TaskStep2.TASK_2, payload = "{'a'='1'}", status = Status.KLAR_TIL_PLUKK)
+        repository.save(ubehandletTask)
+        repository.save(feiletTask)
+        repository.save(avvikshåndtertTask)
+        repository.save(manuellOppfølgingTask)
+        repository.save(ferdigTask)
+        repository.save(klarTilPlukkTask)
 
+        val response = taskController.task2(null, null, TaskStep1.TASK_1)
+
+        assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
+        assertThat((response.body.data as PaginableResponse<*>).tasks).hasSize(2)
+    }
 
 }

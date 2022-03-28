@@ -30,12 +30,12 @@ class RestTaskService(private val taskService: TaskService) {
         )
     }
 
-    fun hentTasks(statuses: List<Status>, saksbehandlerId: String, page: Int): Ressurs<PaginableResponse<TaskDto>> {
-        logger.info("$saksbehandlerId henter tasker med status $statuses")
+    fun hentTasks(statuses: List<Status>, saksbehandlerId: String, page: Int, type: String?): Ressurs<PaginableResponse<TaskDto>> {
+        logger.info("$saksbehandlerId henter ${type?.plus("-") ?: ""}tasker med status $statuses")
 
         return Result.runCatching {
             val pageRequest = PageRequest.of(page, TASK_LIMIT, Sort.Direction.DESC, "opprettetTid")
-            PaginableResponse(taskService.finnTasksTilFrontend(statuses, pageRequest).map {
+            PaginableResponse(taskService.finnTasksTilFrontend(statuses, pageRequest, type).map {
                 TaskDto(it.id,
                         it.status,
                         it.avvikstype,

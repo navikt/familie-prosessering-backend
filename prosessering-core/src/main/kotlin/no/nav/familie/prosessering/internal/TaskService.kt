@@ -46,8 +46,9 @@ class TaskService(val taskRepository: TaskRepository) {
         return taskRepository.findByStatusAndTriggerTidBefore(Status.FERDIG, eldreEnnDato)
     }
 
-    fun finnTasksTilFrontend(status: List<Status>, page: Pageable): List<ITask> {
-        return taskRepository.findByStatusIn(status, page)
+    fun finnTasksTilFrontend(status: List<Status>, page: Pageable, type: String? = null): List<ITask> {
+        return if (type == null) taskRepository.findByStatusIn(status, page)
+        else taskRepository.findByStatusInAndType(status, type, page)
     }
 
     fun delete(it: ITask) {
