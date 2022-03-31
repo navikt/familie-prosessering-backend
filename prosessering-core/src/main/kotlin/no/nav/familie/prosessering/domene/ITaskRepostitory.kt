@@ -19,4 +19,6 @@ interface ITaskRepostitory<T : ITask> : PagingAndSortingRepository<T, Long> {
     fun findByStatusAndTriggerTidBefore(status: Status, triggerTid: LocalDateTime): List<T>
 
     fun countByStatusIn(status: List<Status>): Long
+
+    fun findByStatusInAndType(status: List<Status>, type: String, page: Pageable): List<T>
 }
