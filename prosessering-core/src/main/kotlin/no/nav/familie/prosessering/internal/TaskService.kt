@@ -51,6 +51,10 @@ class TaskService(val taskRepository: TaskRepository) {
         else taskRepository.findByStatusInAndType(status, type, page)
     }
 
+    fun findTasksMedPayloadOgType(payload: String, type: String): ITask {
+        return taskRepository.findByPayloadAndType(payload, type)
+    }
+
     fun delete(it: ITask) {
         taskRepository.delete(it)
     }
