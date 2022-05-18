@@ -50,9 +50,9 @@ class TaskRepositoryTest {
 
         val funnetTask = repository.findByPayloadAndType(feiletTask1.payload, TaskStep2.TASK_2)
 
-        assertThat(funnetTask.payload).isEqualTo(feiletTask1.payload)
-        assertThat(funnetTask.type).isEqualTo(feiletTask1.type)
-        assertThat(funnetTask.status).isEqualTo(feiletTask1.status)
+        assertThat(funnetTask?.payload).isEqualTo(feiletTask1.payload)
+        assertThat(funnetTask?.type).isEqualTo(feiletTask1.type)
+        assertThat(funnetTask?.status).isEqualTo(feiletTask1.status)
     }
 
     @Test
