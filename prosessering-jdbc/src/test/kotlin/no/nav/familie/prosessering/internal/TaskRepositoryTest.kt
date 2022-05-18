@@ -22,6 +22,7 @@ import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import java.time.LocalDateTime
 import java.util.Properties
+import java.util.UUID
 
 @ExtendWith(SpringExtension::class)
 @ContextConfiguration(classes = [TestAppConfig::class])
@@ -34,6 +35,23 @@ class TaskRepositoryTest {
     @AfterEach
     fun clear() {
         repository.deleteAll()
+    }
+
+    @Test
+    fun `findByPayloadAndType - skal finne task for gitt payload og type`() {
+        val ubehandletTask = Task(type = TaskStep1.TASK_1, payload = "{'a'='b'}", status = Status.FEILET)
+        val feiletTask1 = Task(type = TaskStep2.TASK_2, payload = UUID.randomUUID().toString(), status = Status.FEILET)
+        val feiletTask2 = Task(type = TaskStep2.TASK_2, payload = "{'a'='1'}", status = Status.UBEHANDLET)
+
+        repository.save(ubehandletTask)
+        repository.save(feiletTask1)
+        repository.save(feiletTask2)
+
+        val funnetTask = repository.findByPayloadAndType(feiletTask1.payload, TaskStep2.TASK_2)
+
+        assertThat(funnetTask?.payload).isEqualTo(feiletTask1.payload)
+        assertThat(funnetTask?.type).isEqualTo(feiletTask1.type)
+        assertThat(funnetTask?.status).isEqualTo(feiletTask1.status)
     }
 
     @Test
