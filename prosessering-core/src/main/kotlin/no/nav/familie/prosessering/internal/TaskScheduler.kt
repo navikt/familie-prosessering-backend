@@ -1,5 +1,6 @@
 package no.nav.familie.prosessering.internal
 
+import no.nav.familie.leader.LeaderClient
 import no.nav.familie.prosessering.util.isOptimisticLocking
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -37,6 +38,14 @@ class TaskScheduler(private val taskMaintenanceService: TaskMaintenanceService) 
             taskMaintenanceService.slettTasksKlarForSletting()
         } catch (e: Exception) {
             loggFeil(e, "slettTasksKlarForSletting")
+        }
+    }
+
+
+    @Scheduled(cron = "@hourly")
+    fun tellAntallÅpneTask() {
+        if (LeaderClient.isLeader() == null || LeaderClient.isLeader() == true) {
+            taskMaintenanceService.tellAntallÅpneTask()
         }
     }
 

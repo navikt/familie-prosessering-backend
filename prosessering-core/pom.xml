@@ -34,6 +34,10 @@
         </dependency>
         <dependency>
             <groupId>no.nav.familie.felles</groupId>
+            <artifactId>leader</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>no.nav.familie.felles</groupId>
             <artifactId>sikkerhet</artifactId>
         </dependency>
         <dependency>

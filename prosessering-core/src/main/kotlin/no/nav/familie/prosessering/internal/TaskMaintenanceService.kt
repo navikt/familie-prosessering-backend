@@ -1,5 +1,8 @@
 package no.nav.familie.prosessering.internal
 
+import io.micrometer.core.instrument.Metrics
+import io.micrometer.core.instrument.MultiGauge
+import io.micrometer.core.instrument.Tags
 import no.nav.familie.prosessering.domene.ITask
 import no.nav.familie.prosessering.domene.ITaskLogg
 import no.nav.familie.prosessering.domene.Loggtype
@@ -13,6 +16,8 @@ import java.time.LocalDateTime
 @Service
 class TaskMaintenanceService(private val taskService: TaskService,
                              @Value("\${prosessering.delete.after.weeks:2}") private val deleteTasksAfterWeeks: Long) {
+
+    val antallÅpneTaskGague = MultiGauge.builder("openTasks").register(Metrics.globalRegistry)
 
     @Transactional
     fun retryFeilendeTask() {
@@ -51,6 +56,20 @@ class TaskMaintenanceService(private val taskService: TaskService,
             logger.info("Task klar for sletting. {} {} {} {}", it.id, it.callId, it.triggerTid, it.status)
             taskService.delete(it)
         }
+    }
+
+    fun tellAntallÅpneTask() {
+        val rows = mutableListOf<MultiGauge.Row<Number>>()
+
+        taskService.tellAntallÅpneTasker().map {
+            rows.add(
+                MultiGauge.Row.of(
+                    Tags.of("type", it.type,
+                            "status", it.status.name),
+                    it.count))
+        }
+
+        antallÅpneTaskGague.register(rows, true)
     }
 
     companion object {

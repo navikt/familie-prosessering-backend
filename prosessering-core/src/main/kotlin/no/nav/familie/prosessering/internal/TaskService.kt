@@ -1,6 +1,7 @@
 package no.nav.familie.prosessering.internal
 
 import no.nav.familie.prosessering.domene.ITask
+import no.nav.familie.prosessering.domene.AntallÅpneTask
 import no.nav.familie.prosessering.domene.Status
 import no.nav.familie.prosessering.domene.TaskRepository
 import org.springframework.data.domain.Pageable
@@ -61,6 +62,10 @@ class TaskService(val taskRepository: TaskRepository) {
 
     fun antallTaskerTilOppfølging(): Long {
         return taskRepository.countByStatusIn(listOf(Status.MANUELL_OPPFØLGING, Status.FEILET))
+    }
+
+    fun tellAntallÅpneTasker(): List<AntallÅpneTask> {
+        return taskRepository.countOpenTasks()
     }
 
 }

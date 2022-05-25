@@ -63,7 +63,7 @@ class RestTaskService(private val taskService: TaskService) {
 
         return Result.runCatching {
             val task = taskService.findById(id)
-            task.logg.map { TaskloggDto(it.id, it.endretAv, it.type, it.node, it.melding, it.opprettetTid) }
+            task.logg.sortedByDescending { it.opprettetTid }.map { TaskloggDto(it.id, it.endretAv, it.type, it.node, it.melding, it.opprettetTid) }
         }
                 .fold(
                         onSuccess = { Ressurs.success(data = it) },
