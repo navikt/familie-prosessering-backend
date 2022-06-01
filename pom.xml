@@ -20,7 +20,7 @@
         <maven.compiler.release>17</maven.compiler.release>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
-        <kontrakter.version>2.0_20220222213922_64795e8</kontrakter.version>
+        <kontrakter.version>2.0_20220531163525_b066cb4</kontrakter.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <kotlin.version>1.6.10</kotlin.version>
         <felles.version>1.20211123111608_c4e75eb</felles.version>
@@ -42,7 +42,6 @@
 
     <modules>
         <module>prosessering-core</module>
-        <module>prosessering-jpa</module>
         <module>prosessering-jdbc</module>
     </modules>
 
@@ -63,6 +62,11 @@
             <dependency>
                 <groupId>no.nav.familie.felles</groupId>
                 <artifactId>log</artifactId>
+                <version>${felles.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>no.nav.familie.felles</groupId>
+                <artifactId>leader</artifactId>
                 <version>${felles.version}</version>
             </dependency>
             <dependency>
