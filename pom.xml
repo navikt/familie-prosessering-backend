@@ -42,7 +42,6 @@
 
     <modules>
         <module>prosessering-core</module>
-        <module>prosessering-jpa</module>
         <module>prosessering-jdbc</module>
     </modules>
 
@@ -63,6 +62,11 @@
             <dependency>
                 <groupId>no.nav.familie.felles</groupId>
                 <artifactId>log</artifactId>
+                <version>${felles.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>no.nav.familie.felles</groupId>
+                <artifactId>leader</artifactId>
                 <version>${felles.version}</version>
             </dependency>
             <dependency>

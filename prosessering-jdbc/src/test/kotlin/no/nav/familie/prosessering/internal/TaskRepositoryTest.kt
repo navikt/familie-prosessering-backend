@@ -1,6 +1,7 @@
 package no.nav.familie.prosessering.internal
 
 import no.nav.familie.prosessering.TestAppConfig
+import no.nav.familie.prosessering.domene.AntallÅpneTask
 import no.nav.familie.prosessering.domene.Status
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.domene.TaskRepository
@@ -145,6 +146,22 @@ class TaskRepositoryTest {
             "task med opprettetTid nå",
             "task med senest oppettetTid"
         )
+    }
+
+
+    @Test
+    fun `countOpenTask - skal returenere antall åpne tasker`() {
+        val task1 = Task(type = TaskStep1.TASK_1, payload = "1", opprettetTid = LocalDateTime.now())
+        val task2 = Task(type = TaskStep2.TASK_2, payload = "1", opprettetTid = LocalDateTime.now())
+        val task3 = Task(type = TaskStep2.TASK_2, payload = "1", opprettetTid = LocalDateTime.now())
+
+        repository.save(task1)
+        repository.save(task2)
+        repository.save(task3)
+
+        val åpneTask = repository.countOpenTasks()
+        assertThat(åpneTask).hasSize(2).contains(AntallÅpneTask(TaskStep1.TASK_1, Status.UBEHANDLET, 1),
+                                                 AntallÅpneTask(TaskStep2.TASK_2, Status.UBEHANDLET, 2))
     }
 
     @Test

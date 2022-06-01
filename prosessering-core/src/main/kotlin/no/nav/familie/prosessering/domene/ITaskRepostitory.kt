@@ -23,4 +23,8 @@ interface ITaskRepostitory<T : ITask> : PagingAndSortingRepository<T, Long> {
     fun findByStatusInAndType(status: List<Status>, type: String, page: Pageable): List<T>
 
     fun findByPayloadAndType(payload: String, type: String): T?
+
+    fun countOpenTasks(): List<AntallÅpneTask>
 }
+
+
