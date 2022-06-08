@@ -104,4 +104,18 @@ internal class TaskControllerIntegrasjonTest {
         assertThat((response.body.data as PaginableResponse<*>).tasks).hasSize(2)
     }
 
+
+    @Test
+    fun `skal hente kommentarer hvis det finnes i logg`() {
+        val ubehandletTask = Task(type = TaskStep1.TASK_1, payload = "{'a'='b'}", status = Status.UBEHANDLET)
+
+       val lagretTask =  repository.save(ubehandletTask)
+
+        taskController.kommenterTask(lagretTask.id,"dette er en test")
+
+        val response = taskController.task2(null, null, TaskStep1.TASK_1)
+
+        assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
+        assertThat((((response.body.data as PaginableResponse<*>).tasks).first() as TaskDto).kommentar.equals("dette er en test"))
+    }
 }
