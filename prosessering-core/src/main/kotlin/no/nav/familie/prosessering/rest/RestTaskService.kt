@@ -3,6 +3,7 @@ package no.nav.familie.prosessering.rest
 import no.nav.familie.kontrakter.felles.Ressurs
 import no.nav.familie.prosessering.domene.Avvikstype
 import no.nav.familie.prosessering.domene.ITask
+import no.nav.familie.prosessering.domene.Loggtype
 import no.nav.familie.prosessering.domene.Status
 import no.nav.familie.prosessering.domene.asString
 import no.nav.familie.prosessering.internal.TaskService
@@ -36,17 +37,18 @@ class RestTaskService(private val taskService: TaskService) {
         return Result.runCatching {
             val pageRequest = PageRequest.of(page, TASK_LIMIT, Sort.Direction.DESC, "opprettetTid")
             PaginableResponse(taskService.finnTasksTilFrontend(statuses, pageRequest, type).map {
-                TaskDto(it.id,
-                        it.status,
-                        it.avvikstype,
-                        it.opprettetTid,
-                        it.triggerTid,
-                        it.type,
-                        it.metadata,
-                        it.payload,
-                        it.logg.size,
-                        it.logg.maxByOrNull { logg -> logg.opprettetTid }?.opprettetTid,
-                        it.callId)
+                TaskDto(id = it.id,
+                        status = it.status,
+                        avvikstype = it.avvikstype,
+                        opprettetTidspunkt = it.opprettetTid,
+                        triggerTid = it.triggerTid,
+                        taskStepType = it.type,
+                        metadata = it.metadata,
+                        payload = it.payload,
+                        antallLogger = it.logg.size,
+                        sistKjørt = it.logg.maxByOrNull { logg -> logg.opprettetTid }?.opprettetTid,
+                        kommentar = it.logg.filter { it.type.equals(Loggtype.KOMMENTAR) }.maxByOrNull { logg -> logg.opprettetTid }?.melding,
+                        callId = it.callId)
             })
         }
                 .fold(
@@ -118,6 +120,24 @@ class RestTaskService(private val taskService: TaskService) {
                             Ressurs.failure(errorMessage = "Avvikshåndtering av $taskId feilet", error = e)
                         }
                 )
+    }
+
+    @Transactional
+    fun kommenterTask(taskId: Long, kommentar: String, saksbehandlerId: String): Ressurs<String> {
+        val task: ITask = taskService.findById(taskId)
+
+        logger.info("$saksbehandlerId legger inn kommentar på task $taskId", taskId)
+
+        return Result.runCatching { taskService.save(task.kommenter(kommentar, saksbehandlerId)) }
+            .fold(
+                onSuccess = {
+                    Ressurs.success(data = "")
+                },
+                onFailure = { e ->
+                    logger.error("Kommentering av $taskId feilet", e)
+                    Ressurs.failure(errorMessage = "Kommentering av $taskId feilet", error = e)
+                }
+            )
     }
 
     companion object {

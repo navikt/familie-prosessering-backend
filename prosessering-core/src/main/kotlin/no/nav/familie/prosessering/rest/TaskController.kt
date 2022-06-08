@@ -53,4 +53,12 @@ class TaskController(private val restTaskService: RestTaskService, private val o
                                                                    avvikshåndterDTO.årsak,
                                                                    hentBrukernavn()))
     }
+
+    @PutMapping(path = ["/task/kommenter"])
+    fun kommenterTask(@RequestParam taskId: Long,
+                          @RequestBody kommentar: String): ResponseEntity<Ressurs<String>> {
+        return ResponseEntity.ok(restTaskService.kommenterTask(taskId,
+                                                                   kommentar,
+                                                                   hentBrukernavn()))
+    }
 }

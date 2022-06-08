@@ -34,6 +34,7 @@ abstract class ITask {
     abstract fun avvikshåndter(avvikstype: Avvikstype,
                                årsak: String,
                                endretAv: String): ITask
+    abstract fun kommenter(kommentar: String, endretAv: String): ITask
 
     abstract fun behandler(): ITask
     abstract fun klarTilPlukk(endretAv: String, melding: String? = null): ITask
