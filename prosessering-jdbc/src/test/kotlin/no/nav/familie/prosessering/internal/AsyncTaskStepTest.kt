@@ -21,14 +21,18 @@ class AsyncTaskStepTest {
 
     @Test
     fun `skal ha annotasjon`() {
-        Assertions.assertThat(tasker.any {
-            harIkkePåkrevdAnnotasjon(it)
-        }).isFalse()
+        Assertions.assertThat(
+            tasker.any {
+                harIkkePåkrevdAnnotasjon(it)
+            }
+        ).isFalse()
     }
 
     private fun harIkkePåkrevdAnnotasjon(it: AsyncTaskStep): Boolean {
-        return !AnnotationUtils.isAnnotationDeclaredLocally(TaskStepBeskrivelse::class.java,
-                                                            it.javaClass)
+        return !AnnotationUtils.isAnnotationDeclaredLocally(
+            TaskStepBeskrivelse::class.java,
+            it.javaClass
+        )
     }
 
     @Test
@@ -36,7 +40,7 @@ class AsyncTaskStepTest {
         val taskTyper = tasker.map { taskStep: AsyncTaskStep -> finnAnnotasjon(taskStep).taskStepType }
 
         Assertions.assertThat(taskTyper)
-                .isEqualTo(taskTyper.distinct())
+            .isEqualTo(taskTyper.distinct())
     }
 
     private fun finnAnnotasjon(taskStep: AsyncTaskStep): TaskStepBeskrivelse {

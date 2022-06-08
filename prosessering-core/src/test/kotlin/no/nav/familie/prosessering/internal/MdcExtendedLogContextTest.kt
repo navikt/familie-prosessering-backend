@@ -48,8 +48,8 @@ class MdcExtendedLogContextTest {
         val key = "Bl[bær"
 
         assertThatThrownBy { mdcExtendedLogContext.getValue(key) }
-                .isInstanceOf(IllegalArgumentException::class.java)
-                .hasMessage("Ugyldig key: '$key'")
+            .isInstanceOf(IllegalArgumentException::class.java)
+            .hasMessage("Ugyldig key: '$key'")
     }
 
     @Test
@@ -57,8 +57,8 @@ class MdcExtendedLogContextTest {
         val key = "Bl]bær"
 
         assertThatThrownBy { mdcExtendedLogContext.getValue(key) }
-                .isInstanceOf(IllegalArgumentException::class.java)
-                .hasMessage("Ugyldig key: '$key'")
+            .isInstanceOf(IllegalArgumentException::class.java)
+            .hasMessage("Ugyldig key: '$key'")
     }
 
     @Test
@@ -66,8 +66,7 @@ class MdcExtendedLogContextTest {
         val key = "Bl=bær"
 
         assertThatThrownBy { mdcExtendedLogContext.getValue(key) }
-                .isInstanceOf(IllegalArgumentException::class.java)
-                .hasMessage("Ugyldig key: '$key'")
+            .isInstanceOf(IllegalArgumentException::class.java)
+            .hasMessage("Ugyldig key: '$key'")
     }
-
 }

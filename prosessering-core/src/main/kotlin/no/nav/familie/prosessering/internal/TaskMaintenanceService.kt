@@ -14,8 +14,10 @@ import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
 
 @Service
-class TaskMaintenanceService(private val taskService: TaskService,
-                             @Value("\${prosessering.delete.after.weeks:2}") private val deleteTasksAfterWeeks: Long) {
+class TaskMaintenanceService(
+    private val taskService: TaskService,
+    @Value("\${prosessering.delete.after.weeks:2}") private val deleteTasksAfterWeeks: Long
+) {
 
     val antallÅpneTaskGague = MultiGauge.builder("openTasks").register(Metrics.globalRegistry)
 
@@ -43,9 +45,9 @@ class TaskMaintenanceService(private val taskService: TaskService,
 
     private fun værtPlukketMinstEnTime(it: ITask): Boolean {
         val sisteLogg = it.logg.maxByOrNull { logg -> logg.opprettetTid }
-        return sisteLogg != null
-               && sisteLogg.type == Loggtype.PLUKKET
-               && sisteLogg.opprettetTid.isBefore(LocalDateTime.now().minusMinutes(60))
+        return sisteLogg != null &&
+            sisteLogg.type == Loggtype.PLUKKET &&
+            sisteLogg.opprettetTid.isBefore(LocalDateTime.now().minusMinutes(60))
     }
 
     @Transactional
@@ -64,9 +66,13 @@ class TaskMaintenanceService(private val taskService: TaskService,
         taskService.tellAntallÅpneTasker().map {
             rows.add(
                 MultiGauge.Row.of(
-                    Tags.of("type", it.type,
-                            "status", it.status.name),
-                    it.count))
+                    Tags.of(
+                        "type", it.type,
+                        "status", it.status.name
+                    ),
+                    it.count
+                )
+            )
         }
 
         antallÅpneTaskGague.register(rows, true)
@@ -76,5 +82,4 @@ class TaskMaintenanceService(private val taskService: TaskService,
 
         val logger: Logger = LoggerFactory.getLogger(TaskScheduler::class.java)
     }
-
 }

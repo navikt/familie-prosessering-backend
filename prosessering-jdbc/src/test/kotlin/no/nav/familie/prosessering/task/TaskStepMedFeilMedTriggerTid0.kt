@@ -6,9 +6,11 @@ import no.nav.familie.prosessering.domene.Task
 import org.springframework.stereotype.Service
 
 @Service
-@TaskStepBeskrivelse(taskStepType = TaskStepMedFeilMedTriggerTid0.TYPE,
-                     beskrivelse = "Task med feil",
-                     triggerTidVedFeilISekunder = 0)
+@TaskStepBeskrivelse(
+    taskStepType = TaskStepMedFeilMedTriggerTid0.TYPE,
+    beskrivelse = "Task med feil",
+    triggerTidVedFeilISekunder = 0
+)
 class TaskStepMedFeilMedTriggerTid0 : AsyncTaskStep {
 
     override fun doTask(task: Task) {

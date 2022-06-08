@@ -23,30 +23,32 @@ import java.io.StringWriter
 @JsonAutoDetect(getterVisibility = Visibility.NONE, setterVisibility = Visibility.NONE, fieldVisibility = Visibility.ANY)
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class TaskFeil(
-        @JsonProperty("taskId")
-        val taskId: Long?,
-        @JsonProperty("taskName")
-        val taskName: String?,
-        @JsonProperty("exceptionCauseClass")
-        var exceptionCauseClass: String? = null,
-        @JsonProperty("exceptionCauseMessage")
-        var exceptionCauseMessage: String? = null,
-        @JsonProperty("feilmelding")
-        var feilmelding: String? = null,
-        @JsonProperty("stacktrace")
-        var stackTrace: String? = null,
-        @JsonProperty("callId")
-        val callId: String? = null,
-        @JsonProperty("feilkode")
-        var feilkode: String? = null
+    @JsonProperty("taskId")
+    val taskId: Long?,
+    @JsonProperty("taskName")
+    val taskName: String?,
+    @JsonProperty("exceptionCauseClass")
+    var exceptionCauseClass: String? = null,
+    @JsonProperty("exceptionCauseMessage")
+    var exceptionCauseMessage: String? = null,
+    @JsonProperty("feilmelding")
+    var feilmelding: String? = null,
+    @JsonProperty("stacktrace")
+    var stackTrace: String? = null,
+    @JsonProperty("callId")
+    val callId: String? = null,
+    @JsonProperty("feilkode")
+    var feilkode: String? = null
 ) {
 
-    constructor(taskInfo: ITask, feil: Exception?) : this(taskInfo.id,
-                                                          taskInfo.type,
-                                                          feil?.cause?.javaClass?.name,
-                                                          feil?.cause?.message,
-                                                          feil?.message,
-                                                          getStacktraceAsString(feil))
+    constructor(taskInfo: ITask, feil: Exception?) : this(
+        taskInfo.id,
+        taskInfo.type,
+        feil?.cause?.javaClass?.name,
+        feil?.cause?.message,
+        feil?.message,
+        getStacktraceAsString(feil)
+    )
 
     @Throws(IOException::class)
     fun writeValueAsString(): String {
@@ -75,5 +77,4 @@ data class TaskFeil(
             return sw.toString()
         }
     }
-
 }

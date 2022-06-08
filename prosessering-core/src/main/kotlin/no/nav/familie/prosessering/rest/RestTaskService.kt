@@ -5,7 +5,6 @@ import no.nav.familie.prosessering.domene.Avvikstype
 import no.nav.familie.prosessering.domene.ITask
 import no.nav.familie.prosessering.domene.Loggtype
 import no.nav.familie.prosessering.domene.Status
-import no.nav.familie.prosessering.domene.asString
 import no.nav.familie.prosessering.internal.TaskService
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -23,11 +22,11 @@ class RestTaskService(private val taskService: TaskService) {
         return Result.runCatching {
             taskService.antallTaskerTilOppfølging()
         }.fold(
-                onSuccess = { Ressurs.success(it) },
-                onFailure = { e ->
-                    logger.error("Henting av antall tasker som krever oppfølging feilet", e)
-                    Ressurs.failure(errorMessage = "Henting av antall tasker som krever oppfølging feilet.", error = e)
-                }
+            onSuccess = { Ressurs.success(it) },
+            onFailure = { e ->
+                logger.error("Henting av antall tasker som krever oppfølging feilet", e)
+                Ressurs.failure(errorMessage = "Henting av antall tasker som krever oppfølging feilet.", error = e)
+            }
         )
     }
 
@@ -36,8 +35,10 @@ class RestTaskService(private val taskService: TaskService) {
 
         return Result.runCatching {
             val pageRequest = PageRequest.of(page, TASK_LIMIT, Sort.Direction.DESC, "opprettetTid")
-            PaginableResponse(taskService.finnTasksTilFrontend(statuses, pageRequest, type).map {
-                TaskDto(id = it.id,
+            PaginableResponse(
+                taskService.finnTasksTilFrontend(statuses, pageRequest, type).map {
+                    TaskDto(
+                        id = it.id,
                         status = it.status,
                         avvikstype = it.avvikstype,
                         opprettetTidspunkt = it.opprettetTid,
@@ -48,16 +49,18 @@ class RestTaskService(private val taskService: TaskService) {
                         antallLogger = it.logg.size,
                         sistKjørt = it.logg.maxByOrNull { logg -> logg.opprettetTid }?.opprettetTid,
                         kommentar = it.logg.filter { it.type.equals(Loggtype.KOMMENTAR) }.maxByOrNull { logg -> logg.opprettetTid }?.melding,
-                        callId = it.callId)
-            })
+                        callId = it.callId
+                    )
+                }
+            )
         }
-                .fold(
-                        onSuccess = { Ressurs.success(data = it) },
-                        onFailure = { e ->
-                            logger.error("Henting av tasker feilet", e)
-                            Ressurs.failure(errorMessage = "Henting av tasker med status '$statuses', feilet.", error = e)
-                        }
-                )
+            .fold(
+                onSuccess = { Ressurs.success(data = it) },
+                onFailure = { e ->
+                    logger.error("Henting av tasker feilet", e)
+                    Ressurs.failure(errorMessage = "Henting av tasker med status '$statuses', feilet.", error = e)
+                }
+            )
     }
 
     fun hentTaskLogg(id: Long, saksbehandlerId: String): Ressurs<List<TaskloggDto>> {
@@ -67,13 +70,13 @@ class RestTaskService(private val taskService: TaskService) {
             val task = taskService.findById(id)
             task.logg.sortedByDescending { it.opprettetTid }.map { TaskloggDto(it.id, it.endretAv, it.type, it.node, it.melding, it.opprettetTid) }
         }
-                .fold(
-                        onSuccess = { Ressurs.success(data = it) },
-                        onFailure = { e ->
-                            logger.error("Henting av tasker feilet", e)
-                            Ressurs.failure(errorMessage = "Henting av tasklogg feilet.", error = e)
-                        }
-                )
+            .fold(
+                onSuccess = { Ressurs.success(data = it) },
+                onFailure = { e ->
+                    logger.error("Henting av tasker feilet", e)
+                    Ressurs.failure(errorMessage = "Henting av tasklogg feilet.", error = e)
+                }
+            )
     }
 
     @Transactional
@@ -84,7 +87,6 @@ class RestTaskService(private val taskService: TaskService) {
         logger.info("$saksbehandlerId rekjører task $taskId")
 
         return Ressurs.success(data = "")
-
     }
 
     @Transactional
@@ -93,15 +95,15 @@ class RestTaskService(private val taskService: TaskService) {
 
         return Result.runCatching {
             taskService.finnTasksMedStatus(listOf(status), Pageable.unpaged())
-                    .map { taskService.save(it.klarTilPlukk(saksbehandlerId).medTriggerTid(LocalDateTime.now())) }
+                .map { taskService.save(it.klarTilPlukk(saksbehandlerId).medTriggerTid(LocalDateTime.now())) }
         }
-                .fold(
-                        onSuccess = { Ressurs.success(data = "") },
-                        onFailure = { e ->
-                            logger.error("Rekjøring av tasker med status '$status' feilet", e)
-                            Ressurs.failure(errorMessage = "Rekjøring av tasker med status '$status' feilet", error = e)
-                        }
-                )
+            .fold(
+                onSuccess = { Ressurs.success(data = "") },
+                onFailure = { e ->
+                    logger.error("Rekjøring av tasker med status '$status' feilet", e)
+                    Ressurs.failure(errorMessage = "Rekjøring av tasker med status '$status' feilet", error = e)
+                }
+            )
     }
 
     @Transactional
@@ -111,15 +113,15 @@ class RestTaskService(private val taskService: TaskService) {
         logger.info("$saksbehandlerId setter task $taskId til avvikshåndtert", taskId)
 
         return Result.runCatching { taskService.save(task.avvikshåndter(avvikstype, årsak, saksbehandlerId)) }
-                .fold(
-                        onSuccess = {
-                            Ressurs.success(data = "")
-                        },
-                        onFailure = { e ->
-                            logger.error("Avvikshåndtering av $taskId feilet", e)
-                            Ressurs.failure(errorMessage = "Avvikshåndtering av $taskId feilet", error = e)
-                        }
-                )
+            .fold(
+                onSuccess = {
+                    Ressurs.success(data = "")
+                },
+                onFailure = { e ->
+                    logger.error("Avvikshåndtering av $taskId feilet", e)
+                    Ressurs.failure(errorMessage = "Avvikshåndtering av $taskId feilet", error = e)
+                }
+            )
     }
 
     @Transactional

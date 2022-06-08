@@ -14,7 +14,7 @@ private const val CRON_DAILY_1000 = "0 0 10 1/1 * ?"
 @Service
 class TaskScheduler(private val taskMaintenanceService: TaskMaintenanceService) {
 
-    @Scheduled(cron = "\${prosessering.cronRetryTasks:${CRON_DAILY_0700}}")
+    @Scheduled(cron = "\${prosessering.cronRetryTasks:$CRON_DAILY_0700}")
     fun retryFeilendeTask() {
         try {
             taskMaintenanceService.retryFeilendeTask()
@@ -40,7 +40,6 @@ class TaskScheduler(private val taskMaintenanceService: TaskMaintenanceService) 
             loggFeil(e, "slettTasksKlarForSletting")
         }
     }
-
 
     @Scheduled(cron = "@hourly")
     fun tellAntallÅpneTask() {

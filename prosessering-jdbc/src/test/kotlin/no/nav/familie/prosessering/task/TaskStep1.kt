@@ -12,7 +12,6 @@ import java.util.concurrent.TimeUnit
 @TaskStepBeskrivelse(taskStepType = TaskStep1.TASK_1, beskrivelse = "Dette er task 1")
 class TaskStep1 @Autowired constructor(private val taskRepository: TaskRepository) : AsyncTaskStep {
 
-
     override fun doTask(task: Task) {
         try {
             TimeUnit.MICROSECONDS.sleep(1)
@@ -23,7 +22,7 @@ class TaskStep1 @Autowired constructor(private val taskRepository: TaskRepositor
 
     override fun onCompletion(task: Task) {
         val nesteTask =
-                Task(TaskStep2.TASK_2, task.payload)
+            Task(TaskStep2.TASK_2, task.payload)
         taskRepository.save(nesteTask)
     }
 
@@ -31,5 +30,4 @@ class TaskStep1 @Autowired constructor(private val taskRepository: TaskRepositor
 
         const val TASK_1 = "task1"
     }
-
 }

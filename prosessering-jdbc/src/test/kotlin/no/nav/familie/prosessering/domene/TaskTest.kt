@@ -12,16 +12,16 @@ internal class TaskTest {
     @Test
     internal fun `Task skal ikke logge payload eller metadata`() {
         val task = Task("Type", "payload", Properties().also { it.put("key", "value") })
-                .copy(opprettetTid = tid, triggerTid = tid)
+            .copy(opprettetTid = tid, triggerTid = tid)
         assertThat(task.toString())
-                .isEqualTo("Task(id=0, status=UBEHANDLET, opprettetTid=2021-01-01T00:00, triggerTid=2021-01-01T00:00, type='Type', versjon=0)")
+            .isEqualTo("Task(id=0, status=UBEHANDLET, opprettetTid=2021-01-01T00:00, triggerTid=2021-01-01T00:00, type='Type', versjon=0)")
     }
 
     @Test
     internal fun `TaskLogg skal ikke logge melding`() {
         val taskLogg = TaskLogg(melding = "melding", type = Loggtype.FEILET)
-                .copy(opprettetTid = tid)
+            .copy(opprettetTid = tid)
         assertThat(taskLogg.toString())
-                .isEqualTo("TaskLogg(id=0, type=FEILET, opprettetTid=2021-01-01T00:00)")
+            .isEqualTo("TaskLogg(id=0, type=FEILET, opprettetTid=2021-01-01T00:00)")
     }
 }

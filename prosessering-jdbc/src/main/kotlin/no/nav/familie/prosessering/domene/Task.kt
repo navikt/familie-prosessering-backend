@@ -16,49 +16,59 @@ import java.util.*
 
 @Table("task")
 data class Task(
-        @Id
-        override val id: Long = 0L,
-        override val payload: String,
-        override val status: Status = Status.UBEHANDLET,
-        override val avvikstype: Avvikstype? = null,
-        override val opprettetTid: LocalDateTime = LocalDateTime.now(),
-        override val triggerTid: LocalDateTime = LocalDateTime.now(),
-        override val type: String,
-        @Column("metadata")
-        val metadataWrapper: PropertiesWrapper = PropertiesWrapper(Properties().apply {
+    @Id
+    override val id: Long = 0L,
+    override val payload: String,
+    override val status: Status = Status.UBEHANDLET,
+    override val avvikstype: Avvikstype? = null,
+    override val opprettetTid: LocalDateTime = LocalDateTime.now(),
+    override val triggerTid: LocalDateTime = LocalDateTime.now(),
+    override val type: String,
+    @Column("metadata")
+    val metadataWrapper: PropertiesWrapper = PropertiesWrapper(
+        Properties().apply {
             this[MDCConstants.MDC_CALL_ID] =
-                    MDC.get(MDCConstants.MDC_CALL_ID)
+                MDC.get(MDCConstants.MDC_CALL_ID)
                     ?: IdUtils.generateId()
-        }),
-        @Version
-        override val versjon: Long = 0,
-        @MappedCollection(idColumn = "task_id")
-        override val logg: Set<TaskLogg> = setOf(TaskLogg(type = Loggtype.UBEHANDLET))
+        }
+    ),
+    @Version
+    override val versjon: Long = 0,
+    @MappedCollection(idColumn = "task_id")
+    override val logg: Set<TaskLogg> = setOf(TaskLogg(type = Loggtype.UBEHANDLET))
 ) : ITask() {
-
-
 
     @Transient
     override val metadata: Properties = metadataWrapper.properties
 
     constructor (type: String, payload: String, properties: Properties = Properties()) :
-            this(type = type,
-                 payload = payload,
-                 metadataWrapper = PropertiesWrapper(properties.apply {
-                     this[MDCConstants.MDC_CALL_ID] =
-                             MDC.get(MDCConstants.MDC_CALL_ID)
-                             ?: IdUtils.generateId()
-                 }))
+        this(
+            type = type,
+            payload = payload,
+            metadataWrapper = PropertiesWrapper(
+                properties.apply {
+                    this[MDCConstants.MDC_CALL_ID] =
+                        MDC.get(MDCConstants.MDC_CALL_ID)
+                            ?: IdUtils.generateId()
+                }
+            )
+        )
 
-    override fun avvikshåndter(avvikstype: Avvikstype,
-                               årsak: String,
-                               endretAv: String): Task {
+    override fun avvikshåndter(
+        avvikstype: Avvikstype,
+        årsak: String,
+        endretAv: String
+    ): Task {
 
-        return copy(status = Status.AVVIKSHÅNDTERT,
-                    avvikstype = avvikstype,
-                    logg = logg + TaskLogg(type = Loggtype.AVVIKSHÅNDTERT,
-                                           melding = årsak,
-                                           endretAv = endretAv))
+        return copy(
+            status = Status.AVVIKSHÅNDTERT,
+            avvikstype = avvikstype,
+            logg = logg + TaskLogg(
+                type = Loggtype.AVVIKSHÅNDTERT,
+                melding = årsak,
+                endretAv = endretAv
+            )
+        )
     }
 
     override fun kommenter(kommentar: String, endretAv: String, settTilManuellOppfølgning: Boolean): Task {
@@ -66,9 +76,12 @@ data class Task(
         if (settTilManuellOppfølgning) {
             return this.copy(
                 status = Status.MANUELL_OPPFØLGING,
-                          logg = logg + TaskLogg(type = Loggtype.KOMMENTAR,
-                                                 melding = kommentar,
-                                                 endretAv = endretAv))
+                logg = logg + TaskLogg(
+                    type = Loggtype.KOMMENTAR,
+                    melding = kommentar,
+                    endretAv = endretAv
+                )
+            )
         } else {
             return copy(
                 logg = logg + TaskLogg(
@@ -85,8 +98,10 @@ data class Task(
     }
 
     override fun klarTilPlukk(endretAv: String, melding: String?): Task {
-        return copy(status = Status.KLAR_TIL_PLUKK,
-                    logg = logg + TaskLogg(type = Loggtype.KLAR_TIL_PLUKK, endretAv = endretAv, melding = melding))
+        return copy(
+            status = Status.KLAR_TIL_PLUKK,
+            logg = logg + TaskLogg(type = Loggtype.KLAR_TIL_PLUKK, endretAv = endretAv, melding = melding)
+        )
     }
 
     override fun plukker(): Task {
@@ -99,16 +114,21 @@ data class Task(
 
     override fun feilet(feil: TaskFeil, maxAntallFeil: Int, settTilManuellOppfølgning: Boolean): Task {
         if (this.status == Status.MANUELL_OPPFØLGING) {
-            return this.copy(logg = logg + TaskLogg(type = Loggtype.MANUELL_OPPFØLGING,
-                                                    melding = feil.writeValueAsString()))
+            return this.copy(
+                logg = logg + TaskLogg(
+                    type = Loggtype.MANUELL_OPPFØLGING,
+                    melding = feil.writeValueAsString()
+                )
+            )
         }
 
         val nyStatus = nyFeiletStatus(maxAntallFeil, settTilManuellOppfølgning)
 
         return try {
-            this.copy(status = nyStatus,
-                      logg = logg + TaskLogg(type = Loggtype.FEILET, melding = feil.writeValueAsString()))
-
+            this.copy(
+                status = nyStatus,
+                logg = logg + TaskLogg(type = Loggtype.FEILET, melding = feil.writeValueAsString())
+            )
         } catch (e: IOException) {
             this.copy(status = nyStatus, logg = logg + TaskLogg(type = Loggtype.FEILET))
         }
@@ -121,5 +141,4 @@ data class Task(
     override fun toString(): String {
         return "Task(id=$id, status=$status, opprettetTid=$opprettetTid, triggerTid=$triggerTid, type='$type', versjon=$versjon)"
     }
-
 }

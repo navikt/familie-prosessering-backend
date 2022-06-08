@@ -24,16 +24,18 @@ import kotlin.math.min
  * @param [continuousRunningEnabled] hvis true så kjører man tasks direkt på nytt etter att man behandlet tasks
  */
 @Service
-class TaskStepExecutorService(@Value("\${prosessering.maxAntall:10}") private val maxAntall: Int,
-                              @Value("\${prosessering.continuousRunning.enabled:false}")
-                              private val continuousRunningEnabled: Boolean,
-                              @Value("\${prosessering.enabled:true}")
-                              private val enabled: Boolean,
-                              @Value("\${prosessering.fixedDelayString.in.milliseconds:1000}")
-                              private val fixedDelayString: String,
-                              private val taskWorker: TaskWorker,
-                              @Qualifier("taskExecutor") private val taskExecutor: TaskExecutor,
-                              private val taskService: TaskService) : ApplicationListener<ContextClosedEvent> {
+class TaskStepExecutorService(
+    @Value("\${prosessering.maxAntall:10}") private val maxAntall: Int,
+    @Value("\${prosessering.continuousRunning.enabled:false}")
+    private val continuousRunningEnabled: Boolean,
+    @Value("\${prosessering.enabled:true}")
+    private val enabled: Boolean,
+    @Value("\${prosessering.fixedDelayString.in.milliseconds:1000}")
+    private val fixedDelayString: String,
+    private val taskWorker: TaskWorker,
+    @Qualifier("taskExecutor") private val taskExecutor: TaskExecutor,
+    private val taskService: TaskService
+) : ApplicationListener<ContextClosedEvent> {
 
     private val secureLog = LoggerFactory.getLogger("secureLogger")
 
@@ -121,23 +123,25 @@ class TaskStepExecutorService(@Value("\${prosessering.maxAntall:10}") private va
 
         try {
             taskWorker.doActualWork(plukketTask.id)
-            secureLog.info("Fullført kjøring av task '{}', kjøretid={} ms",
-                           task,
-                           System.currentTimeMillis() - startTidspunkt)
+            secureLog.info(
+                "Fullført kjøring av task '{}', kjøretid={} ms",
+                task,
+                System.currentTimeMillis() - startTidspunkt
+            )
         } catch (e: RekjørSenereException) {
             taskWorker.rekjørSenere(task.id, e)
         } catch (e: Exception) {
             secureLog.info("Feilhåndterer task=${task.id} message=${e.message}")
             taskWorker.doFeilhåndtering(task.id, e)
-            secureLog.warn("Fullført kjøring av task '{}', kjøretid={} ms med feil",
-                           task,
-                           System.currentTimeMillis() - startTidspunkt,
-                           e)
-
+            secureLog.warn(
+                "Fullført kjøring av task '{}', kjøretid={} ms med feil",
+                task,
+                System.currentTimeMillis() - startTidspunkt,
+                e
+            )
         } finally {
             clearLogContext()
         }
-
     }
 
     private fun initLogContext(taskDetails: ITask) {
@@ -156,7 +160,6 @@ class TaskStepExecutorService(@Value("\${prosessering.maxAntall:10}") private va
         log.trace("Ledig kapasitet i kø {}, poller etter {}", remainingCapacity, pollingSize)
         return pollingSize
     }
-
 
     companion object {
 

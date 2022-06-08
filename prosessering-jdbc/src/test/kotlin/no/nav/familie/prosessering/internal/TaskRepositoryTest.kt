@@ -115,8 +115,10 @@ class TaskRepositoryTest {
         repository.save(task2)
         repository.save(task3)
 
-        val message = repository.findByStatusIn(listOf(Status.UBEHANDLET),
-                                                PageRequest.of(0, 3, Sort.Direction.DESC, "opprettetTid"))
+        val message = repository.findByStatusIn(
+            listOf(Status.UBEHANDLET),
+            PageRequest.of(0, 3, Sort.Direction.DESC, "opprettetTid")
+        )
         assertThat(message.map { it.payload }).containsExactly("3", "1", "2")
     }
 
@@ -148,7 +150,6 @@ class TaskRepositoryTest {
         )
     }
 
-
     @Test
     fun `countOpenTask - skal returenere antall åpne tasker`() {
         val task1 = Task(type = TaskStep1.TASK_1, payload = "1", opprettetTid = LocalDateTime.now())
@@ -160,18 +161,24 @@ class TaskRepositoryTest {
         repository.save(task3)
 
         val åpneTask = repository.countOpenTasks()
-        assertThat(åpneTask).hasSize(2).contains(AntallÅpneTask(TaskStep1.TASK_1, Status.UBEHANDLET, 1),
-                                                 AntallÅpneTask(TaskStep2.TASK_2, Status.UBEHANDLET, 2))
+        assertThat(åpneTask).hasSize(2).contains(
+            AntallÅpneTask(TaskStep1.TASK_1, Status.UBEHANDLET, 1),
+            AntallÅpneTask(TaskStep2.TASK_2, Status.UBEHANDLET, 2)
+        )
     }
 
     @Test
     fun `skal håndtere properties`() {
         val property = "PROPERTY"
-        val lagretTask = repository.save(Task(type = TaskStep1.TASK_1,
-                                              payload = "{'a'='b'}",
-                                              properties = Properties().apply {
-                                                  this[property] = property
-                                              }))
+        val lagretTask = repository.save(
+            Task(
+                type = TaskStep1.TASK_1,
+                payload = "{'a'='b'}",
+                properties = Properties().apply {
+                    this[property] = property
+                }
+            )
+        )
         val task = repository.findByIdOrNull(lagretTask.id)!!
         assertThat(task.metadata.getProperty(property)).isEqualTo(property)
     }
@@ -181,7 +188,6 @@ class TaskRepositoryTest {
         val task = repository.save(Task(TaskStep1.TASK_1, "{'a'='b'}"))
         repository.save(task.copy(status = Status.KLAR_TIL_PLUKK))
         assertThat(catchThrowable { repository.save(task.copy(status = Status.KLAR_TIL_PLUKK)) })
-                .matches { isOptimisticLocking(it as Exception) }
+            .matches { isOptimisticLocking(it as Exception) }
     }
-
 }

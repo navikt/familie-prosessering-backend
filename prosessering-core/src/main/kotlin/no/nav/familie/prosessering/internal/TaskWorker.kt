@@ -11,15 +11,16 @@ import no.nav.familie.prosessering.domene.Status
 import no.nav.familie.prosessering.error.RekjørSenereException
 import org.slf4j.LoggerFactory
 import org.springframework.aop.framework.AopProxyUtils
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.core.annotation.AnnotationUtils
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
 
 @Service
-class TaskWorker(private val taskService: TaskService,
-                 taskStepTyper: List<AsyncITaskStep<out ITask>>) {
+class TaskWorker(
+    private val taskService: TaskService,
+    taskStepTyper: List<AsyncITaskStep<out ITask>>
+) {
 
     private val taskStepMap: Map<String, AsyncITaskStep<ITask>>
 
@@ -31,29 +32,33 @@ class TaskWorker(private val taskService: TaskService,
 
     init {
         val tasksTilTaskStepBeskrivelse: Map<AsyncITaskStep<ITask>, TaskStepBeskrivelse> =
-                taskStepTyper.map { it as AsyncITaskStep<ITask> }.associateWith { task ->
-                    val aClass = AopProxyUtils.ultimateTargetClass(task)
-                    val annotation = AnnotationUtils.findAnnotation(aClass, TaskStepBeskrivelse::class.java)
-                    requireNotNull(annotation) { "annotasjon mangler" }
-                    annotation
-                }
+            taskStepTyper.map { it as AsyncITaskStep<ITask> }.associateWith { task ->
+                val aClass = AopProxyUtils.ultimateTargetClass(task)
+                val annotation = AnnotationUtils.findAnnotation(aClass, TaskStepBeskrivelse::class.java)
+                requireNotNull(annotation) { "annotasjon mangler" }
+                annotation
+            }
         taskStepMap = tasksTilTaskStepBeskrivelse.entries.associate { it.value.taskStepType to it.key }
         maxAntallFeilMap = tasksTilTaskStepBeskrivelse.values.associate { it.taskStepType to it.maxAntallFeil }
         triggerTidVedFeilMap = tasksTilTaskStepBeskrivelse.values.associate { it.taskStepType to it.triggerTidVedFeilISekunder }
         settTilManuellOppfølgningVedFeil = tasksTilTaskStepBeskrivelse.values.associate { it.taskStepType to it.settTilManuellOppfølgning }
         feiltellereForTaskSteps = tasksTilTaskStepBeskrivelse.values.associate {
-            it.taskStepType to Metrics.counter("mottak.feilede.tasks",
-                                               "status",
-                                               it.taskStepType,
-                                               "beskrivelse",
-                                               it.beskrivelse)
+            it.taskStepType to Metrics.counter(
+                "mottak.feilede.tasks",
+                "status",
+                it.taskStepType,
+                "beskrivelse",
+                it.beskrivelse
+            )
         }
         fullførttellereForTaskSteps = tasksTilTaskStepBeskrivelse.values.associate {
-            it.taskStepType to Metrics.counter("mottak.fullfort.tasks",
-                                               "status",
-                                               it.taskStepType,
-                                               "beskrivelse",
-                                               it.beskrivelse)
+            it.taskStepType to Metrics.counter(
+                "mottak.fullfort.tasks",
+                "status",
+                it.taskStepType,
+                "beskrivelse",
+                it.beskrivelse
+            )
         }
     }
 
@@ -89,9 +94,11 @@ class TaskWorker(private val taskService: TaskService,
         log.info("Rekjører task=$taskId senere, triggerTid=${e.triggerTid}")
         secureLog.info("Rekjører task=$taskId senere, årsak=${e.årsak}", e)
         val taskMedNyTriggerTid = taskService.findById(taskId)
-                .medTriggerTid(e.triggerTid)
-                .klarTilPlukk(endretAv = BRUKERNAVN_NÅR_SIKKERHETSKONTEKST_IKKE_FINNES,
-                              melding = e.årsak)
+            .medTriggerTid(e.triggerTid)
+            .klarTilPlukk(
+                endretAv = BRUKERNAVN_NÅR_SIKKERHETSKONTEKST_IKKE_FINNES,
+                melding = e.årsak
+            )
         taskService.save(taskMedNyTriggerTid)
     }
 
@@ -106,8 +113,10 @@ class TaskWorker(private val taskService: TaskService,
         // lager metrikker på tasks som har feilet max antall ganger.
         if (task.status == Status.FEILET || task.status == Status.MANUELL_OPPFØLGING) {
             finnFeilteller(task.type).increment()
-            log.error("Task ${task.id} av type ${task.type} har feilet/satt til manuell oppfølgning. " +
-                      "Sjekk familie-prosessering for detaljer")
+            log.error(
+                "Task ${task.id} av type ${task.type} har feilet/satt til manuell oppfølgning. " +
+                    "Sjekk familie-prosessering for detaljer"
+            )
         }
         task = task.medTriggerTid(task.triggerTid.plusSeconds(finnTriggerTidVedFeil(task.type)))
         taskService.save(task)

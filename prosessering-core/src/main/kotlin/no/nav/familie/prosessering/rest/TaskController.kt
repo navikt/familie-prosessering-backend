@@ -5,7 +5,14 @@ import no.nav.familie.prosessering.domene.Status
 import no.nav.familie.sikkerhet.OIDCUtil
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.*
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.PutMapping
+import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestHeader
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
+import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("/api")
@@ -17,9 +24,11 @@ class TaskController(private val restTaskService: RestTaskService, private val o
     }
 
     @GetMapping(path = ["/v2/task", "task/v2"])
-    fun task2(@RequestParam status: Status?,
-              @RequestParam(required = false) page: Int?,
-              @RequestParam(required = false) type: String? = null): ResponseEntity<Ressurs<PaginableResponse<TaskDto>>> {
+    fun task2(
+        @RequestParam status: Status?,
+        @RequestParam(required = false) page: Int?,
+        @RequestParam(required = false) type: String? = null
+    ): ResponseEntity<Ressurs<PaginableResponse<TaskDto>>> {
         val statuser: List<Status> = status?.let { listOf(it) } ?: Status.values().toList()
         return ResponseEntity.ok(restTaskService.hentTasks(statuser, hentBrukernavn(), page ?: 0, type))
     }
@@ -30,8 +39,10 @@ class TaskController(private val restTaskService: RestTaskService, private val o
     }
 
     @GetMapping(path = ["/task/logg/{id}"])
-    fun tasklogg(@PathVariable id: Long,
-                 @RequestParam(required = false) page: Int?): ResponseEntity<Ressurs<List<TaskloggDto>>> {
+    fun tasklogg(
+        @PathVariable id: Long,
+        @RequestParam(required = false) page: Int?
+    ): ResponseEntity<Ressurs<List<TaskloggDto>>> {
         return ResponseEntity.ok(restTaskService.hentTaskLogg(id, hentBrukernavn()))
     }
 
@@ -46,19 +57,31 @@ class TaskController(private val restTaskService: RestTaskService, private val o
     }
 
     @PutMapping(path = ["/task/avvikshaandter"])
-    fun avvikshåndterTask(@RequestParam taskId: Long,
-                          @RequestBody avvikshåndterDTO: AvvikshåndterDTO): ResponseEntity<Ressurs<String>> {
-        return ResponseEntity.ok(restTaskService.avvikshåndterTask(taskId,
-                                                                   avvikshåndterDTO.avvikstype,
-                                                                   avvikshåndterDTO.årsak,
-                                                                   hentBrukernavn()))
+    fun avvikshåndterTask(
+        @RequestParam taskId: Long,
+        @RequestBody avvikshåndterDTO: AvvikshåndterDTO
+    ): ResponseEntity<Ressurs<String>> {
+        return ResponseEntity.ok(
+            restTaskService.avvikshåndterTask(
+                taskId,
+                avvikshåndterDTO.avvikstype,
+                avvikshåndterDTO.årsak,
+                hentBrukernavn()
+            )
+        )
     }
 
     @PutMapping(path = ["/task/kommenter"])
-    fun kommenterTask(@RequestParam taskId: Long,
-                          @RequestBody kommentarDTO: KommentarDTO): ResponseEntity<Ressurs<String>> {
-        return ResponseEntity.ok(restTaskService.kommenterTask(taskId,
-                                                                   kommentarDTO,
-                                                                   hentBrukernavn()))
+    fun kommenterTask(
+        @RequestParam taskId: Long,
+        @RequestBody kommentarDTO: KommentarDTO
+    ): ResponseEntity<Ressurs<String>> {
+        return ResponseEntity.ok(
+            restTaskService.kommenterTask(
+                taskId,
+                kommentarDTO,
+                hentBrukernavn()
+            )
+        )
     }
 }
