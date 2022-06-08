@@ -19,6 +19,7 @@ data class TaskDto(val id: Long,
                    val payload: String,
                    val antallLogger: Int,
                    val sistKjørt: LocalDateTime?,
+                   val kommentar: String?,
                    val callId: String)
 
 data class TaskloggDto(val id: Long,

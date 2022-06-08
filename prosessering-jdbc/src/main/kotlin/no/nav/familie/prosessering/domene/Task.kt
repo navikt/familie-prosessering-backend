@@ -61,6 +61,25 @@ data class Task(
                                            endretAv = endretAv))
     }
 
+    override fun kommenter(kommentar: String, endretAv: String, settTilManuellOppfølgning: Boolean): Task {
+
+        if (settTilManuellOppfølgning) {
+            return this.copy(
+                status = Status.MANUELL_OPPFØLGING,
+                          logg = logg + TaskLogg(type = Loggtype.KOMMENTAR,
+                                                 melding = kommentar,
+                                                 endretAv = endretAv))
+        } else {
+            return copy(
+                logg = logg + TaskLogg(
+                    type = Loggtype.KOMMENTAR,
+                    melding = kommentar,
+                    endretAv = endretAv
+                )
+            )
+        }
+    }
+
     override fun behandler(): Task {
         return copy(status = Status.BEHANDLER, logg = logg + TaskLogg(type = Loggtype.BEHANDLER))
     }
