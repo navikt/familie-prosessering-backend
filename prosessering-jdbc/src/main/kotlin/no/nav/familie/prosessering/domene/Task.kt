@@ -64,13 +64,12 @@ data class Task(
     override fun kommenter(kommentar: String, endretAv: String, settTilManuellOppfølgning: Boolean): Task {
 
         if (settTilManuellOppfølgning) {
-        return this.copy(
-            status = Status.MANUELL_OPPFØLGING,
-                      logg = logg + TaskLogg(type = Loggtype.KOMMENTAR,
-                                             melding = kommentar,
-                                             endretAv = endretAv))
+            return this.copy(
+                status = Status.MANUELL_OPPFØLGING,
+                          logg = logg + TaskLogg(type = Loggtype.KOMMENTAR,
+                                                 melding = kommentar,
+                                                 endretAv = endretAv))
         } else {
-
             return copy(
                 logg = logg + TaskLogg(
                     type = Loggtype.KOMMENTAR,
