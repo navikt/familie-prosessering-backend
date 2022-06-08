@@ -111,11 +111,26 @@ internal class TaskControllerIntegrasjonTest {
 
        val lagretTask =  repository.save(ubehandletTask)
 
-        taskController.kommenterTask(lagretTask.id,"dette er en test")
+        taskController.kommenterTask(lagretTask.id, KommentarDTO(false, "dette er en test"))
 
         val response = taskController.task2(null, null, TaskStep1.TASK_1)
 
         assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
         assertThat((((response.body.data as PaginableResponse<*>).tasks).first() as TaskDto).kommentar.equals("dette er en test"))
+    }
+
+    @Test
+    fun `skal kommentere og sette status til manuell oppfølging`() {
+        val ubehandletTask = Task(type = TaskStep1.TASK_1, payload = "{'a'='b'}", status = Status.UBEHANDLET)
+
+        val lagretTask =  repository.save(ubehandletTask)
+
+        taskController.kommenterTask(lagretTask.id,KommentarDTO(true, "dette er en test"))
+
+        val response = taskController.task2(null, null, TaskStep1.TASK_1)
+
+        assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
+        assertThat((((response.body.data as PaginableResponse<*>).tasks).first() as TaskDto).kommentar.equals("dette er en test"))
+        assertThat((((response.body.data as PaginableResponse<*>).tasks).first() as TaskDto).status.equals(Status.MANUELL_OPPFØLGING))
     }
 }

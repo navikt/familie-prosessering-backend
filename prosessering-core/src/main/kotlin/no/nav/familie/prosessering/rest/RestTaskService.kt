@@ -123,12 +123,12 @@ class RestTaskService(private val taskService: TaskService) {
     }
 
     @Transactional
-    fun kommenterTask(taskId: Long, kommentar: String, saksbehandlerId: String): Ressurs<String> {
+    fun kommenterTask(taskId: Long, kommentarDTO: KommentarDTO, saksbehandlerId: String): Ressurs<String> {
         val task: ITask = taskService.findById(taskId)
 
         logger.info("$saksbehandlerId legger inn kommentar på task $taskId", taskId)
 
-        return Result.runCatching { taskService.save(task.kommenter(kommentar, saksbehandlerId)) }
+        return Result.runCatching { taskService.save(task.kommenter(kommentarDTO.kommentar, saksbehandlerId, kommentarDTO.settTilManuellOppfølging)) }
             .fold(
                 onSuccess = {
                     Ressurs.success(data = "")
