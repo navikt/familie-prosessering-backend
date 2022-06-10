@@ -10,7 +10,11 @@ class DatabaseConfiguration : AbstractJdbcConfiguration() {
 
     @Bean
     override fun jdbcCustomConversions(): JdbcCustomConversions {
-        return JdbcCustomConversions(listOf(StringTilPropertiesWrapperConverter(),
-                                            PropertiesWrapperTilStringConverter()))
+        return JdbcCustomConversions(
+            listOf(
+                StringTilPropertiesWrapperConverter(),
+                PropertiesWrapperTilStringConverter()
+            )
+        )
     }
 }

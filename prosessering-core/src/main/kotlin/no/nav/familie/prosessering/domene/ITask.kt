@@ -5,7 +5,6 @@ import no.nav.familie.prosessering.TaskFeil
 import java.time.LocalDateTime
 import java.util.*
 
-
 abstract class ITask {
 
     abstract val id: Long
@@ -31,9 +30,11 @@ abstract class ITask {
     val callId: String
         get() = metadata.getProperty(MDCConstants.MDC_CALL_ID)
 
-    abstract fun avvikshåndter(avvikstype: Avvikstype,
-                               årsak: String,
-                               endretAv: String): ITask
+    abstract fun avvikshåndter(
+        avvikstype: Avvikstype,
+        årsak: String,
+        endretAv: String
+    ): ITask
     abstract fun kommenter(kommentar: String, endretAv: String, settTilManuellOppfølgning: Boolean): ITask
 
     abstract fun behandler(): ITask
@@ -51,5 +52,4 @@ abstract class ITask {
             else -> Status.FEILET
         }
     }
-
 }

@@ -10,6 +10,3 @@ interface TaskRepository : ITaskRepostitory<Task> {
     @Query("""select t.type,t.status, count(*) as count from task t WHERE t.status in ('UBEHANDLET', 'BEHANDLER', 'PLUKKET', 'KLAR_TIL_PLUKK') GROUP BY t.type, t.status""")
     override fun countOpenTasks(): List<AntallÅpneTask>
 }
-
-
-

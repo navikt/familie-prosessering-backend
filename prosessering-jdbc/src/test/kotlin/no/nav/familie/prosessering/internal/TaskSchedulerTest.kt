@@ -23,7 +23,6 @@ import java.time.LocalDateTime
 @DataJdbcTest(excludeAutoConfiguration = [TestDatabaseAutoConfiguration::class])
 class TaskSchedulerTest {
 
-
     @Autowired
     private lateinit var tasksScheduler: TaskScheduler
 
@@ -41,8 +40,8 @@ class TaskSchedulerTest {
         tasksScheduler.slettTasksKlarForSletting()
 
         assertThat(taskRepository.findAll())
-                .hasSize(1)
-                .extracting("status").containsOnly(Status.KLAR_TIL_PLUKK)
+            .hasSize(1)
+            .extracting("status").containsOnly(Status.KLAR_TIL_PLUKK)
     }
 
     @Test
@@ -50,12 +49,11 @@ class TaskSchedulerTest {
         val nyTask = Task("type", "payload").ferdigstill()
         val saved = taskRepository.save(nyTask)
 
-
         tasksScheduler.slettTasksKlarForSletting()
 
         assertThat(taskRepository.findAll())
-                .filteredOn("id", saved.id)
-                .isNotEmpty
+            .filteredOn("id", saved.id)
+            .isNotEmpty
     }
 
     @Test

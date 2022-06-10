@@ -42,7 +42,6 @@ internal class TaskControllerIntegrasjonTest {
     fun setup() {
         taskController = TaskController(restTaskService, mockk())
         every { taskController.hentBrukernavn() } returns ""
-
     }
 
     @Test
@@ -104,12 +103,11 @@ internal class TaskControllerIntegrasjonTest {
         assertThat((response.body.data as PaginableResponse<*>).tasks).hasSize(2)
     }
 
-
     @Test
     fun `skal hente kommentarer hvis det finnes i logg`() {
         val ubehandletTask = Task(type = TaskStep1.TASK_1, payload = "{'a'='b'}", status = Status.UBEHANDLET)
 
-       val lagretTask =  repository.save(ubehandletTask)
+        val lagretTask = repository.save(ubehandletTask)
 
         taskController.kommenterTask(lagretTask.id, KommentarDTO(false, "dette er en test"))
 
@@ -123,9 +121,9 @@ internal class TaskControllerIntegrasjonTest {
     fun `skal kommentere og sette status til manuell oppfølging`() {
         val ubehandletTask = Task(type = TaskStep1.TASK_1, payload = "{'a'='b'}", status = Status.UBEHANDLET)
 
-        val lagretTask =  repository.save(ubehandletTask)
+        val lagretTask = repository.save(ubehandletTask)
 
-        taskController.kommenterTask(lagretTask.id,KommentarDTO(true, "dette er en test"))
+        taskController.kommenterTask(lagretTask.id, KommentarDTO(true, "dette er en test"))
 
         val response = taskController.task2(null, null, TaskStep1.TASK_1)
 

@@ -21,5 +21,4 @@ class PropertiesWrapperTilStringConverter : Converter<PropertiesWrapper, String>
     override fun convert(taskPropertiesWrapper: PropertiesWrapper): String? {
         return taskPropertiesWrapper.properties.asString()
     }
-
 }

@@ -14,5 +14,4 @@ internal class OptimisticLockingUtilTest {
         assertThat(isOptimisticLocking(RuntimeException("asd"))).isFalse
         assertThat(isOptimisticLocking(RuntimeException(RuntimeException("")))).isFalse
     }
-
 }

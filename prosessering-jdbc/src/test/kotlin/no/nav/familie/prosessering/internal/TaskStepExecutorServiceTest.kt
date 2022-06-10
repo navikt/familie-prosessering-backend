@@ -33,7 +33,6 @@ import org.springframework.test.context.transaction.TestTransaction
 import java.time.LocalDate
 import java.util.UUID
 
-
 @EnableScheduling
 @ExtendWith(SpringExtension::class)
 @ContextConfiguration(classes = [TestAppConfig::class])
@@ -107,7 +106,6 @@ class TaskStepExecutorServiceTest {
             assertThat(it.status).isEqualTo(Status.FERDIG)
             assertThat(it.logg.size).isEqualTo(4)
         }
-
     }
 
     @Test

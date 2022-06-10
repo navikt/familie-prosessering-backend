@@ -8,9 +8,11 @@ import java.time.LocalDateTime
 @NoRepositoryBean
 interface ITaskRepostitory<T : ITask> : PagingAndSortingRepository<T, Long> {
 
-    fun findByStatusInAndTriggerTidBeforeOrderByOpprettetTid(status: List<Status>,
-                                                                 triggerTid: LocalDateTime,
-                                                                 page: Pageable): List<T>
+    fun findByStatusInAndTriggerTidBeforeOrderByOpprettetTid(
+        status: List<Status>,
+        triggerTid: LocalDateTime,
+        page: Pageable
+    ): List<T>
 
     fun findByStatus(status: Status): List<T>
 
@@ -26,5 +28,3 @@ interface ITaskRepostitory<T : ITask> : PagingAndSortingRepository<T, Long> {
 
     fun countOpenTasks(): List<AntallÅpneTask>
 }
-
-

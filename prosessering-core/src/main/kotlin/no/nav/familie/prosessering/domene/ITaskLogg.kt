@@ -2,7 +2,6 @@ package no.nav.familie.prosessering.domene
 
 import java.time.LocalDateTime
 
-
 abstract class ITaskLogg {
 
     abstract val id: Long

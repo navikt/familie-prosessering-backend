@@ -35,10 +35,10 @@ class MdcExtendedLogContext private constructor(private val paramName: String) {
     private fun currentValueMap(): MutableMap<String, String> {
         val currentValues = MDC.get(paramName) ?: return mutableMapOf()
         return currentValues
-                .substring(paramName.length + 1, currentValues.length - 1)
-                .split(";")
-                .associateBy({ it.substringBefore('=') }, { it.substringAfter('=') })
-                .toMutableMap()
+            .substring(paramName.length + 1, currentValues.length - 1)
+            .split(";")
+            .associateBy({ it.substringBefore('=') }, { it.substringAfter('=') })
+            .toMutableMap()
     }
 
     private fun toParamValue(elements: Map<String, String>): String {

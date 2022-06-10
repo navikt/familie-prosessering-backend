@@ -33,15 +33,16 @@ class TestAppConfig : JdbcRepositoryConfigExtension() {
      * Mocker ut TaskStepExecutor, hvis ikke kjører den runnables async
      */
     @Primary
-    @Bean(name=["taskExecutor"])
+    @Bean(name = ["taskExecutor"])
     fun threadPoolTaskExecutor(): TaskExecutor {
-        val taskExecutor1 = spyk<TaskExecutor>(ThreadPoolTaskExecutor().also {
-            it.initialize()
-        })
+        val taskExecutor1 = spyk<TaskExecutor>(
+            ThreadPoolTaskExecutor().also {
+                it.initialize()
+            }
+        )
         every { taskExecutor1.execute(any()) } answers {
             firstArg<Runnable>().run()
         }
         return taskExecutor1
     }
-
 }

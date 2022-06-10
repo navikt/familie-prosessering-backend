@@ -2,7 +2,7 @@ package no.nav.familie.prosessering
 
 import no.nav.familie.prosessering.domene.ITask
 
-interface AsyncITaskStep<T: ITask> {
+interface AsyncITaskStep<T : ITask> {
 
     /**
      * Kaster exception hvis ikke oppfylt.

@@ -9,7 +9,6 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
-
 internal class TaskControllerTest {
 
     private val taskService: TaskService = mockk()
@@ -22,7 +21,6 @@ internal class TaskControllerTest {
         restTaskService = RestTaskService(taskService)
         taskController = TaskController(restTaskService, mockk())
         every { taskController.hentBrukernavn() } returns ""
-
     }
 
     @Test

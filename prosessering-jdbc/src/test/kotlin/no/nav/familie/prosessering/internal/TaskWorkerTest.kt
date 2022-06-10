@@ -1,6 +1,5 @@
 package no.nav.familie.prosessering.internal
 
-import com.ninjasquad.springmockk.SpykBean
 import no.nav.familie.prosessering.TestAppConfig
 import no.nav.familie.prosessering.domene.Status
 import no.nav.familie.prosessering.domene.Task
@@ -46,5 +45,4 @@ class TaskWorkerTest {
         assertThat(findByIdOrNull?.status).isEqualTo(Status.FERDIG)
         assertThat(findByIdOrNull?.logg).hasSize(4)
     }
-
 }
