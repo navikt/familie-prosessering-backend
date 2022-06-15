@@ -103,7 +103,7 @@ class TaskWorker(
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    fun doFeilhåndtering(taskId: Long, e: Exception) {
+    fun doFeilhåndtering(taskId: Long, e: Throwable) {
         var task = taskService.findById(taskId)
         val maxAntallFeil = finnMaxAntallFeil(task.type)
         val settTilManuellOppfølgning = finnSettTilManuellOppfølgning(task.type)

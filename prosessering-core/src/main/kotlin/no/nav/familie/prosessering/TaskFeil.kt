@@ -41,7 +41,7 @@ data class TaskFeil(
     var feilkode: String? = null
 ) {
 
-    constructor(taskInfo: ITask, feil: Exception?) : this(
+    constructor(taskInfo: ITask, feil: Throwable?) : this(
         taskInfo.id,
         taskInfo.type,
         feil?.cause?.javaClass?.name,

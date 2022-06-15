@@ -130,7 +130,7 @@ class TaskStepExecutorService(
             )
         } catch (e: RekjørSenereException) {
             taskWorker.rekjørSenere(task.id, e)
-        } catch (e: Exception) {
+        } catch (e: Throwable) {
             secureLog.info("Feilhåndterer task=${task.id} message=${e.message}")
             taskWorker.doFeilhåndtering(task.id, e)
             secureLog.warn(
@@ -139,6 +139,7 @@ class TaskStepExecutorService(
                 System.currentTimeMillis() - startTidspunkt,
                 e
             )
+            if (e is Error) throw e
         } finally {
             clearLogContext()
         }
