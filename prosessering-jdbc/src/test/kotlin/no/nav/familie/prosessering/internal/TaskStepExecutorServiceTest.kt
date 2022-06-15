@@ -15,12 +15,14 @@ import no.nav.familie.prosessering.task.TaskStep1
 import no.nav.familie.prosessering.task.TaskStep2
 import no.nav.familie.prosessering.task.TaskStepExceptionUtenStackTrace
 import no.nav.familie.prosessering.task.TaskStepFeilManuellOppfølgning
+import no.nav.familie.prosessering.task.TaskStepMedError
 import no.nav.familie.prosessering.task.TaskStepMedFeil
 import no.nav.familie.prosessering.task.TaskStepMedFeilMedTriggerTid0
 import no.nav.familie.prosessering.task.TaskStepRekjørSenere
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.data.jdbc.DataJdbcTest
@@ -32,6 +34,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.context.transaction.TestTransaction
 import java.time.LocalDate
 import java.util.UUID
+import java.util.concurrent.ExecutionException
 
 @EnableScheduling
 @ExtendWith(SpringExtension::class)
@@ -59,6 +62,21 @@ class TaskStepExecutorServiceTest {
         assertThat(savedTask.status).isEqualTo(Status.UBEHANDLET)
 
         taskStepExecutorService.pollAndExecute()
+
+        savedTask = repository.findById(savedTask.id).orElseThrow()
+        assertThat(savedTask.status).isEqualTo(Status.KLAR_TIL_PLUKK)
+        assertThat(savedTask.logg.filter { it.type == Loggtype.FEILET }).hasSize(1)
+    }
+
+    @Test
+    fun `skal håndtere feil med error`() {
+        var savedTask = repository.save(Task(TaskStepMedError.TYPE, "{'a'='b'}"))
+        TestTransaction.flagForCommit()
+        TestTransaction.end()
+
+        assertThat(savedTask.status).isEqualTo(Status.UBEHANDLET)
+
+        assertThrows<ExecutionException> { taskStepExecutorService.pollAndExecute() }
 
         savedTask = repository.findById(savedTask.id).orElseThrow()
         assertThat(savedTask.status).isEqualTo(Status.KLAR_TIL_PLUKK)
