@@ -7,7 +7,7 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.ObjectReader
 import com.fasterxml.jackson.databind.ObjectWriter
-import no.nav.familie.prosessering.domene.ITask
+import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.error.TaskExceptionUtenStackTrace
 import java.io.IOException
 import java.io.PrintWriter
@@ -41,7 +41,7 @@ data class TaskFeil(
     var feilkode: String? = null
 ) {
 
-    constructor(taskInfo: ITask, feil: Throwable?) : this(
+    constructor(taskInfo: Task, feil: Throwable?) : this(
         taskInfo.id,
         taskInfo.type,
         feil?.cause?.javaClass?.name,

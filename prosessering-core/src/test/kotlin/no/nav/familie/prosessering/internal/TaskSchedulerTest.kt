@@ -35,7 +35,7 @@ class TaskSchedulerTest {
     }
 
     @Test
-    @Sql("classpath:sql-testdata/gamle_tasker_med_logg.sql")
+    @Sql("sql-testdata/gamle_tasker_med_logg.sql")
     fun `skal slette gamle tasker med status FERDIG`() {
         tasksScheduler.slettTasksKlarForSletting()
 
