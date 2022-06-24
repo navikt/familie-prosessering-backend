@@ -2,7 +2,7 @@ package no.nav.familie.prosessering.rest
 
 import io.mockk.every
 import io.mockk.mockk
-import no.nav.familie.prosessering.TestAppConfig
+import no.nav.familie.prosessering.IntegrationRunnerTest
 import no.nav.familie.prosessering.domene.Status
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.domene.TaskRepository
@@ -12,18 +12,10 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.data.jdbc.DataJdbcTest
-import org.springframework.boot.test.autoconfigure.jdbc.TestDatabaseAutoConfiguration
 import org.springframework.http.HttpStatus
-import org.springframework.test.context.ContextConfiguration
-import org.springframework.test.context.junit.jupiter.SpringExtension
 
-@ExtendWith(SpringExtension::class)
-@ContextConfiguration(classes = [TestAppConfig::class])
-@DataJdbcTest(excludeAutoConfiguration = [TestDatabaseAutoConfiguration::class])
-internal class TaskControllerIntegrasjonTest {
+internal class TaskControllerIntegrasjonTest : IntegrationRunnerTest() {
 
     @Autowired
     lateinit var restTaskService: RestTaskService
@@ -32,11 +24,6 @@ internal class TaskControllerIntegrasjonTest {
     lateinit var repository: TaskRepository
 
     lateinit var taskController: TaskController
-
-    @AfterEach
-    fun clear() {
-        repository.deleteAll()
-    }
 
     @BeforeEach
     fun setup() {
@@ -66,7 +53,8 @@ internal class TaskControllerIntegrasjonTest {
         val ubehandletTask = Task(type = TaskStep1.TASK_1, payload = "{'a'='b'}", status = Status.UBEHANDLET)
         val feiletTask = Task(type = TaskStep2.TASK_2, payload = "{'a'='1'}", status = Status.FEILET)
         val avvikshåndtertTask = Task(type = TaskStep2.TASK_2, payload = "{'a'='1'}", status = Status.AVVIKSHÅNDTERT)
-        val manuellOppfølgingTask = Task(type = TaskStep2.TASK_2, payload = "{'a'='1'}", status = Status.MANUELL_OPPFØLGING)
+        val manuellOppfølgingTask =
+            Task(type = TaskStep2.TASK_2, payload = "{'a'='1'}", status = Status.MANUELL_OPPFØLGING)
         val ferdigTask = Task(type = TaskStep2.TASK_2, payload = "{'a'='1'}", status = Status.FERDIG)
         val klarTilPlukkTask = Task(type = TaskStep2.TASK_2, payload = "{'a'='1'}", status = Status.KLAR_TIL_PLUKK)
         repository.save(ubehandletTask)
@@ -87,7 +75,8 @@ internal class TaskControllerIntegrasjonTest {
         val ubehandletTask = Task(type = TaskStep1.TASK_1, payload = "{'a'='b'}", status = Status.UBEHANDLET)
         val feiletTask = Task(type = TaskStep2.TASK_2, payload = "{'a'='1'}", status = Status.FEILET)
         val avvikshåndtertTask = Task(type = TaskStep2.TASK_2, payload = "{'a'='1'}", status = Status.AVVIKSHÅNDTERT)
-        val manuellOppfølgingTask = Task(type = TaskStep2.TASK_2, payload = "{'a'='1'}", status = Status.MANUELL_OPPFØLGING)
+        val manuellOppfølgingTask =
+            Task(type = TaskStep2.TASK_2, payload = "{'a'='1'}", status = Status.MANUELL_OPPFØLGING)
         val ferdigTask = Task(type = TaskStep1.TASK_1, payload = "{'a'='1'}", status = Status.FERDIG)
         val klarTilPlukkTask = Task(type = TaskStep2.TASK_2, payload = "{'a'='1'}", status = Status.KLAR_TIL_PLUKK)
         repository.save(ubehandletTask)

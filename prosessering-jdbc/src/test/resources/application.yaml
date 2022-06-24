@@ -10,13 +10,15 @@ spring:
   main:
     allow-bean-definition-overriding: true
     banner-mode: "off"
+    web-application-type: none
   flyway:
     enabled: true
   datasource:
-    username: sa
-    password:
-    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;CASE_INSENSITIVE_IDENTIFIERS=TRUE;MODE=POSTGRESQL
-    driver-class-name: org.h2.Driver
+    #type: com.zaxxer.hikari.HikariDataSource
+    username: postgres
+    password: test
+    url: jdbc:tc:postgresql:11.1:///prosessering
+    driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
 
 
     hikari:
@@ -26,4 +28,3 @@ spring:
       minimum-idle: 1
 
 prosessering.continuousRunning.enabled: true
-prosessering.delete.pagesize: 2

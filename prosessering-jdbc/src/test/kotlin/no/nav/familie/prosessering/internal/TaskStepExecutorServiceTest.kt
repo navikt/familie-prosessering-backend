@@ -5,8 +5,8 @@ import com.fasterxml.jackson.module.kotlin.readValue
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import no.nav.familie.prosessering.IntegrationRunnerTest
 import no.nav.familie.prosessering.TaskFeil
-import no.nav.familie.prosessering.TestAppConfig
 import no.nav.familie.prosessering.domene.Loggtype
 import no.nav.familie.prosessering.domene.Status
 import no.nav.familie.prosessering.domene.Task
@@ -20,38 +20,24 @@ import no.nav.familie.prosessering.task.TaskStepMedFeil
 import no.nav.familie.prosessering.task.TaskStepMedFeilMedTriggerTid0
 import no.nav.familie.prosessering.task.TaskStepRekjørSenere
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.data.jdbc.DataJdbcTest
-import org.springframework.boot.test.autoconfigure.jdbc.TestDatabaseAutoConfiguration
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.scheduling.annotation.EnableScheduling
-import org.springframework.test.context.ContextConfiguration
-import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.context.transaction.TestTransaction
 import java.time.LocalDate
 import java.util.UUID
 import java.util.concurrent.ExecutionException
 
 @EnableScheduling
-@ExtendWith(SpringExtension::class)
-@ContextConfiguration(classes = [TestAppConfig::class])
-@DataJdbcTest(excludeAutoConfiguration = [TestDatabaseAutoConfiguration::class])
-class TaskStepExecutorServiceTest {
+class TaskStepExecutorServiceTest : IntegrationRunnerTest() {
 
     @Autowired
     private lateinit var repository: TaskRepository
 
     @Autowired
     private lateinit var taskStepExecutorService: TaskStepExecutorService
-
-    @AfterEach
-    fun clear() {
-        repository.deleteAll()
-    }
 
     @Test
     fun `skal håndtere feil`() {
@@ -136,7 +122,9 @@ class TaskStepExecutorServiceTest {
 
         val feiletTask = repository.findByIdOrNull(task.id)!!
         assertThat(feiletTask.status).isEqualTo(Status.MANUELL_OPPFØLGING)
-        assertThat(om.readValue<TaskFeil>(feiletTask.logg.last().melding!!).stackTrace).isNotNull
+        feiletTask.logg.filter { it.type == Loggtype.MANUELL_OPPFØLGING }
+            .map { TaskStepExecutorServiceWithoutRerunTest.om.readValue<TaskFeil>(it.melding!!) }
+            .forEach { assertThat(it.stackTrace).isNotNull }
     }
 
     @Test
@@ -163,7 +151,7 @@ class TaskStepExecutorServiceTest {
         val oppdatertTask = repository.findByIdOrNull(task.id)!!
 
         assertThat(oppdatertTask.logg).hasSize(3)
-        val melding = om.readValue<TaskFeil>(oppdatertTask.logg.toList()[2].melding!!)
+        val melding = om.readValue<TaskFeil>(oppdatertTask.logg.single { it.type == Loggtype.FEILET }.melding!!)
         assertThat(melding.feilmelding).isEqualTo("feilmelding")
         assertThat(melding.stackTrace).isEqualTo(null)
     }

@@ -4,6 +4,9 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.data.jdbc.core.convert.JdbcCustomConversions
 import org.springframework.data.jdbc.repository.config.AbstractJdbcConfiguration
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcOperations
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate
+import javax.sql.DataSource
 
 @Configuration
 class DatabaseConfiguration : AbstractJdbcConfiguration() {
@@ -16,5 +19,10 @@ class DatabaseConfiguration : AbstractJdbcConfiguration() {
                 PropertiesWrapperTilStringConverter()
             )
         )
+    }
+
+    @Bean
+    fun operations(dataSource: DataSource): NamedParameterJdbcOperations {
+        return NamedParameterJdbcTemplate(dataSource)
     }
 }

@@ -10,7 +10,7 @@ import org.springframework.data.convert.WritingConverter
 @ReadingConverter
 class StringTilPropertiesWrapperConverter : Converter<String, PropertiesWrapper> {
 
-    override fun convert(p0: String): PropertiesWrapper? {
+    override fun convert(p0: String): PropertiesWrapper {
         return PropertiesWrapper(p0.asProperties())
     }
 }
@@ -18,7 +18,7 @@ class StringTilPropertiesWrapperConverter : Converter<String, PropertiesWrapper>
 @WritingConverter
 class PropertiesWrapperTilStringConverter : Converter<PropertiesWrapper, String> {
 
-    override fun convert(taskPropertiesWrapper: PropertiesWrapper): String? {
+    override fun convert(taskPropertiesWrapper: PropertiesWrapper): String {
         return taskPropertiesWrapper.properties.asString()
     }
 }

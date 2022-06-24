@@ -1,6 +1,5 @@
 package no.nav.familie.prosessering.domene
 
-import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.NoRepositoryBean
 import org.springframework.data.repository.PagingAndSortingRepository
@@ -18,8 +17,6 @@ interface ITaskRepostitory<T : ITask> : PagingAndSortingRepository<T, Long> {
     fun findByStatus(status: Status): List<T>
 
     fun findByStatusIn(status: List<Status>, page: Pageable): List<T>
-
-    fun findByStatusAndTriggerTidBefore(status: Status, triggerTid: LocalDateTime, page: Pageable): Page<T>
 
     fun countByStatusIn(status: List<Status>): Long
 

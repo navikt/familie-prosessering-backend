@@ -3,13 +3,13 @@ package no.nav.familie.prosessering.internal
 import io.micrometer.core.instrument.Metrics
 import io.micrometer.core.instrument.MultiGauge
 import io.micrometer.core.instrument.Tags
+import no.nav.familie.prosessering.domene.DatabaseMaintenance
 import no.nav.familie.prosessering.domene.ITask
 import no.nav.familie.prosessering.domene.ITaskLogg
 import no.nav.familie.prosessering.domene.Loggtype
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
@@ -17,8 +17,8 @@ import java.time.LocalDateTime
 @Service
 class TaskMaintenanceService(
     private val taskService: TaskService,
+    private val databaseMaintenance: DatabaseMaintenance,
     @Value("\${prosessering.delete.after.weeks:2}") private val deleteTasksAfterWeeks: Long,
-    @Value("\${prosessering.delete.pagesize:10000}") private val deleteTasksPageSize: Int
 ) {
 
     val antallÅpneTaskGague = MultiGauge.builder("openTasks").register(Metrics.globalRegistry)
@@ -54,14 +54,11 @@ class TaskMaintenanceService(
 
     @Transactional
     fun slettTasksKlarForSletting() {
-        var klarForSletting = taskService.finnTasksKlarForSletting(LocalDateTime.now().minusWeeks(deleteTasksAfterWeeks), Pageable.ofSize(deleteTasksPageSize))
-        while (klarForSletting.hasContent()) {
-            logger.info("Sletter ${klarForSletting.content.size} tasks")
-            klarForSletting.content.forEach {
-                logger.info("Task klar for sletting. ${it.id}, ${it.callId}, ${it.triggerTid}, ${it.status}")
-                taskService.delete(it)
-            }
-            klarForSletting = taskService.finnTasksKlarForSletting(LocalDateTime.now().minusWeeks(deleteTasksAfterWeeks), klarForSletting.nextPageable())
+        val tidspunkt = LocalDateTime.now().minusWeeks(deleteTasksAfterWeeks)
+        val slettedeTasks = databaseMaintenance.slettFerdigstilteTasksFørTidspunkt(tidspunkt)
+        logger.info("Sletter ${slettedeTasks.size} tasks")
+        slettedeTasks.forEach {
+            logger.info("Task slettes id={} callId={} triggerTid={}", it.id, it.callId, it.triggerTid)
         }
     }
 

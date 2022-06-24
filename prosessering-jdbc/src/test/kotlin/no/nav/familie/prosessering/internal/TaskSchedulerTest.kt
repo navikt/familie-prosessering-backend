@@ -1,38 +1,25 @@
 package no.nav.familie.prosessering.internal
 
+import no.nav.familie.prosessering.IntegrationRunnerTest
 import no.nav.familie.prosessering.TaskFeil
-import no.nav.familie.prosessering.TestAppConfig
 import no.nav.familie.prosessering.domene.Status
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.domene.TaskRepository
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.data.jdbc.DataJdbcTest
-import org.springframework.boot.test.autoconfigure.jdbc.TestDatabaseAutoConfiguration
 import org.springframework.data.repository.findByIdOrNull
-import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.jdbc.Sql
-import org.springframework.test.context.junit.jupiter.SpringExtension
 import java.time.LocalDateTime
 
-@ExtendWith(SpringExtension::class)
-@ContextConfiguration(classes = [TestAppConfig::class])
-@DataJdbcTest(excludeAutoConfiguration = [TestDatabaseAutoConfiguration::class])
-class TaskSchedulerTest {
+class TaskSchedulerTest : IntegrationRunnerTest() {
 
     @Autowired
     private lateinit var tasksScheduler: TaskScheduler
 
     @Autowired
     private lateinit var taskRepository: TaskRepository
-
-    @AfterEach
-    fun clear() {
-        taskRepository.deleteAll()
-    }
 
     @Test
     @Sql("classpath:sql-testdata/gamle_tasker_med_logg.sql")
