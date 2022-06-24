@@ -26,3 +26,4 @@ spring:
       minimum-idle: 1
 
 prosessering.continuousRunning.enabled: true
+prosessering.delete.pagesize: 2
