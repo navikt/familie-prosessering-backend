@@ -4,6 +4,7 @@ import no.nav.familie.prosessering.domene.AntallÅpneTask
 import no.nav.familie.prosessering.domene.ITask
 import no.nav.familie.prosessering.domene.Status
 import no.nav.familie.prosessering.domene.TaskRepository
+import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Component
@@ -43,8 +44,8 @@ class TaskService(val taskRepository: TaskRepository) {
         return taskRepository.findByStatusIn(status, page)
     }
 
-    fun finnTasksKlarForSletting(eldreEnnDato: LocalDateTime): List<ITask> {
-        return taskRepository.findByStatusAndTriggerTidBefore(Status.FERDIG, eldreEnnDato)
+    fun finnTasksKlarForSletting(eldreEnnDato: LocalDateTime, page: Pageable): Page<ITask> {
+        return taskRepository.findByStatusAndTriggerTidBefore(Status.FERDIG, eldreEnnDato, page)
     }
 
     fun finnTasksTilFrontend(status: List<Status>, page: Pageable, type: String? = null): List<ITask> {
