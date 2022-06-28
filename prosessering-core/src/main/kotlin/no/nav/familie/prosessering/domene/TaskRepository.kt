@@ -1,5 +1,6 @@
 package no.nav.familie.prosessering.domene
 
+import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jdbc.repository.query.Query
 import org.springframework.data.repository.PagingAndSortingRepository
@@ -19,7 +20,7 @@ interface TaskRepository : PagingAndSortingRepository<Task, Long> {
 
     fun findByStatusIn(status: List<Status>, page: Pageable): List<Task>
 
-    fun findByStatusAndTriggerTidBefore(status: Status, triggerTid: LocalDateTime): List<Task>
+    fun findByStatusAndTriggerTidBefore(status: Status, triggerTid: LocalDateTime, page: Pageable): Page<Task>
 
     fun countByStatusIn(status: List<Status>): Long
 

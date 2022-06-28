@@ -2,9 +2,9 @@ package no.nav.familie.prosessering.rest
 
 import no.nav.familie.kontrakter.felles.Ressurs
 import no.nav.familie.prosessering.domene.Avvikstype
-import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.domene.Loggtype
 import no.nav.familie.prosessering.domene.Status
+import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.internal.TaskService
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory

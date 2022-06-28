@@ -35,7 +35,9 @@ class TaskScheduler(private val taskMaintenanceService: TaskMaintenanceService) 
     @Scheduled(cron = CRON_DAILY_0900)
     fun slettTasksKlarForSletting() {
         try {
-            taskMaintenanceService.slettTasksKlarForSletting()
+            if (LeaderClient.isLeader() == null || LeaderClient.isLeader() == true) {
+                taskMaintenanceService.slettTasksKlarForSletting()
+            }
         } catch (e: Exception) {
             loggFeil(e, "slettTasksKlarForSletting")
         }
