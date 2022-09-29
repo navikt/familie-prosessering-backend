@@ -23,8 +23,7 @@ internal class TaskServiceTest {
                         )
                     } returns listOf()
                 }
-            ).finnTasksTilFrontend(
-                status = listOf(),
+            ).finnTasksSomErFerdigNåMenFeiletFør(
                 page = Pageable.unpaged()
             )
         ).isEmpty()
@@ -82,8 +81,7 @@ internal class TaskServiceTest {
                             )
                         } returns listOf(ferdigOK, ferdigNåFeiletFør)
                     }
-            ).finnTasksTilFrontend(
-                status = listOf(Status.FERDIG_NÅ_FEILET_FØR),
+            ).finnTasksSomErFerdigNåMenFeiletFør(
                 page = Pageable.unpaged()
             )
         ).hasSize(1)

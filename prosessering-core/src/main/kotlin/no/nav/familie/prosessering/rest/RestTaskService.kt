@@ -30,6 +30,23 @@ class RestTaskService(private val taskService: TaskService) {
         )
     }
 
+    fun hentTasksSomErFerdigNåMenFeiletFør(hentBrukernavn: String): Ressurs<PaginableResponse<TaskDto>>? {
+        logger.info("Henter oppgaver som er ferdige nå, men feilet før")
+        return hentTasksGittSpørring(0) { pageRequest: PageRequest ->
+            taskService.finnTasksSomErFerdigNåMenFeiletFør(pageRequest)
+        }
+            .fold(
+                onSuccess = { Ressurs.success(data = it) },
+                onFailure = { e ->
+                    logger.error("Henting av tasker feilet", e)
+                    Ressurs.failure(
+                        errorMessage = "Henter oppgaver som er ferdige nå, men feilet før feilet.",
+                        error = e
+                    )
+                }
+            )
+    }
+
     fun hentTasks(
         statuses: List<Status>,
         saksbehandlerId: String,

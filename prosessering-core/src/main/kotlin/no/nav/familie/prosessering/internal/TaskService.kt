@@ -49,14 +49,12 @@ class TaskService(val taskRepository: TaskRepository) {
     }
 
     fun finnTasksTilFrontend(status: List<Status>, page: Pageable, type: String? = null): List<ITask> {
-        if (status == listOf(Status.FERDIG_NÅ_FEILET_FØR)) {
-            val tasks = if (type == null) taskRepository.findByStatusIn(listOf(Status.FERDIG), page)
-            else taskRepository.findByStatusInAndType(status, type, page)
-            return tasks.filter { it.logg.size > 4 }
-        }
         return if (type == null) taskRepository.findByStatusIn(status, page)
         else taskRepository.findByStatusInAndType(status, type, page)
     }
+
+    fun finnTasksSomErFerdigNåMenFeiletFør(page: Pageable): List<ITask> =
+        taskRepository.findByStatusIn(listOf(Status.FERDIG), page).filter { it.logg.size > 4 }
 
     fun finnTaskMedPayloadOgType(payload: String, type: String): ITask? {
         return taskRepository.findByPayloadAndType(payload, type)
