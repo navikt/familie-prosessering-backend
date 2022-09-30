@@ -22,15 +22,15 @@
         <maven.compiler.target>17</maven.compiler.target>
         <kontrakter.version>2.0_20220928092558_a8a42e4</kontrakter.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <kotlin.version>1.7.10</kotlin.version>
+        <kotlin.version>1.7.20</kotlin.version>
         <felles.version>1.20220927133157_32b7eda</felles.version>
         <spring.version>5.3.23</spring.version>
         <spring.boot.version>2.7.4</spring.boot.version>
         <spring.data.version>2.7.3</spring.data.version>
         <spring.data.jdbc.version>2.4.3</spring.data.jdbc.version>
-        <mockk.version>1.13.1</mockk.version>
-        <micrometer.version>1.8.3</micrometer.version>
-        <nav.security.token.version>2.1.4</nav.security.token.version>
+        <mockk-jvm.version>1.13.2</mockk-jvm.version>
+        <micrometer.version>1.9.4</micrometer.version>
+        <nav.security.token.version>2.1.5</nav.security.token.version>
 
         <!--suppress UnresolvedMavenProperty  Ligger som secret i github-->
         <sonar.projectKey>${SONAR_PROJECTKEY}</sonar.projectKey>
@@ -120,7 +120,7 @@
             <dependency>
                 <groupId>io.mockk</groupId>
                 <artifactId>mockk-jvm</artifactId>
-                <version>${mockk.version}</version>
+                <version>${mockk-jvm.version}</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
@@ -151,7 +151,7 @@
                 <plugin>
                     <groupId>org.jacoco</groupId>
                     <artifactId>jacoco-maven-plugin</artifactId>
-                    <version>0.8.7</version>
+                    <version>0.8.8</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -198,12 +198,12 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-deploy-plugin</artifactId>
-                    <version>2.8.2</version>
+                    <version>3.0.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <version>3.0.0-M5</version>
+                    <version>3.0.0-M7</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -213,7 +213,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-resources-plugin</artifactId>
-                    <version>3.2.0</version>
+                    <version>3.3.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
@@ -250,7 +250,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-antrun-plugin</artifactId>
-                <version>1.8</version>
+                <version>3.1.0</version>
                 <executions>
                     <execution>
                         <id>ktlint</id>
@@ -290,7 +290,7 @@
                     <dependency>
                         <groupId>com.pinterest</groupId>
                         <artifactId>ktlint</artifactId>
-                        <version>0.45.2</version>
+                        <version>0.47.1</version>
                     </dependency>
                     <!-- additional 3rd party ruleset(s) can be specified here -->
                 </dependencies>

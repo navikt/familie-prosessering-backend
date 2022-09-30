@@ -49,8 +49,11 @@ class TaskService(val taskRepository: TaskRepository) {
     }
 
     fun finnTasksTilFrontend(status: List<Status>, page: Pageable, type: String? = null): List<ITask> {
-        return if (type == null) taskRepository.findByStatusIn(status, page)
-        else taskRepository.findByStatusInAndType(status, type, page)
+        return if (type == null) {
+            taskRepository.findByStatusIn(status, page)
+        } else {
+            taskRepository.findByStatusInAndType(status, type, page)
+        }
     }
 
     fun finnTaskMedPayloadOgType(payload: String, type: String): ITask? {

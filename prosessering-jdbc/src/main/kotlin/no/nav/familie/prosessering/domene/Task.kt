@@ -59,7 +59,6 @@ data class Task(
         årsak: String,
         endretAv: String
     ): Task {
-
         return copy(
             status = Status.AVVIKSHÅNDTERT,
             avvikstype = avvikstype,
@@ -72,7 +71,6 @@ data class Task(
     }
 
     override fun kommenter(kommentar: String, endretAv: String, settTilManuellOppfølgning: Boolean): Task {
-
         if (settTilManuellOppfølgning) {
             return this.copy(
                 status = Status.MANUELL_OPPFØLGING,

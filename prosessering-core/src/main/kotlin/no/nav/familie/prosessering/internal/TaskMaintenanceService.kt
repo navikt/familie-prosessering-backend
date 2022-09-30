@@ -72,8 +72,10 @@ class TaskMaintenanceService(
             rows.add(
                 MultiGauge.Row.of(
                     Tags.of(
-                        "type", it.type,
-                        "status", it.status.name
+                        "type",
+                        it.type,
+                        "status",
+                        it.status.name
                     ),
                     it.count
                 )
