@@ -23,14 +23,14 @@
         <kontrakter.version>2.0_20220928092558_a8a42e4</kontrakter.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <kotlin.version>1.7.20</kotlin.version>
-        <felles.version>1.20220927133157_32b7eda</felles.version>
+        <felles.version>1.20220930133126_14f75ec</felles.version>
         <spring.version>5.3.23</spring.version>
         <spring.boot.version>2.7.4</spring.boot.version>
         <spring.data.version>2.7.3</spring.data.version>
         <spring.data.jdbc.version>2.4.3</spring.data.jdbc.version>
         <mockk-jvm.version>1.13.2</mockk-jvm.version>
         <micrometer.version>1.9.4</micrometer.version>
-        <nav.security.token.version>2.1.5</nav.security.token.version>
+        <nav.security.token.version>2.1.6</nav.security.token.version>
 
         <!--suppress UnresolvedMavenProperty  Ligger som secret i github-->
         <sonar.projectKey>${SONAR_PROJECTKEY}</sonar.projectKey>
@@ -218,7 +218,7 @@
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>flatten-maven-plugin</artifactId>
-                    <version>1.2.7</version>
+                    <version>1.3.0</version>
                 </plugin>
             </plugins>
         </pluginManagement>
