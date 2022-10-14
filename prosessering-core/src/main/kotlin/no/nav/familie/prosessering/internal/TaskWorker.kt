@@ -2,12 +2,12 @@ package no.nav.familie.prosessering.internal
 
 import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.Metrics
-import no.nav.familie.prosessering.AsyncITaskStep
+import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskFeil
 import no.nav.familie.prosessering.TaskStepBeskrivelse
-import no.nav.familie.prosessering.domene.ITask
-import no.nav.familie.prosessering.domene.ITaskLogg.Companion.BRUKERNAVN_NÅR_SIKKERHETSKONTEKST_IKKE_FINNES
 import no.nav.familie.prosessering.domene.Status
+import no.nav.familie.prosessering.domene.Task
+import no.nav.familie.prosessering.domene.TaskLogg.Companion.BRUKERNAVN_NÅR_SIKKERHETSKONTEKST_IKKE_FINNES
 import no.nav.familie.prosessering.error.RekjørSenereException
 import org.slf4j.LoggerFactory
 import org.springframework.aop.framework.AopProxyUtils
@@ -19,10 +19,10 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class TaskWorker(
     private val taskService: TaskService,
-    taskStepTyper: List<AsyncITaskStep<out ITask>>
+    taskStepTyper: List<AsyncTaskStep>
 ) {
 
-    private val taskStepMap: Map<String, AsyncITaskStep<ITask>>
+    private val taskStepMap: Map<String, AsyncTaskStep>
 
     private val maxAntallFeilMap: Map<String, Int>
     private val triggerTidVedFeilMap: Map<String, Long>
@@ -31,8 +31,8 @@ class TaskWorker(
     private val settTilManuellOppfølgningVedFeil: Map<String, Boolean>
 
     init {
-        val tasksTilTaskStepBeskrivelse: Map<AsyncITaskStep<ITask>, TaskStepBeskrivelse> =
-            taskStepTyper.map { it as AsyncITaskStep<ITask> }.associateWith { task ->
+        val tasksTilTaskStepBeskrivelse: Map<AsyncTaskStep, TaskStepBeskrivelse> =
+            taskStepTyper.map { it }.associateWith { task ->
                 val aClass = AopProxyUtils.ultimateTargetClass(task)
                 val annotation = AnnotationUtils.findAnnotation(aClass, TaskStepBeskrivelse::class.java)
                 requireNotNull(annotation) { "annotasjon mangler" }
@@ -139,7 +139,7 @@ class TaskWorker(
         return maxAntallFeilMap[taskType] ?: error("Ukjent tasktype $taskType")
     }
 
-    private fun finnTaskStep(taskType: String): AsyncITaskStep<ITask> {
+    private fun finnTaskStep(taskType: String): AsyncTaskStep {
         return taskStepMap[taskType] ?: error("Ukjent tasktype $taskType")
     }
 
@@ -148,7 +148,7 @@ class TaskWorker(
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    fun markerPlukket(id: Long): ITask? {
+    fun markerPlukket(id: Long): Task? {
         var task = taskService.findById(id)
 
         if (task.status.kanPlukkes()) {

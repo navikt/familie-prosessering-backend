@@ -4,13 +4,12 @@ import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskStepBeskrivelse
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.domene.TaskRepository
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import java.util.concurrent.TimeUnit
 
 @Service
 @TaskStepBeskrivelse(taskStepType = TaskStep1.TASK_1, beskrivelse = "Dette er task 1")
-class TaskStep1 @Autowired constructor(private val taskRepository: TaskRepository) : AsyncTaskStep {
+class TaskStep1 constructor(private val taskRepository: TaskRepository) : AsyncTaskStep {
 
     override fun doTask(task: Task) {
         try {

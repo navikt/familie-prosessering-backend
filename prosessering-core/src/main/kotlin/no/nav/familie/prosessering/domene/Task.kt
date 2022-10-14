@@ -17,13 +17,13 @@ import java.util.*
 @Table("task")
 data class Task(
     @Id
-    override val id: Long = 0L,
-    override val payload: String,
-    override val status: Status = Status.UBEHANDLET,
-    override val avvikstype: Avvikstype? = null,
-    override val opprettetTid: LocalDateTime = LocalDateTime.now(),
-    override val triggerTid: LocalDateTime = LocalDateTime.now(),
-    override val type: String,
+    val id: Long = 0L,
+    val payload: String,
+    val status: Status = Status.UBEHANDLET,
+    val avvikstype: Avvikstype? = null,
+    val opprettetTid: LocalDateTime = LocalDateTime.now(),
+    val triggerTid: LocalDateTime = LocalDateTime.now(),
+    val type: String,
     @Column("metadata")
     val metadataWrapper: PropertiesWrapper = PropertiesWrapper(
         Properties().apply {
@@ -33,13 +33,16 @@ data class Task(
         }
     ),
     @Version
-    override val versjon: Long = 0,
+    val versjon: Long = 0,
     @MappedCollection(idColumn = "task_id")
-    override val logg: Set<TaskLogg> = setOf(TaskLogg(type = Loggtype.UBEHANDLET))
-) : ITask() {
+    val logg: Set<TaskLogg> = setOf(TaskLogg(type = Loggtype.UBEHANDLET))
+) {
 
     @Transient
-    override val metadata: Properties = metadataWrapper.properties
+    val metadata: Properties = metadataWrapper.properties
+
+    val callId: String
+        get() = metadata.getProperty(MDCConstants.MDC_CALL_ID)
 
     constructor (type: String, payload: String, properties: Properties = Properties()) :
         this(
@@ -54,7 +57,7 @@ data class Task(
             )
         )
 
-    override fun avvikshåndter(
+    fun avvikshåndter(
         avvikstype: Avvikstype,
         årsak: String,
         endretAv: String
@@ -71,7 +74,7 @@ data class Task(
         )
     }
 
-    override fun kommenter(kommentar: String, endretAv: String, settTilManuellOppfølgning: Boolean): Task {
+    fun kommenter(kommentar: String, endretAv: String, settTilManuellOppfølgning: Boolean): Task {
 
         if (settTilManuellOppfølgning) {
             return this.copy(
@@ -93,26 +96,26 @@ data class Task(
         }
     }
 
-    override fun behandler(): Task {
+    fun behandler(): Task {
         return copy(status = Status.BEHANDLER, logg = logg + TaskLogg(type = Loggtype.BEHANDLER))
     }
 
-    override fun klarTilPlukk(endretAv: String, melding: String?): Task {
+    fun klarTilPlukk(endretAv: String, melding: String? = null): Task {
         return copy(
             status = Status.KLAR_TIL_PLUKK,
             logg = logg + TaskLogg(type = Loggtype.KLAR_TIL_PLUKK, endretAv = endretAv, melding = melding)
         )
     }
 
-    override fun plukker(): Task {
+    fun plukker(): Task {
         return copy(status = Status.PLUKKET, logg = logg + TaskLogg(type = Loggtype.PLUKKET))
     }
 
-    override fun ferdigstill(): Task {
+    fun ferdigstill(): Task {
         return copy(status = Status.FERDIG, logg = logg + TaskLogg(type = Loggtype.FERDIG))
     }
 
-    override fun feilet(feil: TaskFeil, maxAntallFeil: Int, settTilManuellOppfølgning: Boolean): Task {
+    fun feilet(feil: TaskFeil, maxAntallFeil: Int, settTilManuellOppfølgning: Boolean): Task {
         if (this.status == Status.MANUELL_OPPFØLGING) {
             return this.copy(
                 logg = logg + TaskLogg(
@@ -134,8 +137,17 @@ data class Task(
         }
     }
 
-    override fun medTriggerTid(triggerTid: LocalDateTime): Task {
+    fun medTriggerTid(triggerTid: LocalDateTime): Task {
         return this.copy(triggerTid = triggerTid)
+    }
+
+    protected fun nyFeiletStatus(maxAntallFeil: Int, settTilManuellOppfølgning: Boolean): Status {
+        val antallFeilendeForsøk = logg.count { it.type == Loggtype.FEILET } + 1
+        return when {
+            maxAntallFeil > antallFeilendeForsøk -> Status.KLAR_TIL_PLUKK
+            settTilManuellOppfølgning -> Status.MANUELL_OPPFØLGING
+            else -> Status.FEILET
+        }
     }
 
     override fun toString(): String {

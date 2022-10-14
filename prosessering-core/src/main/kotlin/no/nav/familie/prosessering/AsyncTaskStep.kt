@@ -1,15 +1,15 @@
 package no.nav.familie.prosessering
 
-import no.nav.familie.prosessering.domene.ITask
+import no.nav.familie.prosessering.domene.Task
 
-interface AsyncITaskStep<T : ITask> {
+interface AsyncTaskStep {
 
     /**
      * Kaster exception hvis ikke oppfylt.
      *
      * @param task tasken som skal vurderes
      */
-    fun preCondition(task: T) {
+    fun preCondition(task: Task) {
         // Do nothing by default
     }
 
@@ -18,7 +18,7 @@ interface AsyncITaskStep<T : ITask> {
      *
      * @param task tasken som skal vurderes
      */
-    fun postCondition(task: T) {
+    fun postCondition(task: Task) {
         // Do nothing by default
     }
 
@@ -28,7 +28,7 @@ interface AsyncITaskStep<T : ITask> {
      * @param task Hendelsen
      * @throws RuntimeException exception vil markere saken som feilende
      */
-    fun doTask(task: T)
+    fun doTask(task: Task)
 
     /**
      * Eventuelle oppgaver som må utføres etter at tasken har kjørt OK.
@@ -36,7 +36,7 @@ interface AsyncITaskStep<T : ITask> {
      *
      * @param task tasken som skal vurderes
      */
-    fun onCompletion(task: T) {
+    fun onCompletion(task: Task) {
         // Do nothing by default
     }
 }

@@ -2,9 +2,9 @@ package no.nav.familie.prosessering.rest
 
 import no.nav.familie.kontrakter.felles.Ressurs
 import no.nav.familie.prosessering.domene.Avvikstype
-import no.nav.familie.prosessering.domene.ITask
 import no.nav.familie.prosessering.domene.Loggtype
 import no.nav.familie.prosessering.domene.Status
+import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.internal.TaskService
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -115,7 +115,7 @@ class RestTaskService(private val taskService: TaskService) {
 
     @Transactional
     fun rekjørTask(taskId: Long, saksbehandlerId: String): Ressurs<String> {
-        val task: ITask = taskService.findById(taskId)
+        val task: Task = taskService.findById(taskId)
 
         taskService.save(task.klarTilPlukk(saksbehandlerId).medTriggerTid(LocalDateTime.now()))
         logger.info("$saksbehandlerId rekjører task $taskId")
@@ -141,13 +141,8 @@ class RestTaskService(private val taskService: TaskService) {
     }
 
     @Transactional
-    fun avvikshåndterTask(
-        taskId: Long,
-        avvikstype: Avvikstype,
-        årsak: String,
-        saksbehandlerId: String
-    ): Ressurs<String> {
-        val task: ITask = taskService.findById(taskId)
+    fun avvikshåndterTask(taskId: Long, avvikstype: Avvikstype, årsak: String, saksbehandlerId: String): Ressurs<String> {
+        val task: Task = taskService.findById(taskId)
 
         logger.info("$saksbehandlerId setter task $taskId til avvikshåndtert", taskId)
 
@@ -165,7 +160,7 @@ class RestTaskService(private val taskService: TaskService) {
 
     @Transactional
     fun kommenterTask(taskId: Long, kommentarDTO: KommentarDTO, saksbehandlerId: String): Ressurs<String> {
-        val task: ITask = taskService.findById(taskId)
+        val task: Task = taskService.findById(taskId)
 
         logger.info("$saksbehandlerId legger inn kommentar på task $taskId", taskId)
 

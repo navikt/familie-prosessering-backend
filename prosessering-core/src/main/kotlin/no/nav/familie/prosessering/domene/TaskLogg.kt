@@ -7,15 +7,19 @@ import java.time.LocalDateTime
 @Table("task_logg")
 data class TaskLogg(
     @Id
-    override val id: Long = 0L,
-    override val endretAv: String = BRUKERNAVN_NÅR_SIKKERHETSKONTEKST_IKKE_FINNES,
-    override val type: Loggtype,
-    override val node: String = "node1",
-    override val melding: String? = null,
-    override val opprettetTid: LocalDateTime = LocalDateTime.now()
-) : ITaskLogg() {
+    val id: Long = 0L,
+    val endretAv: String = BRUKERNAVN_NÅR_SIKKERHETSKONTEKST_IKKE_FINNES,
+    val type: Loggtype,
+    val node: String = "node1",
+    val melding: String? = null,
+    val opprettetTid: LocalDateTime = LocalDateTime.now()
+) {
 
     override fun toString(): String {
         return "TaskLogg(id=$id, type=$type, opprettetTid=$opprettetTid)"
+    }
+
+    companion object {
+        const val BRUKERNAVN_NÅR_SIKKERHETSKONTEKST_IKKE_FINNES = "VL"
     }
 }

@@ -1,9 +1,6 @@
 package no.nav.familie.prosessering.internal
 
-import no.nav.familie.prosessering.domene.AntallÅpneTask
-import no.nav.familie.prosessering.domene.ITask
-import no.nav.familie.prosessering.domene.Status
-import no.nav.familie.prosessering.domene.TaskRepository
+import no.nav.familie.prosessering.domene.*
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.findByIdOrNull
@@ -13,15 +10,15 @@ import java.time.LocalDateTime
 @Component
 class TaskService(val taskRepository: TaskRepository) {
 
-    fun findById(id: Long): ITask {
+    fun findById(id: Long): Task {
         return taskRepository.findByIdOrNull(id) ?: error("Task med id: $id ikke funnet.")
     }
 
-    fun save(task: ITask): ITask {
+    fun save(task: Task): Task {
         return taskRepository.save(task)
     }
 
-    fun finnAlleTasksKlareForProsessering(page: Pageable): List<ITask> {
+    fun finnAlleTasksKlareForProsessering(page: Pageable): List<Task> {
         return taskRepository.findByStatusInAndTriggerTidBeforeOrderByOpprettetTid(
             listOf(
                 Status.KLAR_TIL_PLUKK,
@@ -32,35 +29,35 @@ class TaskService(val taskRepository: TaskRepository) {
         )
     }
 
-    fun finnAlleFeiledeTasks(): List<ITask> {
+    fun finnAlleFeiledeTasks(): List<Task> {
         return taskRepository.findByStatus(Status.FEILET)
     }
 
-    fun finnAllePlukkedeTasks(): List<ITask> {
+    fun finnAllePlukkedeTasks(): List<Task> {
         return taskRepository.findByStatus(Status.PLUKKET)
     }
 
-    fun finnTasksMedStatus(status: List<Status>, page: Pageable): List<ITask> {
+    fun finnTasksMedStatus(status: List<Status>, page: Pageable): List<Task> {
         return taskRepository.findByStatusIn(status, page)
     }
 
-    fun finnTasksKlarForSletting(eldreEnnDato: LocalDateTime, page: Pageable): Page<ITask> {
+    fun finnTasksKlarForSletting(eldreEnnDato: LocalDateTime, page: Pageable): Page<Task> {
         return taskRepository.findByStatusAndTriggerTidBefore(Status.FERDIG, eldreEnnDato, page)
     }
 
-    fun finnTasksTilFrontend(status: List<Status>, page: Pageable, type: String? = null): List<ITask> {
+    fun finnTasksTilFrontend(status: List<Status>, page: Pageable, type: String? = null): List<Task> {
         return if (type == null) taskRepository.findByStatusIn(status, page)
         else taskRepository.findByStatusInAndType(status, type, page)
     }
 
-    fun finnTasksSomErFerdigNåMenFeiletFør(page: Pageable): List<ITask> =
+    fun finnTasksSomErFerdigNåMenFeiletFør(page: Pageable): List<Task> =
         taskRepository.findAllById(taskRepository.finnTasksSomErFerdigNåMenFeiletFør(page).toMutableList()).toList()
 
-    fun finnTaskMedPayloadOgType(payload: String, type: String): ITask? {
+    fun finnTaskMedPayloadOgType(payload: String, type: String): Task? {
         return taskRepository.findByPayloadAndType(payload, type)
     }
 
-    fun delete(it: ITask) {
+    fun delete(it: Task) {
         taskRepository.delete(it)
     }
 
