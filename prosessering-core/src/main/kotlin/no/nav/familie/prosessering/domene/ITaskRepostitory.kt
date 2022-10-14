@@ -28,4 +28,6 @@ interface ITaskRepostitory<T : ITask> : PagingAndSortingRepository<T, Long> {
     fun findByPayloadAndType(payload: String, type: String): T?
 
     fun countOpenTasks(): List<AntallÅpneTask>
+
+    fun finnTasksSomErFerdigNåMenFeiletFør(page: Pageable): List<Long>
 }

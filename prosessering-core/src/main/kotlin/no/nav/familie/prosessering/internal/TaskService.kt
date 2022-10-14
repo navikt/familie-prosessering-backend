@@ -54,7 +54,7 @@ class TaskService(val taskRepository: TaskRepository) {
     }
 
     fun finnTasksSomErFerdigNåMenFeiletFør(page: Pageable): List<ITask> =
-        taskRepository.findByStatusIn(listOf(Status.FERDIG), page).filter { it.logg.size > 4 }
+        taskRepository.findAllById(taskRepository.finnTasksSomErFerdigNåMenFeiletFør(page).toMutableList()).toList()
 
     fun finnTaskMedPayloadOgType(payload: String, type: String): ITask? {
         return taskRepository.findByPayloadAndType(payload, type)
