@@ -2,8 +2,10 @@ package no.nav.familie.prosessering.internal
 
 import no.nav.familie.prosessering.TestAppConfig
 import no.nav.familie.prosessering.domene.AntallÅpneTask
+import no.nav.familie.prosessering.domene.Loggtype
 import no.nav.familie.prosessering.domene.Status
 import no.nav.familie.prosessering.domene.Task
+import no.nav.familie.prosessering.domene.TaskLogg
 import no.nav.familie.prosessering.domene.TaskRepository
 import no.nav.familie.prosessering.task.TaskStep1
 import no.nav.familie.prosessering.task.TaskStep2
@@ -17,13 +19,13 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.data.jdbc.DataJdbcTest
 import org.springframework.boot.test.autoconfigure.jdbc.TestDatabaseAutoConfiguration
 import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.test.context.ContextConfiguration
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import java.time.LocalDateTime
-import java.util.Properties
-import java.util.UUID
+import java.util.*
 
 @ExtendWith(SpringExtension::class)
 @ContextConfiguration(classes = [TestAppConfig::class])
@@ -189,5 +191,17 @@ class TaskRepositoryTest {
         repository.save(task.copy(status = Status.KLAR_TIL_PLUKK))
         assertThat(catchThrowable { repository.save(task.copy(status = Status.KLAR_TIL_PLUKK)) })
             .matches { isOptimisticLocking(it as Exception) }
+    }
+
+    @Test
+    internal fun `finnTasksSomErFerdigNåMenFeiletFør skal finne tasks som feilet`() {
+        val task = repository.save(Task(TaskStep1.TASK_1, "{'a':'b'}").copy(status = Status.FERDIG))
+
+        assertThat(repository.finnTasksSomErFerdigNåMenFeiletFør(Pageable.unpaged())).isEmpty()
+
+        repository.save(task.copy(logg = task.logg + TaskLogg(type = Loggtype.FEILET)))
+        val tasks = repository.finnTasksSomErFerdigNåMenFeiletFør(Pageable.unpaged())
+        assertThat(tasks).hasSize(1)
+        assertThat(tasks[0].logg).hasSize(2)
     }
 }
