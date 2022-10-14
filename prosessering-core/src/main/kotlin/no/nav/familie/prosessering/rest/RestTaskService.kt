@@ -30,8 +30,8 @@ class RestTaskService(private val taskService: TaskService) {
         )
     }
 
-    fun hentTasksSomErFerdigNåMenFeiletFør(hentBrukernavn: String): Ressurs<PaginableResponse<TaskDto>>? {
-        logger.info("Henter oppgaver som er ferdige nå, men feilet før")
+    fun hentTasksSomErFerdigNåMenFeiletFør(brukernavn: String): Ressurs<PaginableResponse<TaskDto>>? {
+        logger.info("$brukernavn henter oppgaver som er ferdige nå, men feilet før")
         return hentTasksGittSpørring(0) { pageRequest: PageRequest ->
             taskService.finnTasksSomErFerdigNåMenFeiletFør(pageRequest)
         }

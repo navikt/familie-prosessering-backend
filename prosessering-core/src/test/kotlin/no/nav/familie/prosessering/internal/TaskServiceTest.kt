@@ -11,50 +11,22 @@ import org.springframework.data.domain.Pageable
 
 internal class TaskServiceTest {
 
+    private val taskRepository = mockk<TaskRepository>()
+    private val service = TaskService(taskRepository)
+
     @Test
     fun tomListeGirTomtResultat() {
-        assertThat(
-            TaskService(
-                taskRepository = mockk<TaskRepository>().also {
-                    every {
-                        it.findByStatusIn(
-                            any(),
-                            any()
-                        )
-                    } returns listOf()
-                }
-            ).finnTasksSomErFerdigNåMenFeiletFør(
-                page = Pageable.unpaged()
-            )
-        ).isEmpty()
+        every { taskRepository.findByStatusIn(any(), any()) } returns listOf()
+        assertThat(service.finnTasksSomErFerdigNåMenFeiletFør(Pageable.unpaged())).isEmpty()
     }
 
     @Test
     fun listeForFerdigGirFerdige() {
-        assertThat(
-            TaskService(
-                taskRepository = mockk<TaskRepository>()
-                    .also {
-                        every {
-                            it.findByStatusIn(
-                                not(eq(listOf(Status.FERDIG))),
-                                any()
-                            )
-                        } returns listOf()
-                    }
-                    .also {
-                        every {
-                            it.findByStatusIn(
-                                eq(listOf(Status.FERDIG)),
-                                any()
-                            )
-                        } returns listOf(mockk())
-                    }
-            ).finnTasksTilFrontend(
-                status = listOf(Status.FERDIG),
-                page = Pageable.unpaged()
-            )
-        ).hasSize(1)
+        every { taskRepository.findByStatusIn(not(eq(listOf(Status.FERDIG))), any()) } returns listOf()
+        every { taskRepository.findByStatusIn(eq(listOf(Status.FERDIG)), any()) } returns listOf(mockk())
+
+        assertThat(service.finnTasksTilFrontend(listOf(Status.FERDIG), Pageable.unpaged()))
+            .hasSize(1)
     }
 
     @Test
@@ -62,28 +34,11 @@ internal class TaskServiceTest {
         val ferdigOK = mockk<ITask>().also { every { it.logg } returns listOf(mockk(), mockk(), mockk(), mockk()) }
         val ferdigNåFeiletFør =
             mockk<ITask>().also { every { it.logg } returns listOf(mockk(), mockk(), mockk(), mockk(), mockk()) }
-        assertThat(
-            TaskService(
-                taskRepository = mockk<TaskRepository>()
-                    .also {
-                        every {
-                            it.findByStatusIn(
-                                not(eq(listOf(Status.FERDIG))),
-                                any()
-                            )
-                        } returns listOf()
-                    }
-                    .also {
-                        every {
-                            it.findByStatusIn(
-                                eq(listOf(Status.FERDIG)),
-                                any()
-                            )
-                        } returns listOf(ferdigOK, ferdigNåFeiletFør)
-                    }
-            ).finnTasksSomErFerdigNåMenFeiletFør(
-                page = Pageable.unpaged()
-            )
-        ).hasSize(1)
+
+        every { taskRepository.findByStatusIn(not(eq(listOf(Status.FERDIG))), any()) } returns listOf()
+        every { taskRepository.findByStatusIn(eq(listOf(Status.FERDIG)), any()) } returns
+            listOf(ferdigOK, ferdigNåFeiletFør)
+
+        assertThat(service.finnTasksSomErFerdigNåMenFeiletFør(Pageable.unpaged())).hasSize(1)
     }
 }
