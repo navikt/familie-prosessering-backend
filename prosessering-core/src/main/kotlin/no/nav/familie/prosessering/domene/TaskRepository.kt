@@ -30,4 +30,7 @@ interface TaskRepository : PagingAndSortingRepository<Task, Long> {
 
     @Query("""select t.type,t.status, count(*) as count from task t WHERE t.status in ('UBEHANDLET', 'BEHANDLER', 'PLUKKET', 'KLAR_TIL_PLUKK') GROUP BY t.type, t.status""")
     fun countOpenTasks(): List<AntallÅpneTask>
+
+    @Query("""select distinct t.* from task t join task_logg tl on t.id = tl.task_id WHERE t.status = 'FERDIG' and tl.type in ('FEILET', 'MANUELL_OPPFØLGNING')""")
+    fun finnTasksSomErFerdigNåMenFeiletFør(page: Pageable): List<Task>
 }

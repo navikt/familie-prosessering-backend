@@ -1,6 +1,9 @@
 package no.nav.familie.prosessering.internal
 
-import no.nav.familie.prosessering.domene.*
+import no.nav.familie.prosessering.domene.AntallÅpneTask
+import no.nav.familie.prosessering.domene.Status
+import no.nav.familie.prosessering.domene.Task
+import no.nav.familie.prosessering.domene.TaskRepository
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.findByIdOrNull
@@ -51,7 +54,7 @@ class TaskService(val taskRepository: TaskRepository) {
     }
 
     fun finnTasksSomErFerdigNåMenFeiletFør(page: Pageable): List<Task> =
-        taskRepository.findAllById(taskRepository.finnTasksSomErFerdigNåMenFeiletFør(page).toMutableList()).toList()
+        taskRepository.finnTasksSomErFerdigNåMenFeiletFør(page)
 
     fun finnTaskMedPayloadOgType(payload: String, type: String): Task? {
         return taskRepository.findByPayloadAndType(payload, type)

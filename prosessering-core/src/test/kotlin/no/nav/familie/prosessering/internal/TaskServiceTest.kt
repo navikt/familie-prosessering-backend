@@ -2,7 +2,6 @@ package no.nav.familie.prosessering.internal
 
 import io.mockk.every
 import io.mockk.mockk
-import no.nav.familie.prosessering.domene.ITask
 import no.nav.familie.prosessering.domene.Status
 import no.nav.familie.prosessering.domene.TaskRepository
 import org.assertj.core.api.Assertions.assertThat
@@ -16,7 +15,7 @@ internal class TaskServiceTest {
 
     @Test
     fun tomListeGirTomtResultat() {
-        every { taskRepository.findByStatusIn(any(), any()) } returns listOf()
+        every { taskRepository.finnTasksSomErFerdigNåMenFeiletFør(any()) } returns listOf()
         assertThat(service.finnTasksSomErFerdigNåMenFeiletFør(Pageable.unpaged())).isEmpty()
     }
 
@@ -31,14 +30,7 @@ internal class TaskServiceTest {
 
     @Test
     fun listeForFerdigNåFeiletFørGirFerdigeMedFleireEnnFireLogginnslag() {
-        val ferdigOK = mockk<ITask>().also { every { it.logg } returns listOf(mockk(), mockk(), mockk(), mockk()) }
-        val ferdigNåFeiletFør =
-            mockk<ITask>().also { every { it.logg } returns listOf(mockk(), mockk(), mockk(), mockk(), mockk()) }
-
-        every { taskRepository.findByStatusIn(not(eq(listOf(Status.FERDIG))), any()) } returns listOf()
-        every { taskRepository.findByStatusIn(eq(listOf(Status.FERDIG)), any()) } returns
-            listOf(ferdigOK, ferdigNåFeiletFør)
-
+        every { taskRepository.finnTasksSomErFerdigNåMenFeiletFør(any()) } returns listOf(mockk())
         assertThat(service.finnTasksSomErFerdigNåMenFeiletFør(Pageable.unpaged())).hasSize(1)
     }
 }

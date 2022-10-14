@@ -72,7 +72,7 @@ class RestTaskService(private val taskService: TaskService) {
 
     fun hentTasksGittSpørring(
         page: Int,
-        spørring: (PageRequest) -> List<ITask>
+        spørring: (PageRequest) -> List<Task>
     ): Result<PaginableResponse<TaskDto>> = Result.runCatching {
         val pageRequest = PageRequest.of(page, TASK_LIMIT, Sort.Direction.DESC, "opprettetTid")
         PaginableResponse(
