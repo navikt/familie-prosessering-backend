@@ -42,7 +42,6 @@
 
     <modules>
         <module>prosessering-core</module>
-        <module>prosessering-jdbc</module>
     </modules>
 
     <dependencyManagement>

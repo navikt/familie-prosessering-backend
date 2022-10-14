@@ -1,7 +1,7 @@
 package no.nav.familie.prosessering.internal
 
 import no.nav.familie.log.mdc.MDCConstants
-import no.nav.familie.prosessering.domene.ITask
+import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.error.RekjørSenereException
 import no.nav.familie.prosessering.util.isOptimisticLocking
 import org.slf4j.LoggerFactory
@@ -89,7 +89,7 @@ class TaskStepExecutorService(
         return false
     }
 
-    private fun executeTasks(tasks: List<ITask>): Boolean {
+    private fun executeTasks(tasks: List<Task>): Boolean {
         if (!continuousRunningEnabled) {
             tasks.forEach { taskExecutor.execute { executeWork(it) } }
             return false
@@ -100,12 +100,12 @@ class TaskStepExecutorService(
         try {
             CompletableFuture.allOf(*futures.toTypedArray()).get(2, TimeUnit.MINUTES)
         } catch (e: TimeoutException) {
-            log.warn("En av taskene av ${tasks.map(ITask::id)} klarte ikke å fullføre innen timeout")
+            log.warn("En av taskene av ${tasks.map(Task::id)} klarte ikke å fullføre innen timeout")
         }
         return true
     }
 
-    private fun executeWork(task: ITask) {
+    private fun executeWork(task: Task) {
         val startTidspunkt = System.currentTimeMillis()
         initLogContext(task)
 
@@ -145,7 +145,7 @@ class TaskStepExecutorService(
         }
     }
 
-    private fun initLogContext(taskDetails: ITask) {
+    private fun initLogContext(taskDetails: Task) {
         MDC.put(MDCConstants.MDC_CALL_ID, taskDetails.callId)
         LOG_CONTEXT.add("task", taskDetails.type)
     }
