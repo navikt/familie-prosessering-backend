@@ -111,6 +111,13 @@ class TaskService internal constructor(
         return taskRepository.findByPayloadAndType(payload, type)
     }
 
+    /**
+     * Då taskRepository er internal så kan denne fortsatt være fin å bruke fra tests
+     */
+    fun findAll(): Iterable<Task> {
+        return taskRepository.findAll()
+    }
+
     @Transactional
     fun delete(task: Task) {
         taskLoggRepository.deleteAllByTaskId(task.id)
