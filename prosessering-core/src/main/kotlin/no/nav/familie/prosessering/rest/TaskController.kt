@@ -33,6 +33,10 @@ class TaskController(private val restTaskService: RestTaskService, private val o
         return ResponseEntity.ok(restTaskService.hentTasks(statuser, hentBrukernavn(), page ?: 0, type))
     }
 
+    @GetMapping(path = ["/task/ferdigNaaFeiletFoer"])
+    fun tasksSomErFerdigNåMenFeiletFør(): ResponseEntity<Ressurs<PaginableResponse<TaskDto>>> =
+        ResponseEntity.ok(restTaskService.hentTasksSomErFerdigNåMenFeiletFør(hentBrukernavn()))
+
     @GetMapping(path = ["/task/antall-til-oppfolging"])
     fun antallTilOppfølging(): ResponseEntity<Ressurs<Long>> {
         return ResponseEntity.ok(restTaskService.finnAntallTaskerSomKreverOppfølging())

@@ -53,6 +53,9 @@ class TaskService(val taskRepository: TaskRepository) {
         else taskRepository.findByStatusInAndType(status, type, page)
     }
 
+    fun finnTasksSomErFerdigNåMenFeiletFør(page: Pageable): List<Task> =
+        taskRepository.finnTasksSomErFerdigNåMenFeiletFør(page)
+
     fun finnTaskMedPayloadOgType(payload: String, type: String): Task? {
         return taskRepository.findByPayloadAndType(payload, type)
     }
