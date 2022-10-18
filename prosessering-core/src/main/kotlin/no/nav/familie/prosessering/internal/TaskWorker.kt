@@ -71,8 +71,7 @@ class TaskWorker(
             return // en annen pod har startet behandling
         }
 
-        task = task.behandler()
-        task = taskService.save(task)
+        task = taskService.behandler(task)
         // finn tasktype
         val taskStep = finnTaskStep(task.type)
 
@@ -82,8 +81,7 @@ class TaskWorker(
         taskStep.postCondition(task)
         taskStep.onCompletion(task)
 
-        task = task.ferdigstill()
-        taskService.save(task)
+        taskService.ferdigstill(task)
         secureLog.trace("Ferdigstiller task='{}'", task)
 
         finnFullførtteller(task.type).increment()
@@ -95,11 +93,11 @@ class TaskWorker(
         secureLog.info("Rekjører task=$taskId senere, årsak=${e.årsak}", e)
         val taskMedNyTriggerTid = taskService.findById(taskId)
             .medTriggerTid(e.triggerTid)
-            .klarTilPlukk(
-                endretAv = BRUKERNAVN_NÅR_SIKKERHETSKONTEKST_IKKE_FINNES,
-                melding = e.årsak
-            )
-        taskService.save(taskMedNyTriggerTid)
+        taskService.klarTilPlukk(
+            taskMedNyTriggerTid,
+            endretAv = BRUKERNAVN_NÅR_SIKKERHETSKONTEKST_IKKE_FINNES,
+            melding = e.årsak
+        )
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -108,8 +106,16 @@ class TaskWorker(
         val maxAntallFeil = finnMaxAntallFeil(task.type)
         val settTilManuellOppfølgning = finnSettTilManuellOppfølgning(task.type)
         secureLog.trace("Behandler task='{}'", task)
-
-        task = task.feilet(TaskFeil(task, e), maxAntallFeil, settTilManuellOppfølgning)
+        val antallFeil = taskService.antallFeil(taskId)
+        val taskFeil = TaskFeil(task, e)
+        val triggerTid = task.triggerTid.plusSeconds(finnTriggerTidVedFeil(task.type))
+        task = taskService.feilet(
+            task.medTriggerTid(triggerTid),
+            taskFeil,
+            antallFeil,
+            maxAntallFeil,
+            settTilManuellOppfølgning
+        )
         // lager metrikker på tasks som har feilet max antall ganger.
         if (task.status == Status.FEILET || task.status == Status.MANUELL_OPPFØLGING) {
             finnFeilteller(task.type).increment()
@@ -118,8 +124,6 @@ class TaskWorker(
                     "Sjekk familie-prosessering for detaljer"
             )
         }
-        task = task.medTriggerTid(task.triggerTid.plusSeconds(finnTriggerTidVedFeil(task.type)))
-        taskService.save(task)
         secureLog.info("Feilhåndtering lagret ok {}", task)
     }
 
@@ -149,11 +153,10 @@ class TaskWorker(
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     fun markerPlukket(id: Long): Task? {
-        var task = taskService.findById(id)
+        val task = taskService.findById(id)
 
         if (task.status.kanPlukkes()) {
-            task = task.plukker()
-            return taskService.save(task)
+            return taskService.plukker(task)
         }
         return null
     }

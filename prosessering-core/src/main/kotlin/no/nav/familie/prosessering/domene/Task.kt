@@ -2,17 +2,14 @@ package no.nav.familie.prosessering.domene
 
 import no.nav.familie.log.IdUtils
 import no.nav.familie.log.mdc.MDCConstants
-import no.nav.familie.prosessering.TaskFeil
 import org.slf4j.MDC
 import org.springframework.data.annotation.Id
 import org.springframework.data.annotation.Transient
 import org.springframework.data.annotation.Version
 import org.springframework.data.relational.core.mapping.Column
-import org.springframework.data.relational.core.mapping.MappedCollection
 import org.springframework.data.relational.core.mapping.Table
-import java.io.IOException
 import java.time.LocalDateTime
-import java.util.*
+import java.util.Properties
 
 @Table("task")
 data class Task(
@@ -34,8 +31,6 @@ data class Task(
     ),
     @Version
     val versjon: Long = 0,
-    @MappedCollection(idColumn = "task_id")
-    val logg: Set<TaskLogg> = setOf(TaskLogg(type = Loggtype.UBEHANDLET))
 ) {
 
     @Transient
@@ -57,97 +52,8 @@ data class Task(
             )
         )
 
-    fun avvikshåndter(
-        avvikstype: Avvikstype,
-        årsak: String,
-        endretAv: String
-    ): Task {
-
-        return copy(
-            status = Status.AVVIKSHÅNDTERT,
-            avvikstype = avvikstype,
-            logg = logg + TaskLogg(
-                type = Loggtype.AVVIKSHÅNDTERT,
-                melding = årsak,
-                endretAv = endretAv
-            )
-        )
-    }
-
-    fun kommenter(kommentar: String, endretAv: String, settTilManuellOppfølgning: Boolean): Task {
-
-        if (settTilManuellOppfølgning) {
-            return this.copy(
-                status = Status.MANUELL_OPPFØLGING,
-                logg = logg + TaskLogg(
-                    type = Loggtype.KOMMENTAR,
-                    melding = kommentar,
-                    endretAv = endretAv
-                )
-            )
-        } else {
-            return copy(
-                logg = logg + TaskLogg(
-                    type = Loggtype.KOMMENTAR,
-                    melding = kommentar,
-                    endretAv = endretAv
-                )
-            )
-        }
-    }
-
-    fun behandler(): Task {
-        return copy(status = Status.BEHANDLER, logg = logg + TaskLogg(type = Loggtype.BEHANDLER))
-    }
-
-    fun klarTilPlukk(endretAv: String, melding: String? = null): Task {
-        return copy(
-            status = Status.KLAR_TIL_PLUKK,
-            logg = logg + TaskLogg(type = Loggtype.KLAR_TIL_PLUKK, endretAv = endretAv, melding = melding)
-        )
-    }
-
-    fun plukker(): Task {
-        return copy(status = Status.PLUKKET, logg = logg + TaskLogg(type = Loggtype.PLUKKET))
-    }
-
-    fun ferdigstill(): Task {
-        return copy(status = Status.FERDIG, logg = logg + TaskLogg(type = Loggtype.FERDIG))
-    }
-
-    fun feilet(feil: TaskFeil, maxAntallFeil: Int, settTilManuellOppfølgning: Boolean): Task {
-        if (this.status == Status.MANUELL_OPPFØLGING) {
-            return this.copy(
-                logg = logg + TaskLogg(
-                    type = Loggtype.MANUELL_OPPFØLGING,
-                    melding = feil.writeValueAsString()
-                )
-            )
-        }
-
-        val nyStatus = nyFeiletStatus(maxAntallFeil, settTilManuellOppfølgning)
-
-        return try {
-            this.copy(
-                status = nyStatus,
-                logg = logg + TaskLogg(type = Loggtype.FEILET, melding = feil.writeValueAsString())
-            )
-        } catch (e: IOException) {
-            this.copy(status = nyStatus, logg = logg + TaskLogg(type = Loggtype.FEILET))
-        }
-    }
-
     fun medTriggerTid(triggerTid: LocalDateTime): Task {
         return this.copy(triggerTid = triggerTid)
-    }
-
-    protected fun nyFeiletStatus(maxAntallFeil: Int, settTilManuellOppfølgning: Boolean): Status {
-        val antallFeilendeForsøk = logg.count { it.type == Loggtype.FEILET } + 1
-        return when {
-            maxAntallFeil > antallFeilendeForsøk -> Status.KLAR_TIL_PLUKK
-            settTilManuellOppfølgning -> Status.MANUELL_OPPFØLGING
-            else -> Status.FEILET
-        }
     }
 
     override fun toString(): String {

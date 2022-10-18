@@ -3,6 +3,7 @@ package no.nav.familie.prosessering.internal
 import io.mockk.every
 import io.mockk.mockk
 import no.nav.familie.prosessering.domene.Status
+import no.nav.familie.prosessering.domene.TaskLoggRepository
 import no.nav.familie.prosessering.domene.TaskRepository
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -11,7 +12,8 @@ import org.springframework.data.domain.Pageable
 internal class TaskServiceTest {
 
     private val taskRepository = mockk<TaskRepository>()
-    private val service = TaskService(taskRepository)
+    private val taskLoggRepository = mockk<TaskLoggRepository>()
+    private val service = TaskService(taskRepository, taskLoggRepository)
 
     @Test
     fun tomListeGirTomtResultat() {

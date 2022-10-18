@@ -3,13 +3,13 @@ package no.nav.familie.prosessering.task
 import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskStepBeskrivelse
 import no.nav.familie.prosessering.domene.Task
-import no.nav.familie.prosessering.domene.TaskRepository
+import no.nav.familie.prosessering.internal.TaskService
 import org.springframework.stereotype.Service
 import java.util.concurrent.TimeUnit
 
 @Service
 @TaskStepBeskrivelse(taskStepType = TaskStep1.TASK_1, beskrivelse = "Dette er task 1")
-class TaskStep1 constructor(private val taskRepository: TaskRepository) : AsyncTaskStep {
+class TaskStep1 constructor(private val taskService: TaskService) : AsyncTaskStep {
 
     override fun doTask(task: Task) {
         try {
@@ -22,7 +22,7 @@ class TaskStep1 constructor(private val taskRepository: TaskRepository) : AsyncT
     override fun onCompletion(task: Task) {
         val nesteTask =
             Task(TaskStep2.TASK_2, task.payload)
-        taskRepository.save(nesteTask)
+        taskService.save(nesteTask)
     }
 
     companion object {

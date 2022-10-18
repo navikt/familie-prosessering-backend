@@ -3,8 +3,6 @@ package no.nav.familie.prosessering.internal
 import io.micrometer.core.instrument.Metrics
 import io.micrometer.core.instrument.MultiGauge
 import io.micrometer.core.instrument.Tags
-import no.nav.familie.prosessering.domene.Loggtype
-import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.domene.TaskLogg
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -29,32 +27,26 @@ class TaskMaintenanceService(
         logger.info("Rekjører ${tasks.size} tasks")
 
         tasks.forEach {
-            taskService.save(it.klarTilPlukk(TaskLogg.BRUKERNAVN_NÅR_SIKKERHETSKONTEKST_IKKE_FINNES))
+            taskService.klarTilPlukk(it, TaskLogg.BRUKERNAVN_NÅR_SIKKERHETSKONTEKST_IKKE_FINNES)
         }
     }
 
     @Transactional
     fun settPermanentPlukketTilKlarTilPlukk() {
-        val tasks = taskService.finnAllePlukkedeTasks()
-        val filtrertTasks = tasks.filter { værtPlukketMinstEnTime(it) }
+        val enTimeSiden = LocalDateTime.now().minusMinutes(60)
+        val (antallPlukkende, tasks) = taskService.finnAllePlukkedeTasks(enTimeSiden)
 
-        logger.info("Fant ${tasks.size} tasks som er plukket. ${filtrertTasks.size} tasks er plukket minst en time siden")
+        logger.info("Fant $antallPlukkende tasks som er plukket. ${tasks.size} tasks er plukket minst en time siden")
 
-        filtrertTasks.forEach {
-            taskService.save(it.klarTilPlukk(TaskLogg.BRUKERNAVN_NÅR_SIKKERHETSKONTEKST_IKKE_FINNES))
+        tasks.forEach {
+            taskService.klarTilPlukk(it, TaskLogg.BRUKERNAVN_NÅR_SIKKERHETSKONTEKST_IKKE_FINNES)
         }
-    }
-
-    private fun værtPlukketMinstEnTime(it: Task): Boolean {
-        val sisteLogg = it.logg.maxByOrNull { logg -> logg.opprettetTid }
-        return sisteLogg != null &&
-            sisteLogg.type == Loggtype.PLUKKET &&
-            sisteLogg.opprettetTid.isBefore(LocalDateTime.now().minusMinutes(60))
     }
 
     @Transactional
     fun slettTasksKlarForSletting() {
-        var klarForSletting = taskService.finnTasksKlarForSletting(LocalDateTime.now().minusWeeks(deleteTasksAfterWeeks), Pageable.ofSize(deleteTasksPageSize))
+        var klarForSletting =
+            taskService.finnTasksKlarForSletting(LocalDateTime.now().minusWeeks(deleteTasksAfterWeeks), Pageable.ofSize(deleteTasksPageSize))
         while (klarForSletting.hasContent()) {
             logger.info("Sletter ${klarForSletting.content.size} tasks")
             klarForSletting.content.forEach {

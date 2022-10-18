@@ -19,7 +19,7 @@ internal class TaskTest {
 
     @Test
     internal fun `TaskLogg skal ikke logge melding`() {
-        val taskLogg = TaskLogg(melding = "melding", type = Loggtype.FEILET)
+        val taskLogg = TaskLogg(taskId = 1, melding = "melding", type = Loggtype.FEILET)
             .copy(opprettetTid = tid)
         assertThat(taskLogg.toString())
             .isEqualTo("TaskLogg(id=0, type=FEILET, opprettetTid=2021-01-01T00:00)")

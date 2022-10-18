@@ -2,7 +2,6 @@ package no.nav.familie.prosessering.rest
 
 import no.nav.familie.kontrakter.felles.Ressurs
 import no.nav.familie.prosessering.domene.Avvikstype
-import no.nav.familie.prosessering.domene.Loggtype
 import no.nav.familie.prosessering.domene.Status
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.internal.TaskService
@@ -75,8 +74,11 @@ class RestTaskService(private val taskService: TaskService) {
         spørring: (PageRequest) -> List<Task>
     ): Result<PaginableResponse<TaskDto>> = Result.runCatching {
         val pageRequest = PageRequest.of(page, TASK_LIMIT, Sort.Direction.DESC, "opprettetTid")
+        val tasks = spørring.invoke(pageRequest)
+        val taskLoggMetadata = taskService.finnTaskLoggMetadata(tasks.map { it.id })
         PaginableResponse(
-            spørring.invoke(pageRequest).map {
+            tasks.map {
+                val taskLogg = taskLoggMetadata[it.id]
                 TaskDto(
                     id = it.id,
                     status = it.status,
@@ -86,10 +88,9 @@ class RestTaskService(private val taskService: TaskService) {
                     taskStepType = it.type,
                     metadata = it.metadata,
                     payload = it.payload,
-                    antallLogger = it.logg.size,
-                    sistKjørt = it.logg.maxByOrNull { logg -> logg.opprettetTid }?.opprettetTid,
-                    kommentar = it.logg.filter { it.type.equals(Loggtype.KOMMENTAR) }
-                        .maxByOrNull { logg -> logg.opprettetTid }?.melding,
+                    antallLogger = taskLogg?.antallLogger ?: 0,
+                    sistKjørt = taskLogg?.sistOpprettetTid,
+                    kommentar = taskLogg?.sisteKommentar,
                     callId = it.callId
                 )
             }
@@ -100,8 +101,8 @@ class RestTaskService(private val taskService: TaskService) {
         logger.info("$saksbehandlerId henter tasklogg til task=$id")
 
         return Result.runCatching {
-            val task = taskService.findById(id)
-            task.logg.sortedByDescending { it.opprettetTid }
+            val taskLogg = taskService.findTaskLoggByTaskId(id)
+            taskLogg.sortedByDescending { it.opprettetTid }
                 .map { TaskloggDto(it.id, it.endretAv, it.type, it.node, it.melding, it.opprettetTid) }
         }
             .fold(
@@ -117,7 +118,7 @@ class RestTaskService(private val taskService: TaskService) {
     fun rekjørTask(taskId: Long, saksbehandlerId: String): Ressurs<String> {
         val task: Task = taskService.findById(taskId)
 
-        taskService.save(task.klarTilPlukk(saksbehandlerId).medTriggerTid(LocalDateTime.now()))
+        taskService.klarTilPlukk(task.medTriggerTid(LocalDateTime.now()), saksbehandlerId)
         logger.info("$saksbehandlerId rekjører task $taskId")
 
         return Ressurs.success(data = "")
@@ -129,7 +130,7 @@ class RestTaskService(private val taskService: TaskService) {
 
         return Result.runCatching {
             taskService.finnTasksMedStatus(listOf(status), Pageable.unpaged())
-                .map { taskService.save(it.klarTilPlukk(saksbehandlerId).medTriggerTid(LocalDateTime.now())) }
+                .map { taskService.klarTilPlukk(it.medTriggerTid(LocalDateTime.now()), saksbehandlerId) }
         }
             .fold(
                 onSuccess = { Ressurs.success(data = "") },
@@ -141,12 +142,24 @@ class RestTaskService(private val taskService: TaskService) {
     }
 
     @Transactional
-    fun avvikshåndterTask(taskId: Long, avvikstype: Avvikstype, årsak: String, saksbehandlerId: String): Ressurs<String> {
+    fun avvikshåndterTask(
+        taskId: Long,
+        avvikstype: Avvikstype,
+        årsak: String,
+        saksbehandlerId: String
+    ): Ressurs<String> {
         val task: Task = taskService.findById(taskId)
 
         logger.info("$saksbehandlerId setter task $taskId til avvikshåndtert", taskId)
 
-        return Result.runCatching { taskService.save(task.avvikshåndter(avvikstype, årsak, saksbehandlerId)) }
+        return Result.runCatching {
+            taskService.avvikshåndter(
+                task = task,
+                avvikstype = avvikstype,
+                årsak = årsak,
+                endretAv = saksbehandlerId
+            )
+        }
             .fold(
                 onSuccess = {
                     Ressurs.success(data = "")
@@ -165,12 +178,11 @@ class RestTaskService(private val taskService: TaskService) {
         logger.info("$saksbehandlerId legger inn kommentar på task $taskId", taskId)
 
         return Result.runCatching {
-            taskService.save(
-                task.kommenter(
-                    kommentarDTO.kommentar,
-                    saksbehandlerId,
-                    kommentarDTO.settTilManuellOppfølging
-                )
+            taskService.kommenter(
+                task = task,
+                kommentar = kommentarDTO.kommentar,
+                endretAv = saksbehandlerId,
+                settTilManuellOppfølgning = kommentarDTO.settTilManuellOppfølging
             )
         }
             .fold(

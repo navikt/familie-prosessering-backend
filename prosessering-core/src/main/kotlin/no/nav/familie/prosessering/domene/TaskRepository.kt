@@ -8,8 +8,7 @@ import org.springframework.stereotype.Repository
 import java.time.LocalDateTime
 
 @Repository
-interface TaskRepository : PagingAndSortingRepository<Task, Long> {
-
+internal interface TaskRepository : PagingAndSortingRepository<Task, Long> {
     fun findByStatusInAndTriggerTidBeforeOrderByOpprettetTid(
         status: List<Status>,
         triggerTid: LocalDateTime,
@@ -28,9 +27,42 @@ interface TaskRepository : PagingAndSortingRepository<Task, Long> {
 
     fun findByPayloadAndType(payload: String, type: String): Task?
 
-    @Query("""select t.type,t.status, count(*) as count from task t WHERE t.status in ('UBEHANDLET', 'BEHANDLER', 'PLUKKET', 'KLAR_TIL_PLUKK') GROUP BY t.type, t.status""")
+    @Query(
+        """
+        SELECT t.type,t.status, count(*) AS count 
+        FROM task t WHERE t.status IN ('UBEHANDLET', 'BEHANDLER', 'PLUKKET', 'KLAR_TIL_PLUKK') 
+        GROUP BY t.type, t.status
+        """
+    )
     fun countOpenTasks(): List<AntallÅpneTask>
 
-    @Query("""select distinct t.* from task t join task_logg tl on t.id = tl.task_id WHERE t.status = 'FERDIG' and tl.type in ('FEILET', 'MANUELL_OPPFØLGNING')""")
+    @Query(
+        """
+        SELECT DISTINCT t.* 
+        FROM task t 
+        JOIN task_logg tl ON t.id = tl.task_id 
+        WHERE t.status = 'FERDIG' AND tl.type IN ('FEILET', 'MANUELL_OPPFØLGNING')"""
+    )
     fun finnTasksSomErFerdigNåMenFeiletFør(page: Pageable): List<Task>
+
+    @Query(
+        """
+        WITH q AS (
+            SELECT 
+                t.id,
+                tl.type,
+                tl.opprettet_tid,
+                row_number() OVER (PARTITION BY t.id ORDER BY tl.opprettet_tid DESC) rn
+            FROM task t
+            JOIN task_logg tl on t.id = tl.task_id
+            WHERE t.status = :status
+        )
+        SELECT t.*
+        FROM task t
+          JOIN q t2 ON t.id = t2.id
+        WHERE t2.rn = 1
+          AND t2.opprettet_tid < :tid
+    """
+    )
+    fun findAllByStatusAndLastProcessed(status: Status, tid: LocalDateTime): List<Task>
 }
