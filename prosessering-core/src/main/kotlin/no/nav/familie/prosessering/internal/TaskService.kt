@@ -200,8 +200,8 @@ class TaskService internal constructor(
             taskLoggRepository.save(taskLogg)
             taskRepository.save(task.copy(status = nyStatus))
         } catch (e: IOException) {
-            logger.warn("Feilet lagrering av task=${task.id} med melding. Se secure logs")
-            secureLog.warn("Feilet lagrering av task=${task.id} med melding", e)
+            logger.warn("Feilet lagring av task=${task.id} med melding. Se secure logs")
+            secureLog.warn("Feilet lagring av task=${task.id} med melding", e)
             taskLoggRepository.save(TaskLogg(taskId = task.id, type = Loggtype.FEILET))
             taskRepository.save(task.copy(status = nyStatus))
         }
