@@ -1,20 +1,15 @@
 package no.nav.familie.prosessering.internal
 
 import no.nav.familie.prosessering.AsyncTaskStep
+import no.nav.familie.prosessering.IntegrationRunnerTest
 import no.nav.familie.prosessering.TaskStepBeskrivelse
 import org.assertj.core.api.Assertions
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.aop.framework.AopProxyUtils
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.data.jdbc.DataJdbcTest
-import org.springframework.boot.test.autoconfigure.jdbc.TestDatabaseAutoConfiguration
 import org.springframework.core.annotation.AnnotationUtils
-import org.springframework.test.context.junit.jupiter.SpringExtension
 
-@ExtendWith(SpringExtension::class)
-@DataJdbcTest(excludeAutoConfiguration = [TestDatabaseAutoConfiguration::class])
-class AsyncTaskStepTest {
+class AsyncTaskStepTest : IntegrationRunnerTest() {
 
     @Autowired
     private lateinit var tasker: List<AsyncTaskStep>

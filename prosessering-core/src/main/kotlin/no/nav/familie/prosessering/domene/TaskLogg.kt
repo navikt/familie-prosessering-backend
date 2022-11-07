@@ -8,6 +8,7 @@ import java.time.LocalDateTime
 data class TaskLogg(
     @Id
     val id: Long = 0L,
+    val taskId: Long,
     val endretAv: String = BRUKERNAVN_NÅR_SIKKERHETSKONTEKST_IKKE_FINNES,
     val type: Loggtype,
     val node: String = "node1",
@@ -23,3 +24,10 @@ data class TaskLogg(
         const val BRUKERNAVN_NÅR_SIKKERHETSKONTEKST_IKKE_FINNES = "VL"
     }
 }
+
+data class TaskLoggMetadata(
+    val taskId: Long,
+    val antallLogger: Int,
+    val sistOpprettetTid: LocalDateTime?,
+    val sisteKommentar: String?
+)

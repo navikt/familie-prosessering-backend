@@ -1,44 +1,33 @@
 package no.nav.familie.prosessering.internal
 
-import no.nav.familie.prosessering.TestAppConfig
+import no.nav.familie.prosessering.IntegrationRunnerTest
+import no.nav.familie.prosessering.TaskFeil
 import no.nav.familie.prosessering.domene.AntallÅpneTask
-import no.nav.familie.prosessering.domene.Loggtype
 import no.nav.familie.prosessering.domene.Status
 import no.nav.familie.prosessering.domene.Task
-import no.nav.familie.prosessering.domene.TaskLogg
 import no.nav.familie.prosessering.domene.TaskRepository
 import no.nav.familie.prosessering.task.TaskStep1
 import no.nav.familie.prosessering.task.TaskStep2
 import no.nav.familie.prosessering.util.isOptimisticLocking
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.catchThrowable
-import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.data.jdbc.DataJdbcTest
-import org.springframework.boot.test.autoconfigure.jdbc.TestDatabaseAutoConfiguration
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
 import org.springframework.data.repository.findByIdOrNull
-import org.springframework.test.context.ContextConfiguration
-import org.springframework.test.context.junit.jupiter.SpringExtension
 import java.time.LocalDateTime
-import java.util.*
+import java.util.Properties
+import java.util.UUID
 
-@ExtendWith(SpringExtension::class)
-@ContextConfiguration(classes = [TestAppConfig::class])
-@DataJdbcTest(excludeAutoConfiguration = [TestDatabaseAutoConfiguration::class])
-class TaskRepositoryTest {
+class TaskRepositoryTest : IntegrationRunnerTest() {
+
+    @Autowired
+    private lateinit var taskService: TaskService
 
     @Autowired
     private lateinit var repository: TaskRepository
-
-    @AfterEach
-    fun clear() {
-        repository.deleteAll()
-    }
 
     @Test
     fun `findByPayloadAndType - skal finne task for gitt payload og type`() {
@@ -46,9 +35,9 @@ class TaskRepositoryTest {
         val feiletTask1 = Task(type = TaskStep2.TASK_2, payload = UUID.randomUUID().toString(), status = Status.FEILET)
         val feiletTask2 = Task(type = TaskStep2.TASK_2, payload = "{'a'='1'}", status = Status.UBEHANDLET)
 
-        repository.save(ubehandletTask)
-        repository.save(feiletTask1)
-        repository.save(feiletTask2)
+        taskService.save(ubehandletTask)
+        taskService.save(feiletTask1)
+        taskService.save(feiletTask2)
 
         val funnetTask = repository.findByPayloadAndType(feiletTask1.payload, TaskStep2.TASK_2)
 
@@ -67,9 +56,9 @@ class TaskRepositoryTest {
         val feiletTask1 = Task(type = TaskStep2.TASK_2, payload = "{'a'='1'}", status = Status.FEILET)
         val feiletTask2 = Task(type = TaskStep2.TASK_2, payload = "{'a'='1'}", status = Status.UBEHANDLET)
 
-        repository.save(ubehandletTask)
-        repository.save(feiletTask1)
-        repository.save(feiletTask2)
+        taskService.save(ubehandletTask)
+        taskService.save(feiletTask1)
+        taskService.save(feiletTask2)
 
         val alleTasks = repository.findByStatusIn(Status.values().toList(), PageRequest.of(0, 1000))
         assertThat(alleTasks.size).isEqualTo(3 + preCount.size)
@@ -83,9 +72,9 @@ class TaskRepositoryTest {
         val feiletTask1 = Task(type = TaskStep2.TASK_2, payload = "{'a'='1'}", status = Status.FEILET)
         val feiletTask2 = Task(type = TaskStep2.TASK_2, payload = "{'a'='1'}", status = Status.FEILET)
 
-        repository.save(ubehandletTask)
-        repository.save(feiletTask1)
-        repository.save(feiletTask2)
+        taskService.save(ubehandletTask)
+        taskService.save(feiletTask1)
+        taskService.save(feiletTask2)
 
         val alleTasks = repository.findByStatusIn(listOf(Status.FEILET), PageRequest.of(0, 1000))
         assertThat(alleTasks.size).isEqualTo(2)
@@ -98,9 +87,9 @@ class TaskRepositoryTest {
         val feiletTask1 = Task(type = TaskStep2.TASK_2, payload = "{'a'='1'}", status = Status.FEILET)
         val feiletTask2 = Task(type = TaskStep2.TASK_2, payload = "{'a'='1'}", status = Status.FEILET)
 
-        repository.save(ubehandletTask)
-        repository.save(feiletTask1)
-        repository.save(feiletTask2)
+        taskService.save(ubehandletTask)
+        taskService.save(feiletTask1)
+        taskService.save(feiletTask2)
 
         val alleTasks = repository.findByStatusIn(listOf(Status.FEILET), PageRequest.of(0, 1))
         assertThat(alleTasks.size).isEqualTo(1)
@@ -113,9 +102,9 @@ class TaskRepositoryTest {
         val task2 = Task(type = TaskStep2.TASK_2, payload = "2", opprettetTid = LocalDateTime.now().minusDays(1))
         val task3 = Task(type = TaskStep2.TASK_2, payload = "3", opprettetTid = LocalDateTime.now().plusDays(1))
 
-        repository.save(task1)
-        repository.save(task2)
-        repository.save(task3)
+        taskService.save(task1)
+        taskService.save(task2)
+        taskService.save(task3)
 
         val message = repository.findByStatusIn(
             listOf(Status.UBEHANDLET),
@@ -126,18 +115,23 @@ class TaskRepositoryTest {
 
     @Test
     fun `findByStatusInAndTriggerTidBeforeOrderByOpprettetTid - skal returnere tasks sortert etter opprettet_tid - eldst først`() {
-        val task1 = Task(type = TaskStep1.TASK_1, payload = "task med opprettetTid nå", opprettetTid = LocalDateTime.now())
+        val task1 =
+            Task(type = TaskStep1.TASK_1, payload = "task med opprettetTid nå", opprettetTid = LocalDateTime.now())
         val task2 = Task(
             type = TaskStep2.TASK_2,
             payload = "task med tidligst oppprettetTid",
             opprettetTid = LocalDateTime.now().minusDays(1)
         )
         val task3 =
-            Task(type = TaskStep2.TASK_2, payload = "task med senest oppettetTid", opprettetTid = LocalDateTime.now().plusDays(1))
+            Task(
+                type = TaskStep2.TASK_2,
+                payload = "task med senest oppettetTid",
+                opprettetTid = LocalDateTime.now().plusDays(1)
+            )
 
-        repository.save(task1)
-        repository.save(task2)
-        repository.save(task3)
+        taskService.save(task1)
+        taskService.save(task2)
+        taskService.save(task3)
 
         val message = repository.findByStatusInAndTriggerTidBeforeOrderByOpprettetTid(
             listOf(Status.UBEHANDLET),
@@ -158,9 +152,9 @@ class TaskRepositoryTest {
         val task2 = Task(type = TaskStep2.TASK_2, payload = "1", opprettetTid = LocalDateTime.now())
         val task3 = Task(type = TaskStep2.TASK_2, payload = "1", opprettetTid = LocalDateTime.now())
 
-        repository.save(task1)
-        repository.save(task2)
-        repository.save(task3)
+        taskService.save(task1)
+        taskService.save(task2)
+        taskService.save(task3)
 
         val åpneTask = repository.countOpenTasks()
         assertThat(åpneTask).hasSize(2).contains(
@@ -172,7 +166,7 @@ class TaskRepositoryTest {
     @Test
     fun `skal håndtere properties`() {
         val property = "PROPERTY"
-        val lagretTask = repository.save(
+        val lagretTask = taskService.save(
             Task(
                 type = TaskStep1.TASK_1,
                 payload = "{'a'='b'}",
@@ -187,21 +181,23 @@ class TaskRepositoryTest {
 
     @Test
     internal fun `skal håndtere optimistic locking`() {
-        val task = repository.save(Task(TaskStep1.TASK_1, "{'a'='b'}"))
-        repository.save(task.copy(status = Status.KLAR_TIL_PLUKK))
-        assertThat(catchThrowable { repository.save(task.copy(status = Status.KLAR_TIL_PLUKK)) })
+        val task = taskService.save(Task(TaskStep1.TASK_1, "{'a'='b'}"))
+        taskService.save(task.copy(status = Status.KLAR_TIL_PLUKK))
+        assertThat(catchThrowable { taskService.save(task.copy(status = Status.KLAR_TIL_PLUKK)) })
             .matches { isOptimisticLocking(it as Exception) }
     }
 
     @Test
     internal fun `finnTasksSomErFerdigNåMenFeiletFør skal finne tasks som feilet`() {
-        val task = repository.save(Task(TaskStep1.TASK_1, "{'a':'b'}").copy(status = Status.FERDIG))
+        var task = taskService.save(Task(TaskStep1.TASK_1, "{'a':'b'}").copy(status = Status.FERDIG))
 
         assertThat(repository.finnTasksSomErFerdigNåMenFeiletFør(Pageable.unpaged())).isEmpty()
 
-        repository.save(task.copy(logg = task.logg + TaskLogg(type = Loggtype.FEILET)))
+        task = taskService.feilet(task, TaskFeil(task, null), 0, 1, false)
+        assertThat(repository.finnTasksSomErFerdigNåMenFeiletFør(Pageable.unpaged())).isEmpty()
+
+        taskService.ferdigstill(task)
         val tasks = repository.finnTasksSomErFerdigNåMenFeiletFør(Pageable.unpaged())
         assertThat(tasks).hasSize(1)
-        assertThat(tasks[0].logg).hasSize(2)
     }
 }
