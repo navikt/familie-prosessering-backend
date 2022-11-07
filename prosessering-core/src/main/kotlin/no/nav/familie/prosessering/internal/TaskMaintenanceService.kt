@@ -33,7 +33,7 @@ class TaskMaintenanceService(
 
     @Transactional
     fun settPermanentPlukketTilKlarTilPlukk() {
-        val enTimeSiden = LocalDateTime.now().minusMinutes(60)
+        val enTimeSiden = LocalDateTime.now().minusHours(1)
         val (antallPlukkende, tasks) = taskService.finnAllePlukkedeTasks(enTimeSiden)
 
         logger.info("Fant $antallPlukkende tasks som er plukket. ${tasks.size} tasks er plukket minst en time siden")
