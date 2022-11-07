@@ -18,7 +18,7 @@ internal interface TaskLoggRepository : PagingAndSortingRepository<TaskLogg, Lon
         """
         SELECT task_id, count(*) antall_logger, MAX(opprettet_tid) sist_opprettet_tid, 
             (SELECT melding FROM task_logg tl1 
-              WHERE tl1.task_id = tl.task_id AND type='FEILET' ORDER BY tl1.opprettet_tid DESC LIMIT 1) siste_kommentar
+              WHERE tl1.task_id = tl.task_id AND type='KOMMENTAR' ORDER BY tl1.opprettet_tid DESC LIMIT 1) siste_kommentar
         FROM task_logg tl
         WHERE task_id IN (:taskIds)
         GROUP BY task_id

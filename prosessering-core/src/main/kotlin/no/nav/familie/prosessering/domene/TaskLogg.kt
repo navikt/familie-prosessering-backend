@@ -28,6 +28,6 @@ data class TaskLogg(
 data class TaskLoggMetadata(
     val taskId: Long,
     val antallLogger: Int,
-    val sistOpprettetTid: LocalDateTime?,
+    val sistOpprettetTid: LocalDateTime,
     val sisteKommentar: String?
 )
