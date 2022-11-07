@@ -194,17 +194,15 @@ class TaskService internal constructor(
     ): Task {
         val nyStatus = nyFeiletStatus(tidligereAntallFeil, maxAntallFeil, settTilManuellOppfølgning)
 
-        return try {
-            val melding = feil.writeValueAsString()
-            val taskLogg = TaskLogg(taskId = task.id, type = Loggtype.FEILET, melding = melding)
-            taskLoggRepository.save(taskLogg)
-            taskRepository.save(task.copy(status = nyStatus))
+        val feilmelding = try {
+            feil.writeValueAsString()
         } catch (e: IOException) {
             logger.warn("Feilet lagring av task=${task.id} med melding. Se secure logs")
             secureLog.warn("Feilet lagring av task=${task.id} med melding", e)
-            taskLoggRepository.save(TaskLogg(taskId = task.id, type = Loggtype.FEILET))
-            taskRepository.save(task.copy(status = nyStatus))
+            "Feilet skriving av feil til json exceptionCauseMessage=${feil.exceptionCauseMessage} feilmelding=${feil.feilmelding} stacktrace=${feil.stackTrace}"
         }
+        taskLoggRepository.save(TaskLogg(taskId = task.id, type = Loggtype.FEILET, melding = feilmelding))
+        return taskRepository.save(task.copy(status = nyStatus))
     }
 
     private fun nyFeiletStatus(
