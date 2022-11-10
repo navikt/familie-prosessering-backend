@@ -119,8 +119,8 @@ class TaskService internal constructor(
      * Då taskRepository er internal så kan denne fortsatt være fin å bruke fra tests
      */
     @Suppress("unused") // brukes av klienter
-    fun findAll(): Iterable<Task> {
-        return taskRepository.findAll()
+    fun findAll(): List<Task> {
+        return taskRepository.findAll().toList()
     }
 
     @Transactional
