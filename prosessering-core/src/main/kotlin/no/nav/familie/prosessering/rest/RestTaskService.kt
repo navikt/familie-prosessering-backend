@@ -54,10 +54,10 @@ class RestTaskService(private val taskService: TaskService) {
     ): Ressurs<PaginableResponse<TaskDto>> {
         logger.info("$saksbehandlerId henter ${type?.plus("-") ?: ""}tasker med status $statuses")
         return hentTasksGittSpørring(page) { pageRequest: PageRequest ->
-            taskService.finnTasksTilFrontend(
+            taskService.finnTasksMedStatus(
                 statuses,
-                pageRequest,
-                type
+                type,
+                pageRequest
             )
         }
             .fold(
@@ -129,7 +129,7 @@ class RestTaskService(private val taskService: TaskService) {
         logger.info("$saksbehandlerId rekjører alle tasks med status $status")
 
         return Result.runCatching {
-            taskService.finnTasksMedStatus(listOf(status), Pageable.unpaged())
+            taskService.finnTasksMedStatus(listOf(status))
                 .map { taskService.klarTilPlukk(it.medTriggerTid(LocalDateTime.now()), saksbehandlerId) }
         }
             .fold(
