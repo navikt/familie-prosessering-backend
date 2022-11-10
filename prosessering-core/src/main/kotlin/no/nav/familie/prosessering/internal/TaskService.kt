@@ -35,6 +35,7 @@ class TaskService internal constructor(
     /**
      * Brukes for å opprette task
      */
+    @Suppress("unused") // brukes av klienter
     @Transactional
     fun save(task: Task): Task {
         val lagretTask = taskRepository.save(task)
@@ -48,6 +49,7 @@ class TaskService internal constructor(
     /**
      * Brukes for å opprette flere tasks
      */
+    @Suppress("unused") // brukes av klienter
     @Transactional
     fun saveAll(tasks: Collection<Task>): List<Task> {
         return tasks.map { save(it) }
@@ -74,20 +76,17 @@ class TaskService internal constructor(
         return taskRepository.findByStatus(Status.FEILET)
     }
 
-    fun finnAllePlukkedeTasks(tid: LocalDateTime): Pair<Long, List<Task>> {
+    internal fun finnAllePlukkedeTasks(tid: LocalDateTime): Pair<Long, List<Task>> {
         return taskRepository.countByStatusIn(listOf(Status.PLUKKET)) to
             taskRepository.findAllByStatusAndLastProcessed(Status.PLUKKET, tid)
     }
 
+    @Deprecated("Bruk finnTasksMedStatus", ReplaceWith("finnTasksMedStatus(status, type, page)"))
     fun finnTasksMedStatus(status: List<Status>, page: Pageable): List<Task> {
         return taskRepository.findByStatusIn(status, page)
     }
 
-    fun finnTasksKlarForSletting(eldreEnnDato: LocalDateTime, page: Pageable): Page<Task> {
-        return taskRepository.findByStatusAndTriggerTidBefore(Status.FERDIG, eldreEnnDato, page)
-    }
-
-    fun finnTasksTilFrontend(status: List<Status>, page: Pageable, type: String? = null): List<Task> {
+    fun finnTasksMedStatus(status: List<Status>, type: String? = null, page: Pageable = Pageable.unpaged()): List<Task> {
         return if (type == null) {
             taskRepository.findByStatusIn(status, page)
         } else {
@@ -95,10 +94,14 @@ class TaskService internal constructor(
         }
     }
 
+    internal fun finnTasksKlarForSletting(eldreEnnDato: LocalDateTime, page: Pageable): Page<Task> {
+        return taskRepository.findByStatusAndTriggerTidBefore(Status.FERDIG, eldreEnnDato, page)
+    }
+
     fun finnTasksSomErFerdigNåMenFeiletFør(page: Pageable): List<Task> =
         taskRepository.finnTasksSomErFerdigNåMenFeiletFør(page)
 
-    fun finnTaskLoggMetadata(taskIds: List<Long>): Map<Long, TaskLoggMetadata> {
+    internal fun finnTaskLoggMetadata(taskIds: List<Long>): Map<Long, TaskLoggMetadata> {
         if (taskIds.isEmpty()) return emptyMap()
         return taskLoggRepository.finnTaskLoggMetadata(taskIds).associateBy { it.taskId }
     }
@@ -107,6 +110,7 @@ class TaskService internal constructor(
         return taskLoggRepository.findByTaskId(taskId)
     }
 
+    @Suppress("unused") // brukes av klienter
     fun finnTaskMedPayloadOgType(payload: String, type: String): Task? {
         return taskRepository.findByPayloadAndType(payload, type)
     }
@@ -114,6 +118,7 @@ class TaskService internal constructor(
     /**
      * Då taskRepository er internal så kan denne fortsatt være fin å bruke fra tests
      */
+    @Suppress("unused") // brukes av klienter
     fun findAll(): Iterable<Task> {
         return taskRepository.findAll()
     }
@@ -125,17 +130,18 @@ class TaskService internal constructor(
     }
 
     @Transactional
+    @Suppress("unused") // brukes av klienter
     fun deleteAll(tasks: Collection<Task>) {
         if (tasks.toList().isEmpty()) return
         taskLoggRepository.deleteAllByTaskIdIn(tasks.map { it.id })
         taskRepository.deleteAll(tasks)
     }
 
-    fun antallTaskerTilOppfølging(): Long {
+    internal fun antallTaskerTilOppfølging(): Long {
         return taskRepository.countByStatusIn(listOf(Status.MANUELL_OPPFØLGING, Status.FEILET))
     }
 
-    fun tellAntallÅpneTasker(): List<AntallÅpneTask> {
+    internal fun tellAntallÅpneTasker(): List<AntallÅpneTask> {
         return taskRepository.countOpenTasks()
     }
 
@@ -144,7 +150,7 @@ class TaskService internal constructor(
     }
 
     @Transactional
-    fun avvikshåndter(task: Task, avvikstype: Avvikstype, årsak: String, endretAv: String): Task {
+    internal fun avvikshåndter(task: Task, avvikstype: Avvikstype, årsak: String, endretAv: String): Task {
 
         val taskLogg = TaskLogg(taskId = task.id, type = Loggtype.AVVIKSHÅNDTERT, melding = årsak, endretAv = endretAv)
         taskLoggRepository.save(taskLogg)
@@ -152,20 +158,20 @@ class TaskService internal constructor(
     }
 
     @Transactional
-    fun kommenter(task: Task, kommentar: String, endretAv: String, settTilManuellOppfølgning: Boolean): Task {
+    internal fun kommenter(task: Task, kommentar: String, endretAv: String, settTilManuellOppfølgning: Boolean): Task {
         val taskLogg = TaskLogg(taskId = task.id, type = Loggtype.KOMMENTAR, melding = kommentar, endretAv = endretAv)
         taskLoggRepository.save(taskLogg)
         return taskRepository.save(task.copy(status = if (settTilManuellOppfølgning) Status.MANUELL_OPPFØLGING else task.status))
     }
 
     @Transactional
-    fun behandler(task: Task): Task {
+    internal fun behandler(task: Task): Task {
         taskLoggRepository.save(TaskLogg(taskId = task.id, type = Loggtype.BEHANDLER))
         return taskRepository.save(task.copy(status = Status.BEHANDLER))
     }
 
     @Transactional
-    fun klarTilPlukk(task: Task, endretAv: String, melding: String? = null): Task {
+    internal fun klarTilPlukk(task: Task, endretAv: String, melding: String? = null): Task {
         val taskLogg =
             TaskLogg(taskId = task.id, type = Loggtype.KLAR_TIL_PLUKK, endretAv = endretAv, melding = melding)
         taskLoggRepository.save(taskLogg)
@@ -173,19 +179,19 @@ class TaskService internal constructor(
     }
 
     @Transactional
-    fun plukker(task: Task): Task {
+    internal fun plukker(task: Task): Task {
         taskLoggRepository.save(TaskLogg(taskId = task.id, type = Loggtype.PLUKKET))
         return taskRepository.save(task.copy(status = Status.PLUKKET))
     }
 
     @Transactional
-    fun ferdigstill(task: Task): Task {
+    internal fun ferdigstill(task: Task): Task {
         taskLoggRepository.save(TaskLogg(taskId = task.id, type = Loggtype.FERDIG))
         return taskRepository.save(task.copy(status = Status.FERDIG))
     }
 
     @Transactional
-    fun feilet(
+    internal fun feilet(
         task: Task,
         feil: TaskFeil,
         tidligereAntallFeil: Int,

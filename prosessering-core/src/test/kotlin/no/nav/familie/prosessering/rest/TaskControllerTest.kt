@@ -26,7 +26,7 @@ internal class TaskControllerTest {
     @Test
     fun `skal hente task basert på alle statuser`() {
         val statusSlot = slot<List<Status>>()
-        every { taskService.finnTasksTilFrontend(capture(statusSlot), any()) } returns emptyList()
+        every { taskService.finnTasksMedStatus(capture(statusSlot), any(), any()) } returns emptyList()
 
         taskController.task2(null, null)
         assertThat(statusSlot.captured).isEqualTo(Status.values().toList())
@@ -35,7 +35,7 @@ internal class TaskControllerTest {
     @Test
     fun `skal hente task basert på en status`() {
         val statusSlot = slot<List<Status>>()
-        every { taskService.finnTasksTilFrontend(capture(statusSlot), any()) } returns emptyList()
+        every { taskService.finnTasksMedStatus(capture(statusSlot), any(), any()) } returns emptyList()
 
         taskController.task2(Status.FEILET, null)
         assertThat(statusSlot.captured).isEqualTo(listOf(Status.FEILET))

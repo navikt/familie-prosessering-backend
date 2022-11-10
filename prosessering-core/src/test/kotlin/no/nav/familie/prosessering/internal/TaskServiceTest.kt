@@ -26,8 +26,7 @@ internal class TaskServiceTest {
         every { taskRepository.findByStatusIn(not(eq(listOf(Status.FERDIG))), any()) } returns listOf()
         every { taskRepository.findByStatusIn(eq(listOf(Status.FERDIG)), any()) } returns listOf(mockk())
 
-        assertThat(service.finnTasksTilFrontend(listOf(Status.FERDIG), Pageable.unpaged()))
-            .hasSize(1)
+        assertThat(service.finnTasksMedStatus(listOf(Status.FERDIG))).hasSize(1)
     }
 
     @Test
