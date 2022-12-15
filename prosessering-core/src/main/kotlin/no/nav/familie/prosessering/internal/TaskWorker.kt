@@ -38,6 +38,12 @@ class TaskWorker(
                 requireNotNull(annotation) { "annotasjon mangler" }
                 annotation
             }
+        tasksTilTaskStepBeskrivelse.values.fold(emptySet<String>()) { acc, taskStepBeskrivelse ->
+            require(!acc.contains(taskStepBeskrivelse.taskStepType)) {
+                "Flere tasker har samme taskStepType(${taskStepBeskrivelse.taskStepType})"
+            }
+            acc + taskStepBeskrivelse.taskStepType
+        }
         taskStepMap = tasksTilTaskStepBeskrivelse.entries.associate { it.value.taskStepType to it.key }
         maxAntallFeilMap = tasksTilTaskStepBeskrivelse.values.associate { it.taskStepType to it.maxAntallFeil }
         triggerTidVedFeilMap = tasksTilTaskStepBeskrivelse.values.associate { it.taskStepType to it.triggerTidVedFeilISekunder }
