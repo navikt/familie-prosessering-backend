@@ -20,17 +20,17 @@
         <maven.compiler.release>17</maven.compiler.release>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
-        <kontrakter.version>2.0_20221104130406_e9b1bc0</kontrakter.version>
+        <kontrakter.version>2.0_20221118154109_cefc994</kontrakter.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <kotlin.version>1.7.20</kotlin.version>
+        <kotlin.version>1.7.21</kotlin.version>
         <felles.version>1.20221101085322_cc4d556</felles.version>
-        <spring.version>5.3.23</spring.version>
+        <spring.version>5.3.24</spring.version>
         <spring.boot.version>2.7.5</spring.boot.version>
-        <spring-data.version>2.7.5</spring-data.version>
-        <spring-data-jdbc.version>2.4.5</spring-data-jdbc.version>
+        <spring-data.version>2.7.6</spring-data.version>
+        <spring-data-jdbc.version>2.4.6</spring-data-jdbc.version>
         <mockk.version>1.13.2</mockk.version>
-        <micrometer.version>1.10.0</micrometer.version>
-        <nav.security.token.version>2.1.7</nav.security.token.version>
+        <micrometer.version>1.10.2</micrometer.version>
+        <nav.security.token.version>2.1.8</nav.security.token.version>
 
         <!--suppress UnresolvedMavenProperty  Ligger som secret i github-->
         <sonar.projectKey>${SONAR_PROJECTKEY}</sonar.projectKey>
@@ -125,13 +125,13 @@
             <dependency>
                 <groupId>com.ninja-squad</groupId>
                 <artifactId>springmockk</artifactId>
-                <version>3.1.1</version>
+                <version>4.0.0</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.testcontainers</groupId>
                 <artifactId>postgresql</artifactId>
-                <version>1.17.2</version>
+                <version>1.17.6</version>
                 <scope>test</scope>
             </dependency>
 
