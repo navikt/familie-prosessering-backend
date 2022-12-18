@@ -28,7 +28,7 @@
         <spring.boot.version>2.7.5</spring.boot.version>
         <spring-data.version>2.7.5</spring-data.version>
         <spring-data-jdbc.version>2.4.5</spring-data-jdbc.version>
-        <mockk.version>1.13.2</mockk.version>
+        <mockk.version>1.13.3</mockk.version>
         <micrometer.version>1.10.0</micrometer.version>
         <nav.security.token.version>2.1.7</nav.security.token.version>
 
