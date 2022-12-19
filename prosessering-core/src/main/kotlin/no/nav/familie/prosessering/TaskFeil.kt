@@ -38,7 +38,7 @@ data class TaskFeil(
     @JsonProperty("callId")
     val callId: String? = null,
     @JsonProperty("feilkode")
-    var feilkode: String? = null
+    var feilkode: String? = null,
 ) {
 
     constructor(taskInfo: Task, feil: Throwable?) : this(
@@ -47,7 +47,7 @@ data class TaskFeil(
         feil?.cause?.javaClass?.name,
         feil?.cause?.message,
         feil?.message,
-        getStacktraceAsString(feil)
+        getStacktraceAsString(feil),
     )
 
     @Throws(IOException::class)

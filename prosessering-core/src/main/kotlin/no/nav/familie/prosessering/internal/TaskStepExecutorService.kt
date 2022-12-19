@@ -34,7 +34,7 @@ class TaskStepExecutorService(
     private val fixedDelayString: String,
     private val taskWorker: TaskWorker,
     @Qualifier("taskExecutor") private val taskExecutor: TaskExecutor,
-    private val taskService: TaskService
+    private val taskService: TaskService,
 ) : ApplicationListener<ContextClosedEvent> {
 
     private val secureLog = LoggerFactory.getLogger("secureLogger")
@@ -126,7 +126,7 @@ class TaskStepExecutorService(
             secureLog.info(
                 "Fullført kjøring av task '{}', kjøretid={} ms",
                 task,
-                System.currentTimeMillis() - startTidspunkt
+                System.currentTimeMillis() - startTidspunkt,
             )
         } catch (e: RekjørSenereException) {
             taskWorker.rekjørSenere(task.id, e)
@@ -137,7 +137,7 @@ class TaskStepExecutorService(
                 "Fullført kjøring av task '{}', kjøretid={} ms med feil",
                 task,
                 System.currentTimeMillis() - startTidspunkt,
-                e
+                e,
             )
             if (e is Error) throw e
         } finally {

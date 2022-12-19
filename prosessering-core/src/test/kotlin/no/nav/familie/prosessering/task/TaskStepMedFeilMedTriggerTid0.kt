@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service
 @TaskStepBeskrivelse(
     taskStepType = TaskStepMedFeilMedTriggerTid0.TYPE,
     beskrivelse = "Task med feil",
-    triggerTidVedFeilISekunder = 0
+    triggerTidVedFeilISekunder = 0,
 )
 class TaskStepMedFeilMedTriggerTid0 : AsyncTaskStep {
 

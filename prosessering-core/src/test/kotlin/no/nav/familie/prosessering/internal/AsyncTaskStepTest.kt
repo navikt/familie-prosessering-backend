@@ -19,14 +19,14 @@ class AsyncTaskStepTest : IntegrationRunnerTest() {
         Assertions.assertThat(
             tasker.any {
                 harIkkePåkrevdAnnotasjon(it)
-            }
+            },
         ).isFalse()
     }
 
     private fun harIkkePåkrevdAnnotasjon(it: AsyncTaskStep): Boolean {
         return !AnnotationUtils.isAnnotationDeclaredLocally(
             TaskStepBeskrivelse::class.java,
-            it.javaClass
+            it.javaClass,
         )
     }
 

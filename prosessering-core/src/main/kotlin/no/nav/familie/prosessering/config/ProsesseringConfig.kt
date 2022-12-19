@@ -15,7 +15,7 @@ import org.springframework.scheduling.config.ScheduledTaskRegistrar
 @EnableAsync
 class ProsesseringConfig(
     @Value("\${prosessering.queue.capacity:20}") private val køstørrelse: Int,
-    @Value("\${prosessering.pool.size:4}") private val poolSize: Int
+    @Value("\${prosessering.pool.size:4}") private val poolSize: Int,
 ) : SchedulingConfigurer {
 
     private val log = LoggerFactory.getLogger(javaClass)
@@ -48,7 +48,7 @@ class ProsesseringConfig(
         executor.setErrorHandler { e ->
             log.error(
                 "TaskScheduler feilet, se secureLogs. exception=${e.javaClass.simpleName}" +
-                    " cause=${e.cause?.javaClass?.simpleName}"
+                    " cause=${e.cause?.javaClass?.simpleName}",
             )
             secureLog.error("TaskScheduler feilet", e)
         }

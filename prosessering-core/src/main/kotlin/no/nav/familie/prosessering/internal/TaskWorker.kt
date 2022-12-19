@@ -19,7 +19,7 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class TaskWorker(
     private val taskService: TaskService,
-    taskStepTyper: List<AsyncTaskStep>
+    taskStepTyper: List<AsyncTaskStep>,
 ) {
 
     private val taskStepMap: Map<String, AsyncTaskStep>
@@ -48,7 +48,7 @@ class TaskWorker(
                 "status",
                 it.taskStepType,
                 "beskrivelse",
-                it.beskrivelse
+                it.beskrivelse,
             )
         }
         fullførttellereForTaskSteps = tasksTilTaskStepBeskrivelse.values.associate {
@@ -57,14 +57,13 @@ class TaskWorker(
                 "status",
                 it.taskStepType,
                 "beskrivelse",
-                it.beskrivelse
+                it.beskrivelse,
             )
         }
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     fun doActualWork(taskId: Long) {
-
         var task = taskService.findById(taskId)
 
         if (task.status != Status.PLUKKET) {
@@ -96,7 +95,7 @@ class TaskWorker(
         taskService.klarTilPlukk(
             taskMedNyTriggerTid,
             endretAv = BRUKERNAVN_NÅR_SIKKERHETSKONTEKST_IKKE_FINNES,
-            melding = e.årsak
+            melding = e.årsak,
         )
     }
 
@@ -114,14 +113,14 @@ class TaskWorker(
             taskFeil,
             antallFeil,
             maxAntallFeil,
-            settTilManuellOppfølgning
+            settTilManuellOppfølgning,
         )
         // lager metrikker på tasks som har feilet max antall ganger.
         if (task.status == Status.FEILET || task.status == Status.MANUELL_OPPFØLGING) {
             finnFeilteller(task.type).increment()
             log.error(
                 "Task ${task.id} av type ${task.type} har feilet/satt til manuell oppfølgning. " +
-                    "Sjekk familie-prosessering for detaljer"
+                    "Sjekk familie-prosessering for detaljer",
             )
         }
         secureLog.info("Feilhåndtering lagret ok {}", task)

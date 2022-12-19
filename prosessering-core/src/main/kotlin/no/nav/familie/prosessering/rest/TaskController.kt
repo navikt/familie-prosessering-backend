@@ -27,7 +27,7 @@ class TaskController(private val restTaskService: RestTaskService, private val o
     fun task2(
         @RequestParam status: Status?,
         @RequestParam(required = false) page: Int?,
-        @RequestParam(required = false) type: String? = null
+        @RequestParam(required = false) type: String? = null,
     ): ResponseEntity<Ressurs<PaginableResponse<TaskDto>>> {
         val statuser: List<Status> = status?.let { listOf(it) } ?: Status.values().toList()
         return ResponseEntity.ok(restTaskService.hentTasks(statuser, hentBrukernavn(), page ?: 0, type))
@@ -45,7 +45,7 @@ class TaskController(private val restTaskService: RestTaskService, private val o
     @GetMapping(path = ["/task/logg/{id}"])
     fun tasklogg(
         @PathVariable id: Long,
-        @RequestParam(required = false) page: Int?
+        @RequestParam(required = false) page: Int?,
     ): ResponseEntity<Ressurs<List<TaskloggDto>>> {
         return ResponseEntity.ok(restTaskService.hentTaskLogg(id, hentBrukernavn()))
     }
@@ -63,29 +63,29 @@ class TaskController(private val restTaskService: RestTaskService, private val o
     @PutMapping(path = ["/task/avvikshaandter"])
     fun avvikshåndterTask(
         @RequestParam taskId: Long,
-        @RequestBody avvikshåndterDTO: AvvikshåndterDTO
+        @RequestBody avvikshåndterDTO: AvvikshåndterDTO,
     ): ResponseEntity<Ressurs<String>> {
         return ResponseEntity.ok(
             restTaskService.avvikshåndterTask(
                 taskId,
                 avvikshåndterDTO.avvikstype,
                 avvikshåndterDTO.årsak,
-                hentBrukernavn()
-            )
+                hentBrukernavn(),
+            ),
         )
     }
 
     @PutMapping(path = ["/task/kommenter"])
     fun kommenterTask(
         @RequestParam taskId: Long,
-        @RequestBody kommentarDTO: KommentarDTO
+        @RequestBody kommentarDTO: KommentarDTO,
     ): ResponseEntity<Ressurs<String>> {
         return ResponseEntity.ok(
             restTaskService.kommenterTask(
                 taskId,
                 kommentarDTO,
-                hentBrukernavn()
-            )
+                hentBrukernavn(),
+            ),
         )
     }
 }

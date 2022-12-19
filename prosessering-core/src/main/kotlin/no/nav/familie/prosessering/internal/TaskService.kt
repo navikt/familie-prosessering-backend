@@ -22,7 +22,7 @@ import java.time.LocalDateTime
 @Component
 class TaskService internal constructor(
     private val taskRepository: TaskRepository,
-    private val taskLoggRepository: TaskLoggRepository
+    private val taskLoggRepository: TaskLoggRepository,
 ) {
 
     private val logger = LoggerFactory.getLogger(javaClass)
@@ -65,10 +65,10 @@ class TaskService internal constructor(
         return taskRepository.findByStatusInAndTriggerTidBeforeOrderByOpprettetTid(
             listOf(
                 Status.KLAR_TIL_PLUKK,
-                Status.UBEHANDLET
+                Status.UBEHANDLET,
             ),
             LocalDateTime.now(),
-            page
+            page,
         )
     }
 
@@ -151,7 +151,6 @@ class TaskService internal constructor(
 
     @Transactional
     internal fun avvikshåndter(task: Task, avvikstype: Avvikstype, årsak: String, endretAv: String): Task {
-
         val taskLogg = TaskLogg(taskId = task.id, type = Loggtype.AVVIKSHÅNDTERT, melding = årsak, endretAv = endretAv)
         taskLoggRepository.save(taskLogg)
         return taskRepository.save(task.copy(status = Status.AVVIKSHÅNDTERT, avvikstype = avvikstype))
@@ -196,7 +195,7 @@ class TaskService internal constructor(
         feil: TaskFeil,
         tidligereAntallFeil: Int,
         maxAntallFeil: Int,
-        settTilManuellOppfølgning: Boolean
+        settTilManuellOppfølgning: Boolean,
     ): Task {
         val nyStatus = nyFeiletStatus(tidligereAntallFeil, maxAntallFeil, settTilManuellOppfølgning)
 
@@ -214,7 +213,7 @@ class TaskService internal constructor(
     private fun nyFeiletStatus(
         tidligereAntallFeil: Int,
         maxAntallFeil: Int,
-        settTilManuellOppfølgning: Boolean
+        settTilManuellOppfølgning: Boolean,
     ): Status {
         val antallFeilendeForsøk = tidligereAntallFeil + 1
         return when {

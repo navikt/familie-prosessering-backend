@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service
     taskStepType = TaskStepFeilManuellOppfølgning.TASK_FEIL_1,
     beskrivelse = "Dette er task 1",
     settTilManuellOppfølgning = true,
-    triggerTidVedFeilISekunder = 0
+    triggerTidVedFeilISekunder = 0,
 )
 class TaskStepFeilManuellOppfølgning : AsyncTaskStep {
 

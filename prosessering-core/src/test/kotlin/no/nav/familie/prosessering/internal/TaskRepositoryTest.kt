@@ -108,7 +108,7 @@ class TaskRepositoryTest : IntegrationRunnerTest() {
 
         val message = repository.findByStatusIn(
             listOf(Status.UBEHANDLET),
-            PageRequest.of(0, 3, Sort.Direction.DESC, "opprettetTid")
+            PageRequest.of(0, 3, Sort.Direction.DESC, "opprettetTid"),
         )
         assertThat(message.map { it.payload }).containsExactly("3", "1", "2")
     }
@@ -120,13 +120,13 @@ class TaskRepositoryTest : IntegrationRunnerTest() {
         val task2 = Task(
             type = TaskStep2.TASK_2,
             payload = "task med tidligst oppprettetTid",
-            opprettetTid = LocalDateTime.now().minusDays(1)
+            opprettetTid = LocalDateTime.now().minusDays(1),
         )
         val task3 =
             Task(
                 type = TaskStep2.TASK_2,
                 payload = "task med senest oppettetTid",
-                opprettetTid = LocalDateTime.now().plusDays(1)
+                opprettetTid = LocalDateTime.now().plusDays(1),
             )
 
         taskService.save(task1)
@@ -136,13 +136,13 @@ class TaskRepositoryTest : IntegrationRunnerTest() {
         val message = repository.findByStatusInAndTriggerTidBeforeOrderByOpprettetTid(
             listOf(Status.UBEHANDLET),
             LocalDateTime.now(),
-            PageRequest.of(0, 5)
+            PageRequest.of(0, 5),
         )
 
         assertThat(message.map { it.payload }).containsExactly(
             "task med tidligst oppprettetTid",
             "task med opprettetTid nå",
-            "task med senest oppettetTid"
+            "task med senest oppettetTid",
         )
     }
 
@@ -159,7 +159,7 @@ class TaskRepositoryTest : IntegrationRunnerTest() {
         val åpneTask = repository.countOpenTasks()
         assertThat(åpneTask).hasSize(2).contains(
             AntallÅpneTask(TaskStep1.TASK_1, Status.UBEHANDLET, 1),
-            AntallÅpneTask(TaskStep2.TASK_2, Status.UBEHANDLET, 2)
+            AntallÅpneTask(TaskStep2.TASK_2, Status.UBEHANDLET, 2),
         )
     }
 
@@ -172,8 +172,8 @@ class TaskRepositoryTest : IntegrationRunnerTest() {
                 payload = "{'a'='b'}",
                 properties = Properties().apply {
                     this[property] = property
-                }
-            )
+                },
+            ),
         )
         val task = repository.findByIdOrNull(lagretTask.id)!!
         assertThat(task.metadata.getProperty(property)).isEqualTo(property)

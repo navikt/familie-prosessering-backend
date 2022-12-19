@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service
 @Service
 @TaskStepBeskrivelse(
     taskStepType = TaskStepMedFeil.TYPE,
-    beskrivelse = "Task med feil"
+    beskrivelse = "Task med feil",
 )
 class TaskStepMedFeil : AsyncTaskStep {
 
