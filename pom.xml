@@ -24,7 +24,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <kotlin.version>1.7.22</kotlin.version>
         <felles.version>1.20221101085322_cc4d556</felles.version>
-        <spring.version>5.3.24</spring.version>
+        <spring.version>6.0.3</spring.version>
         <spring.boot.version>2.7.5</spring.boot.version>
         <spring-data.version>2.7.6</spring-data.version>
         <spring-data-jdbc.version>2.4.6</spring-data-jdbc.version>
