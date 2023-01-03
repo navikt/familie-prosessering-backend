@@ -70,7 +70,6 @@ class TaskWorker(
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     fun doActualWork(taskId: Long) {
-
         var task = taskService.findById(taskId)
 
         if (task.status != Status.PLUKKET) {
