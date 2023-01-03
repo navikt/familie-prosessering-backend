@@ -151,7 +151,6 @@ class TaskService internal constructor(
 
     @Transactional
     internal fun avvikshåndter(task: Task, avvikstype: Avvikstype, årsak: String, endretAv: String): Task {
-
         val taskLogg = TaskLogg(taskId = task.id, type = Loggtype.AVVIKSHÅNDTERT, melding = årsak, endretAv = endretAv)
         taskLoggRepository.save(taskLogg)
         return taskRepository.save(task.copy(status = Status.AVVIKSHÅNDTERT, avvikstype = avvikstype))

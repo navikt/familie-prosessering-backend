@@ -30,7 +30,7 @@ data class Task(
         }
     ),
     @Version
-    val versjon: Long = 0,
+    val versjon: Long = 0
 ) {
 
     @Transient
