@@ -12,7 +12,7 @@ internal interface TaskRepository : PagingAndSortingRepository<Task, Long> {
     fun findByStatusInAndTriggerTidBeforeOrderByOpprettetTid(
         status: List<Status>,
         triggerTid: LocalDateTime,
-        page: Pageable
+        page: Pageable,
     ): List<Task>
 
     fun findByStatus(status: Status): List<Task>
@@ -32,7 +32,7 @@ internal interface TaskRepository : PagingAndSortingRepository<Task, Long> {
         SELECT t.type,t.status, count(*) AS count 
         FROM task t WHERE t.status IN ('UBEHANDLET', 'BEHANDLER', 'PLUKKET', 'KLAR_TIL_PLUKK') 
         GROUP BY t.type, t.status
-        """
+        """,
     )
     fun countOpenTasks(): List<AntallÅpneTask>
 
@@ -41,7 +41,7 @@ internal interface TaskRepository : PagingAndSortingRepository<Task, Long> {
         SELECT DISTINCT t.* 
         FROM task t 
         JOIN task_logg tl ON t.id = tl.task_id 
-        WHERE t.status = 'FERDIG' AND tl.type IN ('FEILET', 'MANUELL_OPPFØLGNING')"""
+        WHERE t.status = 'FERDIG' AND tl.type IN ('FEILET', 'MANUELL_OPPFØLGNING')""",
     )
     fun finnTasksSomErFerdigNåMenFeiletFør(page: Pageable): List<Task>
 
@@ -62,7 +62,7 @@ internal interface TaskRepository : PagingAndSortingRepository<Task, Long> {
           JOIN q t2 ON t.id = t2.id
         WHERE t2.rn = 1
           AND t2.opprettet_tid < :tid
-    """
+    """,
     )
     fun findAllByStatusAndLastProcessed(status: Status, tid: LocalDateTime): List<Task>
 }

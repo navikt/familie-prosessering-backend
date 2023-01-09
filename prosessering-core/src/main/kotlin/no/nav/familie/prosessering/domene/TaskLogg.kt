@@ -13,7 +13,7 @@ data class TaskLogg(
     val type: Loggtype,
     val node: String = "node1",
     val melding: String? = null,
-    val opprettetTid: LocalDateTime = LocalDateTime.now()
+    val opprettetTid: LocalDateTime = LocalDateTime.now(),
 ) {
 
     override fun toString(): String {
@@ -29,5 +29,5 @@ data class TaskLoggMetadata(
     val taskId: Long,
     val antallLogger: Int,
     val sistOpprettetTid: LocalDateTime,
-    val sisteKommentar: String?
+    val sisteKommentar: String?,
 )

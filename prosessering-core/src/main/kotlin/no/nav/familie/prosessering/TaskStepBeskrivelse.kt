@@ -34,5 +34,5 @@ annotation class TaskStepBeskrivelse(
     /**
      * Sett til manuell behandling etter maksAntallFeil
      */
-    val settTilManuellOppfølgning: Boolean = false
+    val settTilManuellOppfølgning: Boolean = false,
 )

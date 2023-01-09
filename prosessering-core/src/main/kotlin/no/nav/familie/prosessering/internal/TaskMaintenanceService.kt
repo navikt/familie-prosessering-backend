@@ -16,7 +16,7 @@ import java.time.LocalDateTime
 class TaskMaintenanceService(
     private val taskService: TaskService,
     @Value("\${prosessering.delete.after.weeks:2}") private val deleteTasksAfterWeeks: Long,
-    @Value("\${prosessering.delete.pagesize:10000}") private val deleteTasksPageSize: Int
+    @Value("\${prosessering.delete.pagesize:10000}") private val deleteTasksPageSize: Int,
 ) {
 
     val antallÅpneTaskGague = MultiGauge.builder("openTasks").register(Metrics.globalRegistry)
@@ -67,10 +67,10 @@ class TaskMaintenanceService(
                         "type",
                         it.type,
                         "status",
-                        it.status.name
+                        it.status.name,
                     ),
-                    it.count
-                )
+                    it.count,
+                ),
             )
         }
 

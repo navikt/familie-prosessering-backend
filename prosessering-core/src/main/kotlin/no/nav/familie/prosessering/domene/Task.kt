@@ -27,10 +27,10 @@ data class Task(
             this[MDCConstants.MDC_CALL_ID] =
                 MDC.get(MDCConstants.MDC_CALL_ID)
                     ?: IdUtils.generateId()
-        }
+        },
     ),
     @Version
-    val versjon: Long = 0
+    val versjon: Long = 0,
 ) {
 
     @Transient
@@ -48,8 +48,8 @@ data class Task(
                     this[MDCConstants.MDC_CALL_ID] =
                         MDC.get(MDCConstants.MDC_CALL_ID)
                             ?: IdUtils.generateId()
-                }
-            )
+                },
+            ),
         )
 
     fun medTriggerTid(triggerTid: LocalDateTime): Task {
