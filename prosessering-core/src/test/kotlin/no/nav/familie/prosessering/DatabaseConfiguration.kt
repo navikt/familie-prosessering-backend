@@ -13,8 +13,8 @@ class DatabaseConfiguration : AbstractJdbcConfiguration() {
         return JdbcCustomConversions(
             listOf(
                 StringTilPropertiesWrapperConverter(),
-                PropertiesWrapperTilStringConverter()
-            )
+                PropertiesWrapperTilStringConverter(),
+            ),
         )
     }
 }

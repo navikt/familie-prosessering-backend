@@ -8,7 +8,7 @@ import javax.servlet.http.HttpServletResponse
 
 class ProsesseringUserAuthorizationFilter(
     private val påkrevdRolle: String,
-    private val oidcUtil: OIDCUtil
+    private val oidcUtil: OIDCUtil,
 ) : OncePerRequestFilter() {
 
     override fun doFilterInternal(request: HttpServletRequest, response: HttpServletResponse, filterChain: FilterChain) {
@@ -17,7 +17,7 @@ class ProsesseringUserAuthorizationFilter(
             currentUserGroups() == null -> response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "No user-groups in JWT")
             !currentUserGroups()!!.contains(påkrevdRolle) -> response.sendError(
                 HttpServletResponse.SC_UNAUTHORIZED,
-                "Missing group $påkrevdRolle in JWT"
+                "Missing group $påkrevdRolle in JWT",
             )
             else -> filterChain.doFilter(request, response)
         }

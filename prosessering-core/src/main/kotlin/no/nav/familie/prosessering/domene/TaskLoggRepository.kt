@@ -22,7 +22,7 @@ internal interface TaskLoggRepository : PagingAndSortingRepository<TaskLogg, Lon
         FROM task_logg tl
         WHERE task_id IN (:taskIds)
         GROUP BY task_id
-    """
+    """,
     )
     fun finnTaskLoggMetadata(taskIds: List<Long>): List<TaskLoggMetadata>
 

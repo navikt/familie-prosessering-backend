@@ -24,7 +24,7 @@ class RestTaskService(private val taskService: TaskService) {
             onFailure = { e ->
                 logger.error("Henting av antall tasker som krever oppfølging feilet", e)
                 Ressurs.failure(errorMessage = "Henting av antall tasker som krever oppfølging feilet.", error = e)
-            }
+            },
         )
     }
 
@@ -39,9 +39,9 @@ class RestTaskService(private val taskService: TaskService) {
                     logger.error("Henting av tasker feilet", e)
                     Ressurs.failure(
                         errorMessage = "Henter oppgaver som er ferdige nå, men feilet før feilet.",
-                        error = e
+                        error = e,
                     )
-                }
+                },
             )
     }
 
@@ -49,14 +49,14 @@ class RestTaskService(private val taskService: TaskService) {
         statuses: List<Status>,
         saksbehandlerId: String,
         page: Int,
-        type: String?
+        type: String?,
     ): Ressurs<PaginableResponse<TaskDto>> {
         logger.info("$saksbehandlerId henter ${type?.plus("-") ?: ""}tasker med status $statuses")
         return hentTasksGittSpørring(page) { pageRequest: PageRequest ->
             taskService.finnTasksMedStatus(
                 statuses,
                 type,
-                pageRequest
+                pageRequest,
             )
         }
             .fold(
@@ -64,13 +64,13 @@ class RestTaskService(private val taskService: TaskService) {
                 onFailure = { e ->
                     logger.error("Henting av tasker feilet", e)
                     Ressurs.failure(errorMessage = "Henting av tasker med status '$statuses', feilet.", error = e)
-                }
+                },
             )
     }
 
     fun hentTasksGittSpørring(
         page: Int,
-        spørring: (PageRequest) -> List<Task>
+        spørring: (PageRequest) -> List<Task>,
     ): Result<PaginableResponse<TaskDto>> = Result.runCatching {
         val pageRequest = PageRequest.of(page, TASK_LIMIT, Sort.Direction.DESC, "opprettetTid")
         val tasks = spørring.invoke(pageRequest)
@@ -90,9 +90,9 @@ class RestTaskService(private val taskService: TaskService) {
                     antallLogger = taskLogg?.antallLogger ?: 0,
                     sistKjørt = taskLogg?.sistOpprettetTid,
                     kommentar = taskLogg?.sisteKommentar,
-                    callId = it.callId
+                    callId = it.callId,
                 )
-            }
+            },
         )
     }
 
@@ -109,7 +109,7 @@ class RestTaskService(private val taskService: TaskService) {
                 onFailure = { e ->
                     logger.error("Henting av tasker feilet", e)
                     Ressurs.failure(errorMessage = "Henting av tasklogg feilet.", error = e)
-                }
+                },
             )
     }
 
@@ -136,7 +136,7 @@ class RestTaskService(private val taskService: TaskService) {
                 onFailure = { e ->
                     logger.error("Rekjøring av tasker med status '$status' feilet", e)
                     Ressurs.failure(errorMessage = "Rekjøring av tasker med status '$status' feilet", error = e)
-                }
+                },
             )
     }
 
@@ -145,7 +145,7 @@ class RestTaskService(private val taskService: TaskService) {
         taskId: Long,
         avvikstype: Avvikstype,
         årsak: String,
-        saksbehandlerId: String
+        saksbehandlerId: String,
     ): Ressurs<String> {
         val task: Task = taskService.findById(taskId)
 
@@ -156,7 +156,7 @@ class RestTaskService(private val taskService: TaskService) {
                 task = task,
                 avvikstype = avvikstype,
                 årsak = årsak,
-                endretAv = saksbehandlerId
+                endretAv = saksbehandlerId,
             )
         }
             .fold(
@@ -166,7 +166,7 @@ class RestTaskService(private val taskService: TaskService) {
                 onFailure = { e ->
                     logger.error("Avvikshåndtering av $taskId feilet", e)
                     Ressurs.failure(errorMessage = "Avvikshåndtering av $taskId feilet", error = e)
-                }
+                },
             )
     }
 
@@ -181,7 +181,7 @@ class RestTaskService(private val taskService: TaskService) {
                 task = task,
                 kommentar = kommentarDTO.kommentar,
                 endretAv = saksbehandlerId,
-                settTilManuellOppfølgning = kommentarDTO.settTilManuellOppfølging
+                settTilManuellOppfølgning = kommentarDTO.settTilManuellOppfølging,
             )
         }
             .fold(
@@ -191,7 +191,7 @@ class RestTaskService(private val taskService: TaskService) {
                 onFailure = { e ->
                     logger.error("Kommentering av $taskId feilet", e)
                     Ressurs.failure(errorMessage = "Kommentering av $taskId feilet", error = e)
-                }
+                },
             )
     }
 

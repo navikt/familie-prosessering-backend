@@ -21,7 +21,7 @@ data class TaskDto(
     val antallLogger: Int,
     val sistKjørt: LocalDateTime?,
     val kommentar: String?,
-    val callId: String
+    val callId: String,
 )
 
 data class TaskloggDto(
@@ -30,5 +30,5 @@ data class TaskloggDto(
     val type: Loggtype,
     val node: String,
     val melding: String?,
-    val opprettetTidspunkt: LocalDateTime
+    val opprettetTidspunkt: LocalDateTime,
 )

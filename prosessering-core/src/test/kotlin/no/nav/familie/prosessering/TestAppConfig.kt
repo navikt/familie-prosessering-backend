@@ -38,7 +38,7 @@ class TestAppConfig : JdbcRepositoryConfigExtension() {
         val taskExecutor1 = spyk<TaskExecutor>(
             ThreadPoolTaskExecutor().also {
                 it.initialize()
-            }
+            },
         )
         every { taskExecutor1.execute(any()) } answers {
             firstArg<Runnable>().run()
