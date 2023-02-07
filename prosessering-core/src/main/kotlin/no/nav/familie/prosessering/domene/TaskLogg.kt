@@ -11,7 +11,7 @@ data class TaskLogg(
     val taskId: Long,
     val endretAv: String = BRUKERNAVN_NÅR_SIKKERHETSKONTEKST_IKKE_FINNES,
     val type: Loggtype,
-    val node: String = "node1",
+    val node: String = hentNodeNavn(),
     val melding: String? = null,
     val opprettetTid: LocalDateTime = LocalDateTime.now(),
 ) {
@@ -20,8 +20,12 @@ data class TaskLogg(
         return "TaskLogg(id=$id, type=$type, opprettetTid=$opprettetTid)"
     }
 
+
     companion object {
         const val BRUKERNAVN_NÅR_SIKKERHETSKONTEKST_IKKE_FINNES = "VL"
+        private fun hentNodeNavn(): String {
+            return System.getenv("HOSTNAME") ?: "node1"
+        }
     }
 }
 

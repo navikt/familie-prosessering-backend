@@ -41,7 +41,7 @@ class TaskService internal constructor(
         val lagretTask = taskRepository.save(task)
         validerTask(lagretTask)
         if (task.versjon == 0L) {
-            taskLoggRepository.save(TaskLogg(type = Loggtype.UBEHANDLET, taskId = lagretTask.id, node = hentNodeNavn()))
+            taskLoggRepository.save(TaskLogg(type = Loggtype.UBEHANDLET, taskId = lagretTask.id))
         }
         return lagretTask
     }
@@ -155,8 +155,7 @@ class TaskService internal constructor(
             taskId = task.id,
             type = Loggtype.AVVIKSHÅNDTERT,
             melding = årsak,
-            endretAv = endretAv,
-            node = hentNodeNavn()
+            endretAv = endretAv
         )
         taskLoggRepository.save(taskLogg)
         return taskRepository.save(task.copy(status = Status.AVVIKSHÅNDTERT, avvikstype = avvikstype))
@@ -165,14 +164,14 @@ class TaskService internal constructor(
     @Transactional
     internal fun kommenter(task: Task, kommentar: String, endretAv: String, settTilManuellOppfølgning: Boolean): Task {
         val taskLogg =
-            TaskLogg(taskId = task.id, type = Loggtype.KOMMENTAR, node = hentNodeNavn(), melding = kommentar, endretAv = endretAv)
+            TaskLogg(taskId = task.id, type = Loggtype.KOMMENTAR, melding = kommentar, endretAv = endretAv)
         taskLoggRepository.save(taskLogg)
         return taskRepository.save(task.copy(status = if (settTilManuellOppfølgning) Status.MANUELL_OPPFØLGING else task.status))
     }
 
     @Transactional
     internal fun behandler(task: Task): Task {
-        taskLoggRepository.save(TaskLogg(taskId = task.id, type = Loggtype.BEHANDLER, node = hentNodeNavn()))
+        taskLoggRepository.save(TaskLogg(taskId = task.id, type = Loggtype.BEHANDLER))
         return taskRepository.save(task.copy(status = Status.BEHANDLER))
     }
 
@@ -182,7 +181,6 @@ class TaskService internal constructor(
             TaskLogg(
                 taskId = task.id,
                 type = Loggtype.KLAR_TIL_PLUKK,
-                node = hentNodeNavn(),
                 endretAv = endretAv,
                 melding = melding
             )
@@ -192,13 +190,13 @@ class TaskService internal constructor(
 
     @Transactional
     internal fun plukker(task: Task): Task {
-        taskLoggRepository.save(TaskLogg(taskId = task.id, type = Loggtype.PLUKKET, node = hentNodeNavn()))
+        taskLoggRepository.save(TaskLogg(taskId = task.id, type = Loggtype.PLUKKET))
         return taskRepository.save(task.copy(status = Status.PLUKKET))
     }
 
     @Transactional
     internal fun ferdigstill(task: Task): Task {
-        taskLoggRepository.save(TaskLogg(taskId = task.id, type = Loggtype.FERDIG, node = hentNodeNavn()))
+        taskLoggRepository.save(TaskLogg(taskId = task.id, type = Loggtype.FERDIG))
         return taskRepository.save(task.copy(status = Status.FERDIG))
     }
 
@@ -219,13 +217,10 @@ class TaskService internal constructor(
             secureLog.warn("Feilet lagring av task=${task.id} med melding", e)
             "Feilet skriving av feil til json exceptionCauseMessage=${feil.exceptionCauseMessage} feilmelding=${feil.feilmelding} stacktrace=${feil.stackTrace}"
         }
-        taskLoggRepository.save(TaskLogg(taskId = task.id, type = Loggtype.FEILET, node = hentNodeNavn(), melding = feilmelding))
+        taskLoggRepository.save(TaskLogg(taskId = task.id, type = Loggtype.FEILET, melding = feilmelding))
         return taskRepository.save(task.copy(status = nyStatus))
     }
 
-    private fun hentNodeNavn(): String {
-        return System.getenv("HOSTNAME") ?: "node1"
-    }
 
     private fun nyFeiletStatus(
         tidligereAntallFeil: Int,
