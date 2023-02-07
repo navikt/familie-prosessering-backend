@@ -151,14 +151,20 @@ class TaskService internal constructor(
 
     @Transactional
     internal fun avvikshåndter(task: Task, avvikstype: Avvikstype, årsak: String, endretAv: String): Task {
-        val taskLogg = TaskLogg(taskId = task.id, type = Loggtype.AVVIKSHÅNDTERT, melding = årsak, endretAv = endretAv)
+        val taskLogg = TaskLogg(
+            taskId = task.id,
+            type = Loggtype.AVVIKSHÅNDTERT,
+            melding = årsak,
+            endretAv = endretAv
+        )
         taskLoggRepository.save(taskLogg)
         return taskRepository.save(task.copy(status = Status.AVVIKSHÅNDTERT, avvikstype = avvikstype))
     }
 
     @Transactional
     internal fun kommenter(task: Task, kommentar: String, endretAv: String, settTilManuellOppfølgning: Boolean): Task {
-        val taskLogg = TaskLogg(taskId = task.id, type = Loggtype.KOMMENTAR, melding = kommentar, endretAv = endretAv)
+        val taskLogg =
+            TaskLogg(taskId = task.id, type = Loggtype.KOMMENTAR, melding = kommentar, endretAv = endretAv)
         taskLoggRepository.save(taskLogg)
         return taskRepository.save(task.copy(status = if (settTilManuellOppfølgning) Status.MANUELL_OPPFØLGING else task.status))
     }
@@ -172,7 +178,12 @@ class TaskService internal constructor(
     @Transactional
     internal fun klarTilPlukk(task: Task, endretAv: String, melding: String? = null): Task {
         val taskLogg =
-            TaskLogg(taskId = task.id, type = Loggtype.KLAR_TIL_PLUKK, endretAv = endretAv, melding = melding)
+            TaskLogg(
+                taskId = task.id,
+                type = Loggtype.KLAR_TIL_PLUKK,
+                endretAv = endretAv,
+                melding = melding
+            )
         taskLoggRepository.save(taskLogg)
         return taskRepository.save(task.copy(status = Status.KLAR_TIL_PLUKK))
     }
@@ -209,6 +220,7 @@ class TaskService internal constructor(
         taskLoggRepository.save(TaskLogg(taskId = task.id, type = Loggtype.FEILET, melding = feilmelding))
         return taskRepository.save(task.copy(status = nyStatus))
     }
+
 
     private fun nyFeiletStatus(
         tidligereAntallFeil: Int,
