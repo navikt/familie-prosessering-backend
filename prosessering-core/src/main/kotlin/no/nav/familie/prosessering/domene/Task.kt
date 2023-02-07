@@ -35,7 +35,7 @@ data class Task(
     @Version
     val versjon: Long = 0,
     @MappedCollection(idColumn = "task_id")
-    val logg: Set<TaskLogg> = setOf(TaskLogg(type = Loggtype.UBEHANDLET))
+    val logg: Set<TaskLogg> = setOf(TaskLogg(type = Loggtype.UBEHANDLET, node = hentNodeNavn()))
 ) {
 
     @Transient
@@ -69,7 +69,8 @@ data class Task(
             logg = logg + TaskLogg(
                 type = Loggtype.AVVIKSHÅNDTERT,
                 melding = årsak,
-                endretAv = endretAv
+                endretAv = endretAv,
+                node = hentNodeNavn()
             )
         )
     }
@@ -82,7 +83,8 @@ data class Task(
                 logg = logg + TaskLogg(
                     type = Loggtype.KOMMENTAR,
                     melding = kommentar,
-                    endretAv = endretAv
+                    endretAv = endretAv,
+                    node = hentNodeNavn()
                 )
             )
         } else {
@@ -90,29 +92,30 @@ data class Task(
                 logg = logg + TaskLogg(
                     type = Loggtype.KOMMENTAR,
                     melding = kommentar,
-                    endretAv = endretAv
+                    endretAv = endretAv,
+                    node = hentNodeNavn()
                 )
             )
         }
     }
 
     fun behandler(): Task {
-        return copy(status = Status.BEHANDLER, logg = logg + TaskLogg(type = Loggtype.BEHANDLER))
+        return copy(status = Status.BEHANDLER, logg = logg + TaskLogg(type = Loggtype.BEHANDLER, node = hentNodeNavn()))
     }
 
     fun klarTilPlukk(endretAv: String, melding: String? = null): Task {
         return copy(
             status = Status.KLAR_TIL_PLUKK,
-            logg = logg + TaskLogg(type = Loggtype.KLAR_TIL_PLUKK, endretAv = endretAv, melding = melding)
+            logg = logg + TaskLogg(type = Loggtype.KLAR_TIL_PLUKK, endretAv = endretAv, melding = melding, node = hentNodeNavn())
         )
     }
 
     fun plukker(): Task {
-        return copy(status = Status.PLUKKET, logg = logg + TaskLogg(type = Loggtype.PLUKKET))
+        return copy(status = Status.PLUKKET, logg = logg + TaskLogg(type = Loggtype.PLUKKET, node = hentNodeNavn()))
     }
 
     fun ferdigstill(): Task {
-        return copy(status = Status.FERDIG, logg = logg + TaskLogg(type = Loggtype.FERDIG))
+        return copy(status = Status.FERDIG, logg = logg + TaskLogg(type = Loggtype.FERDIG, node = hentNodeNavn()))
     }
 
     fun feilet(feil: TaskFeil, maxAntallFeil: Int, settTilManuellOppfølgning: Boolean): Task {
@@ -120,7 +123,8 @@ data class Task(
             return this.copy(
                 logg = logg + TaskLogg(
                     type = Loggtype.MANUELL_OPPFØLGING,
-                    melding = feil.writeValueAsString()
+                    melding = feil.writeValueAsString(),
+                    node = System.getenv("HOSTNAME")
                 )
             )
         }
@@ -130,10 +134,10 @@ data class Task(
         return try {
             this.copy(
                 status = nyStatus,
-                logg = logg + TaskLogg(type = Loggtype.FEILET, melding = feil.writeValueAsString())
+                logg = logg + TaskLogg(type = Loggtype.FEILET, node = hentNodeNavn(), melding = feil.writeValueAsString())
             )
         } catch (e: IOException) {
-            this.copy(status = nyStatus, logg = logg + TaskLogg(type = Loggtype.FEILET))
+            this.copy(status = nyStatus, logg = logg + TaskLogg(type = Loggtype.FEILET, node = hentNodeNavn()))
         }
     }
 
@@ -153,4 +157,8 @@ data class Task(
     override fun toString(): String {
         return "Task(id=$id, status=$status, opprettetTid=$opprettetTid, triggerTid=$triggerTid, type='$type', versjon=$versjon)"
     }
+}
+
+fun hentNodeNavn(): String {
+    return System.getenv("HOSTNAME") ?: "node1"
 }
