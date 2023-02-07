@@ -41,7 +41,7 @@ class TaskService internal constructor(
         val lagretTask = taskRepository.save(task)
         validerTask(lagretTask)
         if (task.versjon == 0L) {
-            taskLoggRepository.save(TaskLogg(type = Loggtype.UBEHANDLET, taskId = lagretTask.id))
+            taskLoggRepository.save(TaskLogg(type = Loggtype.UBEHANDLET, taskId = lagretTask.id, node = hentNodeNavn()))
         }
         return lagretTask
     }
@@ -151,41 +151,54 @@ class TaskService internal constructor(
 
     @Transactional
     internal fun avvikshåndter(task: Task, avvikstype: Avvikstype, årsak: String, endretAv: String): Task {
-        val taskLogg = TaskLogg(taskId = task.id, type = Loggtype.AVVIKSHÅNDTERT, melding = årsak, endretAv = endretAv)
+        val taskLogg = TaskLogg(
+            taskId = task.id,
+            type = Loggtype.AVVIKSHÅNDTERT,
+            melding = årsak,
+            endretAv = endretAv,
+            node = hentNodeNavn()
+        )
         taskLoggRepository.save(taskLogg)
         return taskRepository.save(task.copy(status = Status.AVVIKSHÅNDTERT, avvikstype = avvikstype))
     }
 
     @Transactional
     internal fun kommenter(task: Task, kommentar: String, endretAv: String, settTilManuellOppfølgning: Boolean): Task {
-        val taskLogg = TaskLogg(taskId = task.id, type = Loggtype.KOMMENTAR, melding = kommentar, endretAv = endretAv)
+        val taskLogg =
+            TaskLogg(taskId = task.id, type = Loggtype.KOMMENTAR, node = hentNodeNavn(), melding = kommentar, endretAv = endretAv)
         taskLoggRepository.save(taskLogg)
         return taskRepository.save(task.copy(status = if (settTilManuellOppfølgning) Status.MANUELL_OPPFØLGING else task.status))
     }
 
     @Transactional
     internal fun behandler(task: Task): Task {
-        taskLoggRepository.save(TaskLogg(taskId = task.id, type = Loggtype.BEHANDLER))
+        taskLoggRepository.save(TaskLogg(taskId = task.id, type = Loggtype.BEHANDLER, node = hentNodeNavn()))
         return taskRepository.save(task.copy(status = Status.BEHANDLER))
     }
 
     @Transactional
     internal fun klarTilPlukk(task: Task, endretAv: String, melding: String? = null): Task {
         val taskLogg =
-            TaskLogg(taskId = task.id, type = Loggtype.KLAR_TIL_PLUKK, endretAv = endretAv, melding = melding)
+            TaskLogg(
+                taskId = task.id,
+                type = Loggtype.KLAR_TIL_PLUKK,
+                node = hentNodeNavn(),
+                endretAv = endretAv,
+                melding = melding
+            )
         taskLoggRepository.save(taskLogg)
         return taskRepository.save(task.copy(status = Status.KLAR_TIL_PLUKK))
     }
 
     @Transactional
     internal fun plukker(task: Task): Task {
-        taskLoggRepository.save(TaskLogg(taskId = task.id, type = Loggtype.PLUKKET))
+        taskLoggRepository.save(TaskLogg(taskId = task.id, type = Loggtype.PLUKKET, node = hentNodeNavn()))
         return taskRepository.save(task.copy(status = Status.PLUKKET))
     }
 
     @Transactional
     internal fun ferdigstill(task: Task): Task {
-        taskLoggRepository.save(TaskLogg(taskId = task.id, type = Loggtype.FERDIG))
+        taskLoggRepository.save(TaskLogg(taskId = task.id, type = Loggtype.FERDIG, node = hentNodeNavn()))
         return taskRepository.save(task.copy(status = Status.FERDIG))
     }
 
@@ -206,8 +219,12 @@ class TaskService internal constructor(
             secureLog.warn("Feilet lagring av task=${task.id} med melding", e)
             "Feilet skriving av feil til json exceptionCauseMessage=${feil.exceptionCauseMessage} feilmelding=${feil.feilmelding} stacktrace=${feil.stackTrace}"
         }
-        taskLoggRepository.save(TaskLogg(taskId = task.id, type = Loggtype.FEILET, melding = feilmelding))
+        taskLoggRepository.save(TaskLogg(taskId = task.id, type = Loggtype.FEILET, node = hentNodeNavn(), melding = feilmelding))
         return taskRepository.save(task.copy(status = nyStatus))
+    }
+
+    private fun hentNodeNavn(): String {
+        return System.getenv("HOSTNAME") ?: "node1"
     }
 
     private fun nyFeiletStatus(
