@@ -1,10 +1,10 @@
 package no.nav.familie.prosessering.sikkerhet
 
-import no.nav.familie.sikkerhet.OIDCUtil
-import org.springframework.web.filter.OncePerRequestFilter
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
+import no.nav.familie.sikkerhet.OIDCUtil
+import org.springframework.web.filter.OncePerRequestFilter
 
 class ProsesseringUserAuthorizationFilter(
     private val påkrevdRolle: String,

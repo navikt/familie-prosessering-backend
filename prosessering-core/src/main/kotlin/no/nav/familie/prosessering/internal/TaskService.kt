@@ -155,7 +155,7 @@ class TaskService internal constructor(
             taskId = task.id,
             type = Loggtype.AVVIKSHÅNDTERT,
             melding = årsak,
-            endretAv = endretAv
+            endretAv = endretAv,
         )
         taskLoggRepository.save(taskLogg)
         return taskRepository.save(task.copy(status = Status.AVVIKSHÅNDTERT, avvikstype = avvikstype))
@@ -182,7 +182,7 @@ class TaskService internal constructor(
                 taskId = task.id,
                 type = Loggtype.KLAR_TIL_PLUKK,
                 endretAv = endretAv,
-                melding = melding
+                melding = melding,
             )
         taskLoggRepository.save(taskLogg)
         return taskRepository.save(task.copy(status = Status.KLAR_TIL_PLUKK))
@@ -220,7 +220,6 @@ class TaskService internal constructor(
         taskLoggRepository.save(TaskLogg(taskId = task.id, type = Loggtype.FEILET, melding = feilmelding))
         return taskRepository.save(task.copy(status = nyStatus))
     }
-
 
     private fun nyFeiletStatus(
         tidligereAntallFeil: Int,

@@ -20,7 +20,6 @@ data class TaskLogg(
         return "TaskLogg(id=$id, type=$type, opprettetTid=$opprettetTid)"
     }
 
-
     companion object {
         const val BRUKERNAVN_NÅR_SIKKERHETSKONTEKST_IKKE_FINNES = "VL"
         private fun hentNodeNavn(): String {
