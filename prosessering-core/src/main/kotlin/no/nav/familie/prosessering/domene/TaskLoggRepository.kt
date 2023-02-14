@@ -2,11 +2,12 @@ package no.nav.familie.prosessering.domene
 
 import org.springframework.data.jdbc.repository.query.Modifying
 import org.springframework.data.jdbc.repository.query.Query
+import org.springframework.data.repository.CrudRepository
 import org.springframework.data.repository.PagingAndSortingRepository
 import org.springframework.stereotype.Repository
 
 @Repository
-internal interface TaskLoggRepository : PagingAndSortingRepository<TaskLogg, Long> {
+internal interface TaskLoggRepository : PagingAndSortingRepository<TaskLogg, Long>, CrudRepository<TaskLogg, Long> {
 
     @Query
     fun findByTaskId(taskId: Long): List<TaskLogg>
