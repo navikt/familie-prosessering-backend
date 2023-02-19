@@ -29,7 +29,7 @@
         <spring-data.version>2.7.6</spring-data.version>
         <spring-data-jdbc.version>2.4.6</spring-data-jdbc.version>
         <mockk.version>1.13.4</mockk.version>
-        <micrometer.version>1.10.3</micrometer.version>
+        <micrometer.version>1.10.4</micrometer.version>
         <nav.security.token.version>2.1.9</nav.security.token.version>
 
         <!--suppress UnresolvedMavenProperty  Ligger som secret i github-->
