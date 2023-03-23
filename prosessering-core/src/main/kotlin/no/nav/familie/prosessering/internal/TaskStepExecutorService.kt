@@ -148,7 +148,7 @@ class TaskStepExecutorService(
 
     private fun initLogContext(taskDetails: Task) {
         MDC.put(MDCConstants.MDC_CALL_ID, taskDetails.callId)
-        MDC.put(TaskPrioritet.MDC_TASK_PRIORITET, taskDetails.prioritet.toString())
+        MDC.put(TaskPrioritet.MDC_TASK_PRIORITET, taskDetails.prioritet.name)
         LOG_CONTEXT.add("task", taskDetails.type)
     }
 

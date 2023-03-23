@@ -2,7 +2,7 @@ package no.nav.familie.prosessering.domene
 
 import no.nav.familie.log.IdUtils
 import no.nav.familie.log.mdc.MDCConstants
-import no.nav.familie.prosessering.util.TaskPrioritet.gjenbrukTaskPrioritetEller0
+import no.nav.familie.prosessering.util.TaskPrioritet.gjenbrukTaskPrioritetEllerBrukNormal
 import org.slf4j.MDC
 import org.springframework.data.annotation.Id
 import org.springframework.data.annotation.Transient
@@ -32,7 +32,7 @@ data class Task(
     ),
     @Version
     val versjon: Long = 0,
-    val prioritet: Int = gjenbrukTaskPrioritetEller0(),
+    val prioritet: Prioritet = gjenbrukTaskPrioritetEllerBrukNormal(),
 ) {
 
     @Transient
@@ -45,7 +45,7 @@ data class Task(
         type: String,
         payload: String,
         properties: Properties = Properties(),
-        prioritet: Int = gjenbrukTaskPrioritetEller0(),
+        prioritet: Prioritet = gjenbrukTaskPrioritetEllerBrukNormal(),
     ) :
         this(
             type = type,
