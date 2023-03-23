@@ -4,6 +4,7 @@ import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskStepBeskrivelse
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.internal.TaskService
+import no.nav.familie.prosessering.domene.Prioritet
 import org.springframework.stereotype.Service
 import java.util.concurrent.TimeUnit
 
@@ -20,7 +21,7 @@ class TaskStep1AnnenPrioritet constructor(private val taskService: TaskService) 
     }
 
     override fun onCompletion(task: Task) {
-        val nesteTask = Task(type = TaskStep2.TASK_2, payload = task.payload, prioritet = 10)
+        val nesteTask = Task(type = TaskStep2.TASK_2, payload = task.payload, prioritet = Prioritet.HØY)
         taskService.save(nesteTask)
     }
 

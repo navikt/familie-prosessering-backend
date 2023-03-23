@@ -8,6 +8,7 @@ import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.domene.TaskRepository
 import no.nav.familie.prosessering.task.TaskStep1
 import no.nav.familie.prosessering.task.TaskStep2
+import no.nav.familie.prosessering.domene.Prioritet
 import no.nav.familie.prosessering.util.isOptimisticLocking
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.catchThrowable
@@ -120,23 +121,23 @@ class TaskRepositoryTest : IntegrationRunnerTest() {
             type = TaskStep1.TASK_1,
             payload = "nå, prioritet 0",
             opprettetTid = opprettetTid,
-            prioritet = 0,
+            prioritet = Prioritet.NORMAL,
         )
-        val taskNåprioritet1 = taskNå.copy(payload = "nå, prioritet 1", prioritet = 1)
+        val taskNåprioritet1 = taskNå.copy(payload = "nå, prioritet 1", prioritet = Prioritet.HØY)
         val task2 = Task(
             type = TaskStep1.TASK_1,
             payload = "1 dag siden, prioritet 0",
             opprettetTid = opprettetTid.minusDays(1),
-            prioritet = 0,
+            prioritet = Prioritet.NORMAL,
         )
-        val task2Prioritet1 = task2.copy(payload = "1 dag siden, prioritet 1", prioritet = 1)
+        val task2Prioritet1 = task2.copy(payload = "1 dag siden, prioritet 1", prioritet = Prioritet.HØY)
         val task3 = Task(
             type = TaskStep1.TASK_1,
             payload = "neste dag, prioritet 0",
             opprettetTid = LocalDateTime.now().plusDays(1),
-            prioritet = 0,
+            prioritet = Prioritet.NORMAL,
         )
-        val task3Prioritet1 = task3.copy(payload = "neste dag, prioritet 1", prioritet = 1)
+        val task3Prioritet1 = task3.copy(payload = "neste dag, prioritet 1", prioritet = Prioritet.HØY)
 
         taskService.save(taskNå)
         taskService.save(task3Prioritet1)

@@ -14,6 +14,8 @@ class DatabaseConfiguration : AbstractJdbcConfiguration() {
             listOf(
                 StringTilPropertiesWrapperConverter(),
                 PropertiesWrapperTilStringConverter(),
+                IntTilPrioritetConverter2(),
+                PrioritetTilIntConverter(),
             ),
         )
     }

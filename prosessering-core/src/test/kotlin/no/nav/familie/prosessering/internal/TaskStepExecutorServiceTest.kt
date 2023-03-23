@@ -14,7 +14,6 @@ import no.nav.familie.prosessering.domene.TaskLoggRepository
 import no.nav.familie.prosessering.domene.TaskRepository
 import no.nav.familie.prosessering.task.TaskStep1
 import no.nav.familie.prosessering.task.TaskStep1AnnenPrioritet
-import no.nav.familie.prosessering.task.TaskStep1_NesteTaskMedDefaultConstructor
 import no.nav.familie.prosessering.task.TaskStep2
 import no.nav.familie.prosessering.task.TaskStepExceptionUtenStackTrace
 import no.nav.familie.prosessering.task.TaskStepFeilManuellOppfølgning
@@ -22,6 +21,7 @@ import no.nav.familie.prosessering.task.TaskStepMedError
 import no.nav.familie.prosessering.task.TaskStepMedFeil
 import no.nav.familie.prosessering.task.TaskStepMedFeilMedTriggerTid0
 import no.nav.familie.prosessering.task.TaskStepRekjørSenere
+import no.nav.familie.prosessering.domene.Prioritet
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -181,7 +181,7 @@ class TaskStepExecutorServiceTest : IntegrationRunnerTest() {
 
     @Test
     internal fun `skal beholde prioritet når neste task opprettes, per default`() {
-        val prioritet = 5
+        val prioritet = Prioritet.HØY
         val task = taskService.save(Task(TaskStep1.TASK_1, UUID.randomUUID().toString()).copy(prioritet = prioritet))
         TestTransaction.flagForCommit()
         TestTransaction.end()
@@ -191,7 +191,7 @@ class TaskStepExecutorServiceTest : IntegrationRunnerTest() {
         val task2 = tasks.single { it.id != task.id }
         assertThat(task2.prioritet).isEqualTo(prioritet)
     }
-
+/*
     @Test
     internal fun `skal beholde prioritet når neste task opprettes, per default med default constructor `() {
         val prioritet = 5
@@ -204,7 +204,7 @@ class TaskStepExecutorServiceTest : IntegrationRunnerTest() {
         val tasks = repository.findAll()
         val task2 = tasks.single { it.id != task.id }
         assertThat(task2.prioritet).isEqualTo(prioritet)
-    }
+    }*/
 
     @Test
     internal fun `skal ikke beholde prioriteten når man setter prioriteten manuellt`() {

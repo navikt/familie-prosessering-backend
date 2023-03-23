@@ -1,5 +1,5 @@
-
-CREATE TABLE IF NOT EXISTS task (
+CREATE TABLE IF NOT EXISTS task
+(
     id            BIGSERIAL PRIMARY KEY,
     payload       VARCHAR                                              NOT NULL,
     status        VARCHAR(20)  DEFAULT 'UBEHANDLET'::CHARACTER VARYING NOT NULL,
@@ -9,13 +9,14 @@ CREATE TABLE IF NOT EXISTS task (
     metadata      VARCHAR,
     trigger_tid   TIMESTAMP(3) DEFAULT LOCALTIMESTAMP,
     avvikstype    VARCHAR(50),
-    prioritet     SMALLINT DEFAULT 0
+    prioritet     SMALLINT     DEFAULT 1                               NOT NULL
 );
 
 CREATE INDEX IF NOT EXISTS henvendelse_status_idx
     ON task (status);
 
-CREATE TABLE IF NOT EXISTS task_logg (
+CREATE TABLE IF NOT EXISTS task_logg
+(
     id            BIGSERIAL PRIMARY KEY,
     task_id       BIGINT       NOT NULL
         CONSTRAINT henvendelse_logg_henvendelse_id_fkey REFERENCES task,

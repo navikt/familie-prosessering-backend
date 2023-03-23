@@ -32,7 +32,7 @@ data class Task(
     ),
     @Version
     val versjon: Long = 0,
-    val prioritet: Int = gjenbrukTaskPrioritetEller0(),
+    val prioritet: Prioritet = gjenbrukTaskPrioritetEller0(),
 ) {
 
     @Transient
@@ -45,7 +45,7 @@ data class Task(
         type: String,
         payload: String,
         properties: Properties = Properties(),
-        prioritet: Int = gjenbrukTaskPrioritetEller0(),
+        prioritet: Prioritet = gjenbrukTaskPrioritetEller0(),
     ) :
         this(
             type = type,
