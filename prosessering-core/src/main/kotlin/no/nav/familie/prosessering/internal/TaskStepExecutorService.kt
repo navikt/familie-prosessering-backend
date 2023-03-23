@@ -3,6 +3,7 @@ package no.nav.familie.prosessering.internal
 import no.nav.familie.log.mdc.MDCConstants
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.error.RekjørSenereException
+import no.nav.familie.prosessering.util.TaskPrioritet
 import no.nav.familie.prosessering.util.isOptimisticLocking
 import org.slf4j.LoggerFactory
 import org.slf4j.MDC
@@ -147,11 +148,13 @@ class TaskStepExecutorService(
 
     private fun initLogContext(taskDetails: Task) {
         MDC.put(MDCConstants.MDC_CALL_ID, taskDetails.callId)
+        MDC.put(TaskPrioritet.MDC_TASK_PRIORITET, taskDetails.prioritet.toString())
         LOG_CONTEXT.add("task", taskDetails.type)
     }
 
     private fun clearLogContext() {
         LOG_CONTEXT.clear()
+        MDC.remove(TaskPrioritet.MDC_TASK_PRIORITET)
         MDC.remove(MDCConstants.MDC_CALL_ID)
     }
 

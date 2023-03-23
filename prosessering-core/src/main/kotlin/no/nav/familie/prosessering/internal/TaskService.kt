@@ -62,7 +62,7 @@ class TaskService internal constructor(
     }
 
     fun finnAlleTasksKlareForProsessering(page: Pageable): List<Task> {
-        return taskRepository.findByStatusInAndTriggerTidBeforeOrderByOpprettetTid(
+        return taskRepository.findByStatusInAndTriggerTidBeforeOrderByPrioritetDescOpprettetTidAsc(
             listOf(
                 Status.KLAR_TIL_PLUKK,
                 Status.UBEHANDLET,

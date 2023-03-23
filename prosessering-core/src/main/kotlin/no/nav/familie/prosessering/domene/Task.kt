@@ -2,6 +2,7 @@ package no.nav.familie.prosessering.domene
 
 import no.nav.familie.log.IdUtils
 import no.nav.familie.log.mdc.MDCConstants
+import no.nav.familie.prosessering.util.TaskPrioritet.gjenbrukTaskPrioritetEller0
 import org.slf4j.MDC
 import org.springframework.data.annotation.Id
 import org.springframework.data.annotation.Transient
@@ -31,6 +32,7 @@ data class Task(
     ),
     @Version
     val versjon: Long = 0,
+    val prioritet: Int = gjenbrukTaskPrioritetEller0(),
 ) {
 
     @Transient
@@ -39,7 +41,12 @@ data class Task(
     val callId: String
         get() = metadata.getProperty(MDCConstants.MDC_CALL_ID)
 
-    constructor (type: String, payload: String, properties: Properties = Properties()) :
+    constructor (
+        type: String,
+        payload: String,
+        properties: Properties = Properties(),
+        prioritet: Int = gjenbrukTaskPrioritetEller0(),
+    ) :
         this(
             type = type,
             payload = payload,
@@ -50,6 +57,7 @@ data class Task(
                             ?: IdUtils.generateId()
                 },
             ),
+            prioritet = prioritet,
         )
 
     fun medTriggerTid(triggerTid: LocalDateTime): Task {
@@ -57,6 +65,6 @@ data class Task(
     }
 
     override fun toString(): String {
-        return "Task(id=$id, status=$status, opprettetTid=$opprettetTid, triggerTid=$triggerTid, type='$type', versjon=$versjon)"
+        return "Task(id=$id, status=$status, opprettetTid=$opprettetTid, triggerTid=$triggerTid, type='$type', versjon=$versjon, prioritet=$prioritet)"
     }
 }

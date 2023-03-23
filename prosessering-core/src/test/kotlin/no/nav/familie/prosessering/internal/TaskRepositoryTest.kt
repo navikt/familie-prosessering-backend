@@ -114,6 +114,54 @@ class TaskRepositoryTest : IntegrationRunnerTest() {
     }
 
     @Test
+    fun `findByStatusInAndTriggerTidBeforeOrderByPrioritetDescOpprettetTidAsc - skal returnere tasks sortert etter prioritet, og sen opprettet_tid`() {
+        val opprettetTid = LocalDateTime.now()
+        val taskNå = Task(
+            type = TaskStep1.TASK_1,
+            payload = "nå, prioritet 0",
+            opprettetTid = opprettetTid,
+            prioritet = 0,
+        )
+        val taskNåprioritet1 = taskNå.copy(payload = "nå, prioritet 1", prioritet = 1)
+        val task2 = Task(
+            type = TaskStep1.TASK_1,
+            payload = "1 dag siden, prioritet 0",
+            opprettetTid = opprettetTid.minusDays(1),
+            prioritet = 0,
+        )
+        val task2Prioritet1 = task2.copy(payload = "1 dag siden, prioritet 1", prioritet = 1)
+        val task3 = Task(
+            type = TaskStep1.TASK_1,
+            payload = "neste dag, prioritet 0",
+            opprettetTid = LocalDateTime.now().plusDays(1),
+            prioritet = 0,
+        )
+        val task3Prioritet1 = task3.copy(payload = "neste dag, prioritet 1", prioritet = 1)
+
+        taskService.save(taskNå)
+        taskService.save(task3Prioritet1)
+        taskService.save(task2)
+        taskService.save(taskNåprioritet1)
+        taskService.save(task2Prioritet1)
+        taskService.save(task3)
+
+        val tasks = repository.findByStatusInAndTriggerTidBeforeOrderByPrioritetDescOpprettetTidAsc(
+            listOf(Status.UBEHANDLET),
+            LocalDateTime.now(),
+            PageRequest.of(0, 10),
+        ).map { it.payload }
+
+        assertThat(tasks).containsExactly(
+            "1 dag siden, prioritet 1",
+            "nå, prioritet 1",
+            "neste dag, prioritet 1",
+            "1 dag siden, prioritet 0",
+            "nå, prioritet 0",
+            "neste dag, prioritet 0",
+        )
+    }
+
+    @Test
     fun `findByStatusInAndTriggerTidBeforeOrderByOpprettetTid - skal returnere tasks sortert etter opprettet_tid - eldst først`() {
         val task1 =
             Task(type = TaskStep1.TASK_1, payload = "task med opprettetTid nå", opprettetTid = LocalDateTime.now())

@@ -8,7 +8,8 @@ CREATE TABLE IF NOT EXISTS task (
     type          VARCHAR(100)                                         NOT NULL,
     metadata      VARCHAR,
     trigger_tid   TIMESTAMP(3) DEFAULT LOCALTIMESTAMP,
-    avvikstype    VARCHAR(50)
+    avvikstype    VARCHAR(50),
+    prioritet     SMALLINT DEFAULT 0
 );
 
 CREATE INDEX IF NOT EXISTS henvendelse_status_idx

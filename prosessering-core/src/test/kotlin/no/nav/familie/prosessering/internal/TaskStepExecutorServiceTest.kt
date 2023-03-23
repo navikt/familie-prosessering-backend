@@ -13,6 +13,8 @@ import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.domene.TaskLoggRepository
 import no.nav.familie.prosessering.domene.TaskRepository
 import no.nav.familie.prosessering.task.TaskStep1
+import no.nav.familie.prosessering.task.TaskStep1AnnenPrioritet
+import no.nav.familie.prosessering.task.TaskStep1_NesteTaskMedDefaultConstructor
 import no.nav.familie.prosessering.task.TaskStep2
 import no.nav.familie.prosessering.task.TaskStepExceptionUtenStackTrace
 import no.nav.familie.prosessering.task.TaskStepFeilManuellOppfølgning
@@ -174,6 +176,46 @@ class TaskStepExecutorServiceTest : IntegrationRunnerTest() {
         val tasks = repository.findAll()
         val task2 = tasks.single { it.id != task.id }
         assertThat(task2.status).isEqualTo(Status.FERDIG)
+        assertThat(task2.prioritet).isEqualTo(0)
+    }
+
+    @Test
+    internal fun `skal beholde prioritet når neste task opprettes, per default`() {
+        val prioritet = 5
+        val task = taskService.save(Task(TaskStep1.TASK_1, UUID.randomUUID().toString()).copy(prioritet = prioritet))
+        TestTransaction.flagForCommit()
+        TestTransaction.end()
+        taskStepExecutorService.pollAndExecute()
+
+        val tasks = repository.findAll()
+        val task2 = tasks.single { it.id != task.id }
+        assertThat(task2.prioritet).isEqualTo(prioritet)
+    }
+
+    @Test
+    internal fun `skal beholde prioritet når neste task opprettes, per default med default constructor `() {
+        val prioritet = 5
+        val type = TaskStep1_NesteTaskMedDefaultConstructor.TASK_1
+        val task = taskService.save(Task(type, UUID.randomUUID().toString()).copy(prioritet = prioritet))
+        TestTransaction.flagForCommit()
+        TestTransaction.end()
+        taskStepExecutorService.pollAndExecute()
+
+        val tasks = repository.findAll()
+        val task2 = tasks.single { it.id != task.id }
+        assertThat(task2.prioritet).isEqualTo(prioritet)
+    }
+
+    @Test
+    internal fun `skal ikke beholde prioriteten når man setter prioriteten manuellt`() {
+        val task = taskService.save(Task(TaskStep1AnnenPrioritet.TASK_1, UUID.randomUUID().toString()))
+        TestTransaction.flagForCommit()
+        TestTransaction.end()
+        taskStepExecutorService.pollAndExecute()
+
+        val tasks = repository.findAll()
+        val task2 = tasks.single { it.id != task.id }
+        assertThat(task2.prioritet).isEqualTo(10)
     }
 
     companion object {
