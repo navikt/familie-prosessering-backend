@@ -166,20 +166,22 @@ class TaskRepositoryTest : IntegrationRunnerTest() {
     internal fun `skal sorterte tasks etter prioritet`() {
         val opprettetTid = LocalDateTime.now()
 
-        taskService.saveAll(listOf(
-            Prioritet.NORMAL,
-            Prioritet.KRITISK,
-            Prioritet.LITE_VIKTIG,
-            Prioritet.VIKTIG,
-            Prioritet.IKKE_VIKTIG
-        ).map {
-            Task(
-                type = TaskStep1.TASK_1,
-                payload = UUID.randomUUID().toString(),
-                opprettetTid = opprettetTid,
-                prioritet = it,
-            )
-        })
+        taskService.saveAll(
+            listOf(
+                Prioritet.NORMAL,
+                Prioritet.KRITISK,
+                Prioritet.LITE_VIKTIG,
+                Prioritet.VIKTIG,
+                Prioritet.IKKE_VIKTIG,
+            ).map {
+                Task(
+                    type = TaskStep1.TASK_1,
+                    payload = UUID.randomUUID().toString(),
+                    opprettetTid = opprettetTid,
+                    prioritet = it,
+                )
+            },
+        )
 
         val tasks = repository.findByStatusInAndTriggerTidBeforeOrderByPrioritetDescOpprettetTidAsc(
             listOf(Status.UBEHANDLET),
@@ -192,7 +194,7 @@ class TaskRepositoryTest : IntegrationRunnerTest() {
             Prioritet.VIKTIG,
             Prioritet.NORMAL,
             Prioritet.LITE_VIKTIG,
-            Prioritet.IKKE_VIKTIG
+            Prioritet.IKKE_VIKTIG,
         )
     }
 

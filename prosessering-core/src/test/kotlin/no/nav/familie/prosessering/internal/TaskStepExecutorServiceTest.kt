@@ -8,12 +8,14 @@ import kotlinx.coroutines.runBlocking
 import no.nav.familie.prosessering.IntegrationRunnerTest
 import no.nav.familie.prosessering.TaskFeil
 import no.nav.familie.prosessering.domene.Loggtype
+import no.nav.familie.prosessering.domene.Prioritet
 import no.nav.familie.prosessering.domene.Status
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.domene.TaskLoggRepository
 import no.nav.familie.prosessering.domene.TaskRepository
 import no.nav.familie.prosessering.task.TaskStep1
 import no.nav.familie.prosessering.task.TaskStep1AnnenPrioritet
+import no.nav.familie.prosessering.task.TaskStep1_NesteTaskMedDefaultConstructor
 import no.nav.familie.prosessering.task.TaskStep2
 import no.nav.familie.prosessering.task.TaskStepExceptionUtenStackTrace
 import no.nav.familie.prosessering.task.TaskStepFeilManuellOppfølgning
@@ -21,8 +23,6 @@ import no.nav.familie.prosessering.task.TaskStepMedError
 import no.nav.familie.prosessering.task.TaskStepMedFeil
 import no.nav.familie.prosessering.task.TaskStepMedFeilMedTriggerTid0
 import no.nav.familie.prosessering.task.TaskStepRekjørSenere
-import no.nav.familie.prosessering.domene.Prioritet
-import no.nav.familie.prosessering.task.TaskStep1_NesteTaskMedDefaultConstructor
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows

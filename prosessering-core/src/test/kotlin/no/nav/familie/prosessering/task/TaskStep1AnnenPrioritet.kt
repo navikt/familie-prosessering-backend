@@ -2,9 +2,9 @@ package no.nav.familie.prosessering.task
 
 import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskStepBeskrivelse
+import no.nav.familie.prosessering.domene.Prioritet
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.internal.TaskService
-import no.nav.familie.prosessering.domene.Prioritet
 import org.springframework.stereotype.Service
 import java.util.concurrent.TimeUnit
 

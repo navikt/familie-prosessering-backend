@@ -52,15 +52,18 @@ class DatabaseConfiguration : AbstractJdbcConfiguration() {
         operations: NamedParameterJdbcOperations,
         @Lazy relationResolver: RelationResolver,
         conversions: JdbcCustomConversions,
-        dialect: Dialect
+        dialect: Dialect,
     ): JdbcConverter {
         val arrayColumns =
             if (dialect is JdbcDialect) dialect.arraySupport else JdbcArrayColumns.DefaultSupport.INSTANCE
         val jdbcTypeFactory = DefaultJdbcTypeFactory(operations.jdbcOperations, arrayColumns)
 
         return CustomJdbcConverter(
-            mappingContext, relationResolver, conversions, jdbcTypeFactory,
-            dialect.identifierProcessing
+            mappingContext,
+            relationResolver,
+            conversions,
+            jdbcTypeFactory,
+            dialect.identifierProcessing,
         )
     }
 }
@@ -70,7 +73,7 @@ class CustomJdbcConverter(
     relationResolver: RelationResolver?,
     conversions: CustomConversions?,
     typeFactory: JdbcTypeFactory?,
-    identifierProcessing: IdentifierProcessing?
+    identifierProcessing: IdentifierProcessing?,
 ) : BasicJdbcConverter(context, relationResolver, conversions, typeFactory, identifierProcessing) {
 
     override fun getTargetSqlType(property: RelationalPersistentProperty): SQLType {
