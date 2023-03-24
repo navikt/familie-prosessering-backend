@@ -3,6 +3,7 @@ package no.nav.familie.prosessering.internal
 import no.nav.familie.prosessering.IntegrationRunnerTest
 import no.nav.familie.prosessering.TaskFeil
 import no.nav.familie.prosessering.domene.AntallÅpneTask
+import no.nav.familie.prosessering.domene.Prioritet
 import no.nav.familie.prosessering.domene.Status
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.domene.TaskRepository
@@ -111,6 +112,90 @@ class TaskRepositoryTest : IntegrationRunnerTest() {
             PageRequest.of(0, 3, Sort.Direction.DESC, "opprettetTid"),
         )
         assertThat(message.map { it.payload }).containsExactly("3", "1", "2")
+    }
+
+    @Test
+    fun `findByStatusInAndTriggerTidBeforeOrderByPrioritetDescOpprettetTidAsc - skal returnere tasks sortert etter prioritet, og sen opprettet_tid`() {
+        val opprettetTid = LocalDateTime.now()
+        val taskNå = Task(
+            type = TaskStep1.TASK_1,
+            payload = "nå, prioritet 0",
+            opprettetTid = opprettetTid,
+            prioritet = Prioritet.NORMAL,
+        )
+        val taskNåprioritet1 = taskNå.copy(payload = "nå, prioritet 1", prioritet = Prioritet.VIKTIG)
+        val task2 = Task(
+            type = TaskStep1.TASK_1,
+            payload = "1 dag siden, prioritet 0",
+            opprettetTid = opprettetTid.minusDays(1),
+            prioritet = Prioritet.NORMAL,
+        )
+        val task2Prioritet1 = task2.copy(payload = "1 dag siden, prioritet 1", prioritet = Prioritet.VIKTIG)
+        val task3 = Task(
+            type = TaskStep1.TASK_1,
+            payload = "neste dag, prioritet 0",
+            opprettetTid = LocalDateTime.now().plusDays(1),
+            prioritet = Prioritet.NORMAL,
+        )
+        val task3Prioritet1 = task3.copy(payload = "neste dag, prioritet 1", prioritet = Prioritet.VIKTIG)
+
+        taskService.save(taskNå)
+        taskService.save(task3Prioritet1)
+        taskService.save(task2)
+        taskService.save(taskNåprioritet1)
+        taskService.save(task2Prioritet1)
+        taskService.save(task3)
+
+        val tasks = repository.findByStatusInAndTriggerTidBeforeOrderByPrioritetDescOpprettetTidAsc(
+            listOf(Status.UBEHANDLET),
+            LocalDateTime.now(),
+            PageRequest.of(0, 10),
+        ).map { it.payload }
+
+        assertThat(tasks).containsExactly(
+            "1 dag siden, prioritet 1",
+            "nå, prioritet 1",
+            "neste dag, prioritet 1",
+            "1 dag siden, prioritet 0",
+            "nå, prioritet 0",
+            "neste dag, prioritet 0",
+        )
+    }
+
+    @Test
+    internal fun `skal sorterte tasks etter prioritet`() {
+        val opprettetTid = LocalDateTime.now()
+
+        taskService.saveAll(
+            listOf(
+                Prioritet.NORMAL,
+                Prioritet.KRITISK,
+                Prioritet.LITE_VIKTIG,
+                Prioritet.VIKTIG,
+                Prioritet.IKKE_VIKTIG,
+            ).map {
+                Task(
+                    type = TaskStep1.TASK_1,
+                    payload = UUID.randomUUID().toString(),
+                    opprettetTid = opprettetTid,
+                    prioritet = it,
+                )
+            },
+        )
+
+        val tasks = repository.findByStatusInAndTriggerTidBeforeOrderByPrioritetDescOpprettetTidAsc(
+            listOf(Status.UBEHANDLET),
+            LocalDateTime.now(),
+            PageRequest.of(0, 10),
+        ).map { it.prioritet }
+
+        assertThat(tasks).containsExactly(
+            Prioritet.KRITISK,
+            Prioritet.VIKTIG,
+            Prioritet.NORMAL,
+            Prioritet.LITE_VIKTIG,
+            Prioritet.IKKE_VIKTIG,
+        )
     }
 
     @Test

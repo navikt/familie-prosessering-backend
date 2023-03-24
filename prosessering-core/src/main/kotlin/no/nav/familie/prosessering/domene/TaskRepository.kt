@@ -10,6 +10,13 @@ import java.time.LocalDateTime
 
 @Repository
 internal interface TaskRepository : PagingAndSortingRepository<Task, Long>, CrudRepository<Task, Long> {
+
+    fun findByStatusInAndTriggerTidBeforeOrderByPrioritetDescOpprettetTidAsc(
+        status: List<Status>,
+        triggerTid: LocalDateTime,
+        page: Pageable,
+    ): List<Task>
+
     fun findByStatusInAndTriggerTidBeforeOrderByOpprettetTid(
         status: List<Status>,
         triggerTid: LocalDateTime,
