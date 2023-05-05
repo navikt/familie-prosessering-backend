@@ -20,13 +20,13 @@
         <maven.compiler.release>17</maven.compiler.release>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
-        <kontrakter.version>3.0_20230214083426_ba209c2-JAKARTA</kontrakter.version>
+        <kontrakter.version>3.0_20230428084827_0b6a892-JAKARTA</kontrakter.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <kotlin.version>1.8.10</kotlin.version>
+        <kotlin.version>1.8.21</kotlin.version>
         <felles.version>2.20230210162649_a258d57-SPRING_BOOT_3</felles.version>
-        <spring.boot.version>3.0.2</spring.boot.version>
-        <mockk.version>1.13.4</mockk.version>
-        <nav.security.token.version>2.1.9</nav.security.token.version>
+        <spring.boot.version>3.0.6</spring.boot.version>
+        <mockk.version>1.13.5</mockk.version>
+        <nav.security.token.version>3.0.11</nav.security.token.version>
 
         <!--suppress UnresolvedMavenProperty  Ligger som secret i github-->
         <sonar.projectKey>${SONAR_PROJECTKEY}</sonar.projectKey>
