@@ -3,12 +3,13 @@ package no.nav.familie.prosessering.domene
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jdbc.repository.query.Query
+import org.springframework.data.repository.CrudRepository
 import org.springframework.data.repository.PagingAndSortingRepository
 import org.springframework.stereotype.Repository
 import java.time.LocalDateTime
 
 @Repository
-internal interface TaskRepository : PagingAndSortingRepository<Task, Long> {
+internal interface TaskRepository : PagingAndSortingRepository<Task, Long>, CrudRepository<Task, Long> {
     fun findByStatusInAndTriggerTidBeforeOrderByOpprettetTid(
         status: List<Status>,
         triggerTid: LocalDateTime,
