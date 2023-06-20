@@ -11,7 +11,6 @@ import no.nav.familie.prosessering.domene.TaskLoggMetadata
 import no.nav.familie.prosessering.domene.TaskLoggRepository
 import no.nav.familie.prosessering.domene.TaskRepository
 import org.slf4j.LoggerFactory
-import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Component
@@ -94,8 +93,13 @@ class TaskService internal constructor(
         }
     }
 
-    internal fun finnTasksKlarForSletting(eldreEnnDato: LocalDateTime, page: Pageable): Page<Task> {
-        return taskRepository.findByStatusAndTriggerTidBefore(Status.FERDIG, eldreEnnDato, page)
+    internal fun slettTasks(eldreEnnDato: LocalDateTime, antall: Int): Int {
+        val taskIds = taskRepository.finnTasksTilSletting(eldreEnnDato, antall)
+        if (taskIds.isEmpty()) return 0
+
+        taskLoggRepository.deleteAllByTaskIdIn(taskIds)
+        taskRepository.deleteAllById(taskIds)
+        return taskIds.size
     }
 
     fun finnTasksSomErFerdigNåMenFeiletFør(page: Pageable): List<Task> =

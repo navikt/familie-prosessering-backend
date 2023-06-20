@@ -7,14 +7,15 @@ import no.nav.familie.prosessering.domene.TaskLogg
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import org.springframework.transaction.support.TransactionTemplate
 import java.time.LocalDateTime
 
 @Service
 class TaskMaintenanceService(
     private val taskService: TaskService,
+    private val transactionTemplate: TransactionTemplate,
     @Value("\${prosessering.delete.after.weeks:2}") private val deleteTasksAfterWeeks: Long,
     @Value("\${prosessering.delete.pagesize:10000}") private val deleteTasksPageSize: Int,
 ) {
@@ -43,17 +44,14 @@ class TaskMaintenanceService(
         }
     }
 
-    @Transactional
     fun slettTasksKlarForSletting() {
-        var klarForSletting =
-            taskService.finnTasksKlarForSletting(LocalDateTime.now().minusWeeks(deleteTasksAfterWeeks), Pageable.ofSize(deleteTasksPageSize))
-        while (klarForSletting.hasContent()) {
-            logger.info("Sletter ${klarForSletting.content.size} tasks")
-            klarForSletting.content.forEach {
-                logger.info("Task klar for sletting. ${it.id}, ${it.callId}, ${it.triggerTid}, ${it.status}")
-                taskService.delete(it)
+        val eldreEnnDato = LocalDateTime.now().minusWeeks(deleteTasksAfterWeeks)
+        while (true) {
+            val antallTassksSomSlettes = taskService.slettTasks(eldreEnnDato, deleteTasksPageSize)
+            logger.info("Slettet $antallTassksSomSlettes tasks som har triggerTid før $eldreEnnDato")
+            if (antallTassksSomSlettes == 0) {
+                return
             }
-            klarForSletting = taskService.finnTasksKlarForSletting(LocalDateTime.now().minusWeeks(deleteTasksAfterWeeks), klarForSletting.nextPageable())
         }
     }
 

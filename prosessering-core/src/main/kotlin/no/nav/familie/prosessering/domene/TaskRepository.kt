@@ -1,6 +1,5 @@
 package no.nav.familie.prosessering.domene
 
-import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jdbc.repository.query.Query
 import org.springframework.data.repository.CrudRepository
@@ -20,7 +19,8 @@ internal interface TaskRepository : PagingAndSortingRepository<Task, Long>, Crud
 
     fun findByStatusIn(status: List<Status>, page: Pageable): List<Task>
 
-    fun findByStatusAndTriggerTidBefore(status: Status, triggerTid: LocalDateTime, page: Pageable): Page<Task>
+    @Query("SELECT id FROM task WHERE status='FERDIG' AND trigger_tid < :triggerTid LIMIT :limit")
+    fun finnTasksTilSletting(triggerTid: LocalDateTime, limit: Int): List<Long>
 
     fun countByStatusIn(status: List<Status>): Long
 
