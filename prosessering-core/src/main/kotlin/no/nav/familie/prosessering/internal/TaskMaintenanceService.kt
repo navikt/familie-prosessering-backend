@@ -47,9 +47,9 @@ class TaskMaintenanceService(
     fun slettTasksKlarForSletting() {
         val eldreEnnDato = LocalDateTime.now().minusWeeks(deleteTasksAfterWeeks)
         while (true) {
-            val antallTassksSomSlettes = taskService.slettTasks(eldreEnnDato, deleteTasksPageSize)
-            logger.info("Slettet $antallTassksSomSlettes tasks som har triggerTid før $eldreEnnDato")
-            if (antallTassksSomSlettes == 0) {
+            val antallTasksSomSlettes = taskService.slettTasks(eldreEnnDato, deleteTasksPageSize)
+            logger.info("Slettet $antallTasksSomSlettes tasks som har triggerTid før $eldreEnnDato")
+            if (antallTasksSomSlettes == 0) {
                 return
             }
         }
