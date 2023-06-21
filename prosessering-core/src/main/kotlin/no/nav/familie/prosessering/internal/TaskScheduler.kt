@@ -54,7 +54,7 @@ class TaskScheduler(private val taskMaintenanceService: TaskMaintenanceService) 
         if (isOptimisticLocking(e)) {
             logger.warn("OptimisticLockingFailureException metode=$metode")
         } else {
-            logger.warn("Feilet metode=$metode. Se secure logs")
+            logger.error("Feilet metode=$metode. Se secure logs")
             secureLog.info("Feilet metode=$metode", e)
         }
     }

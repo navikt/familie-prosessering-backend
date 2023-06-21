@@ -93,6 +93,7 @@ class TaskService internal constructor(
         }
     }
 
+    @Transactional
     internal fun slettTasks(eldreEnnDato: LocalDateTime, antall: Int): Int {
         val taskIds = taskRepository.finnTasksTilSletting(eldreEnnDato, antall)
         if (taskIds.isEmpty()) return 0
