@@ -36,13 +36,10 @@ class TaskSchedulerTest : IntegrationRunnerTest() {
         TestTransaction.end()
         tasksScheduler.slettTasksKlarForSletting()
 
-        taskLoggRepository.findAll().filter { it.type == Loggtype.FEILET }.forEach {
-            println(it)
-        }
-
         assertThat(taskRepository.findAll())
             .hasSize(1)
             .extracting("status").containsOnly(Status.KLAR_TIL_PLUKK)
+        assertThat(taskLoggRepository.findAll().map { it.taskId }).containsOnly(1000002)
     }
 
     @Test
