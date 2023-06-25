@@ -26,7 +26,7 @@
         <felles.version>2.20230210162649_a258d57-SPRING_BOOT_3</felles.version>
         <spring.boot.version>3.0.6</spring.boot.version>
         <mockk.version>1.13.5</mockk.version>
-        <nav.security.token.version>3.0.11</nav.security.token.version>
+        <nav.security.token.version>3.1.0</nav.security.token.version>
 
         <!--suppress UnresolvedMavenProperty  Ligger som secret i github-->
         <sonar.projectKey>${SONAR_PROJECTKEY}</sonar.projectKey>
