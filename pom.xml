@@ -22,7 +22,7 @@
         <maven.compiler.target>17</maven.compiler.target>
         <kontrakter.version>3.0_20230428084827_0b6a892-JAKARTA</kontrakter.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <kotlin.version>1.8.21</kotlin.version>
+        <kotlin.version>1.9.0</kotlin.version>
         <felles.version>2.20230210162649_a258d57-SPRING_BOOT_3</felles.version>
         <spring.boot.version>3.0.6</spring.boot.version>
         <mockk.version>1.13.5</mockk.version>
