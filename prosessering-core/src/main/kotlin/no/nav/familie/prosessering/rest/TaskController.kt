@@ -1,8 +1,7 @@
 package no.nav.familie.prosessering.rest
 
-import no.nav.familie.kontrakter.felles.Ressurs
+import no.nav.familie.prosessering.config.ProsesseringInfoProvider
 import no.nav.familie.prosessering.domene.Status
-import no.nav.familie.sikkerhet.OIDCUtil
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
@@ -17,13 +16,13 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 @RequestMapping("/api")
 @ProtectedWithClaims(issuer = "azuread")
-class TaskController(private val restTaskService: RestTaskService, private val oidcUtil: OIDCUtil) {
+class TaskController(private val restTaskService: RestTaskService, private val prosesseringInfoProvider: ProsesseringInfoProvider) {
 
     fun hentBrukernavn(): String {
-        return oidcUtil.getClaim("preferred_username")
+        return prosesseringInfoProvider.hentBrukernavn()
     }
 
-    @GetMapping(path = ["/v2/task", "task/v2"])
+    @GetMapping(path = ["task/v2"])
     fun task2(
         @RequestParam status: Status?,
         @RequestParam(required = false) page: Int?,

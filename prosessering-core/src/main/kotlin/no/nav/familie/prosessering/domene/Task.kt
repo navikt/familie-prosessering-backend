@@ -1,7 +1,7 @@
 package no.nav.familie.prosessering.domene
 
-import no.nav.familie.log.IdUtils
-import no.nav.familie.log.mdc.MDCConstants
+import no.nav.familie.prosessering.util.IdUtils
+import no.nav.familie.prosessering.util.MDCConstants
 import org.slf4j.MDC
 import org.springframework.data.annotation.Id
 import org.springframework.data.annotation.Transient

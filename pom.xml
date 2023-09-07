@@ -13,17 +13,15 @@
     <url>https://github.com/navikt/familie-prosessering-backend</url>
 
     <properties>
-        <revision>2.0</revision>
+        <revision>2.1</revision>
         <sha1/>
         <changelist>-SNAPSHOT</changelist>
         <java.version>17</java.version>
         <maven.compiler.release>17</maven.compiler.release>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
-        <kontrakter.version>3.0_20230428084827_0b6a892-JAKARTA</kontrakter.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <kotlin.version>1.9.0</kotlin.version>
-        <felles.version>2.20230210162649_a258d57-SPRING_BOOT_3</felles.version>
         <spring.boot.version>3.1.2</spring.boot.version>
         <mockk.version>1.13.5</mockk.version>
         <nav.security.token.version>3.1.2</nav.security.token.version>
@@ -48,26 +46,6 @@
                 <version>${spring.boot.version}</version>
                 <scope>import</scope>
                 <type>pom</type>
-            </dependency>
-            <dependency>
-                <groupId>no.nav.familie.kontrakter</groupId>
-                <artifactId>felles</artifactId>
-                <version>${kontrakter.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>no.nav.familie.felles</groupId>
-                <artifactId>log</artifactId>
-                <version>${felles.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>no.nav.familie.felles</groupId>
-                <artifactId>leader</artifactId>
-                <version>${felles.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>no.nav.familie.felles</groupId>
-                <artifactId>sikkerhet</artifactId>
-                <version>${felles.version}</version>
             </dependency>
             <dependency>
                 <groupId>no.nav.security</groupId>

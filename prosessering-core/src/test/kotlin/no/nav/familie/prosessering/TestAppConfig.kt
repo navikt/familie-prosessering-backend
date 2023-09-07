@@ -2,8 +2,7 @@ package no.nav.familie.prosessering
 
 import io.mockk.every
 import io.mockk.spyk
-import no.nav.security.token.support.core.context.TokenValidationContext
-import no.nav.security.token.support.core.context.TokenValidationContextHolder
+import no.nav.familie.prosessering.config.ProsesseringInfoProvider
 import org.springframework.boot.SpringBootConfiguration
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.ComponentScan
@@ -19,14 +18,12 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor
 class TestAppConfig : JdbcRepositoryConfigExtension() {
 
     @Bean
-    fun tokenValidationContextHolder(): TokenValidationContextHolder {
-        return object : TokenValidationContextHolder {
-            override fun getTokenValidationContext(): TokenValidationContext {
-                return TokenValidationContext(emptyMap())
-            }
+    fun prosesseringInfoProvider() = object : ProsesseringInfoProvider {
+        override fun hentBrukernavn(): String = "id"
 
-            override fun setTokenValidationContext(tokenValidationContext: TokenValidationContext) {}
-        }
+        override fun harTilgang(): Boolean = true
+
+        override fun isLeaader(): Boolean = true
     }
 
     /**
