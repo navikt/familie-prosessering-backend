@@ -23,7 +23,7 @@ class TestAppConfig : JdbcRepositoryConfigExtension() {
 
         override fun harTilgang(): Boolean = true
 
-        override fun isLeaader(): Boolean = true
+        override fun isLeader(): Boolean = true
     }
 
     /**

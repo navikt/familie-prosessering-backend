@@ -16,5 +16,5 @@ interface ProsesseringInfoProvider {
      * Noen deler kan være fint å kun kjøre på leader, eks sletting av tasks for å unngå locks
      * Hvis man ikke har leader election, returner true
      */
-    fun isLeaader(): Boolean
+    fun isLeader(): Boolean
 }
