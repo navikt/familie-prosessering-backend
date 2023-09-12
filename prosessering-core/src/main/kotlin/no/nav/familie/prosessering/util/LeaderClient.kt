@@ -1,31 +1,48 @@
 package no.nav.familie.prosessering.util
 
 import no.nav.familie.prosessering.util.Environment.hentLeaderSystemEnv
+import org.slf4j.LoggerFactory
 import java.net.InetAddress
 import java.net.URI
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
+import java.time.Duration
 
 internal object LeaderClient {
 
-    private val client = HttpClient.newHttpClient()
+    private val logger = LoggerFactory.getLogger(javaClass)
 
-    private val electorPath = hentLeaderSystemEnv()
+    private val TIMEOUT = Duration.ofSeconds(3)
 
-    private val request = HttpRequest.newBuilder()
-        .uri(URI.create("http://$electorPath"))
-        .GET()
+    private val client = HttpClient.newBuilder()
+        .connectTimeout(TIMEOUT)
         .build()
 
     private val handler = HttpResponse.BodyHandlers.ofString()
 
+    @JvmStatic
     fun isLeader(): Boolean? {
-        val response: HttpResponse<String> = client.send(request, handler)
+        val electorPath = hentLeaderSystemEnv() ?: return null
 
-        val body = response.body()
-        if (body.isNullOrBlank()) return null
+        val request = HttpRequest.newBuilder()
+            .timeout(TIMEOUT)
+            .uri(URI.create("http://$electorPath"))
+            .GET()
+            .build()
 
-        return body.contains(InetAddress.getLocalHost().hostName)
+        try {
+            val response = client.send(request, handler)
+            val body = response.body()
+            if (response.statusCode() != 200 || body.isNullOrBlank()) {
+                logger.warn("isLeader response=${response.statusCode()}")
+                return null
+            }
+
+            return body.contains(InetAddress.getLocalHost().hostName)
+        } catch (e: Exception) {
+            logger.warn("Sjekk av isLeader feilet", e)
+            return false
+        }
     }
 }
