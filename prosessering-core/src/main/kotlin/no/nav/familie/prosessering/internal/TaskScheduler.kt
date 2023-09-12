@@ -38,7 +38,7 @@ class TaskScheduler(
     @Scheduled(cron = CRON_DAILY_0900)
     fun slettTasksKlarForSletting() {
         try {
-            if (prosesseringInfoProvider.isLeader()) {
+            if (prosesseringInfoProvider.isLeader() != false) {
                 taskMaintenanceService.slettTasksKlarForSletting()
             }
         } catch (e: Exception) {
@@ -48,7 +48,7 @@ class TaskScheduler(
 
     @Scheduled(cron = "@hourly")
     fun tellAntallÅpneTask() {
-        if (prosesseringInfoProvider.isLeader()) {
+        if (prosesseringInfoProvider.isLeader() != false) {
             taskMaintenanceService.tellAntallÅpneTask()
         }
     }

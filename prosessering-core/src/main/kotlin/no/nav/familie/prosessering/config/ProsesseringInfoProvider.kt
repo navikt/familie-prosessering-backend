@@ -1,5 +1,7 @@
 package no.nav.familie.prosessering.config
 
+import no.nav.familie.prosessering.util.LeaderClient
+
 interface ProsesseringInfoProvider {
 
     /**
@@ -14,7 +16,7 @@ interface ProsesseringInfoProvider {
 
     /**
      * Noen deler kan være fint å kun kjøre på leader, eks sletting av tasks for å unngå locks
-     * Hvis man ikke har leader election, returner true
+     * null blir håndtert som true
      */
-    fun isLeader(): Boolean
+    fun isLeader(): Boolean? = LeaderClient.isLeader()
 }
