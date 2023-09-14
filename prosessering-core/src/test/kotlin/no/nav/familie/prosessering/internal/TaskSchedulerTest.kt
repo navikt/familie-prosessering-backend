@@ -2,7 +2,6 @@ package no.nav.familie.prosessering.internal
 
 import no.nav.familie.prosessering.IntegrationRunnerTest
 import no.nav.familie.prosessering.TaskFeil
-import no.nav.familie.prosessering.domene.Loggtype
 import no.nav.familie.prosessering.domene.Status
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.domene.TaskLoggRepository

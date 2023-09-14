@@ -1,8 +1,8 @@
 package no.nav.familie.prosessering.internal
 
-import no.nav.familie.log.mdc.MDCConstants
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.error.RekjørSenereException
+import no.nav.familie.prosessering.util.MDCConstants
 import no.nav.familie.prosessering.util.isOptimisticLocking
 import org.slf4j.LoggerFactory
 import org.slf4j.MDC

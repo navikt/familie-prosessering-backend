@@ -1,6 +1,6 @@
 package no.nav.familie.prosessering.internal
 
-import no.nav.familie.leader.LeaderClient
+import no.nav.familie.prosessering.config.ProsesseringInfoProvider
 import no.nav.familie.prosessering.util.isOptimisticLocking
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -12,7 +12,10 @@ private const val CRON_DAILY_0900 = "0 0 9 1/1 * ?"
 private const val CRON_DAILY_1000 = "0 0 10 1/1 * ?"
 
 @Service
-class TaskScheduler(private val taskMaintenanceService: TaskMaintenanceService) {
+class TaskScheduler(
+    private val taskMaintenanceService: TaskMaintenanceService,
+    private val prosesseringInfoProvider: ProsesseringInfoProvider,
+) {
 
     @Scheduled(cron = "\${prosessering.cronRetryTasks:$CRON_DAILY_0700}")
     fun retryFeilendeTask() {
@@ -35,7 +38,7 @@ class TaskScheduler(private val taskMaintenanceService: TaskMaintenanceService) 
     @Scheduled(cron = CRON_DAILY_0900)
     fun slettTasksKlarForSletting() {
         try {
-            if (LeaderClient.isLeader() == null || LeaderClient.isLeader() == true) {
+            if (prosesseringInfoProvider.isLeader() != false) {
                 taskMaintenanceService.slettTasksKlarForSletting()
             }
         } catch (e: Exception) {
@@ -45,7 +48,7 @@ class TaskScheduler(private val taskMaintenanceService: TaskMaintenanceService) 
 
     @Scheduled(cron = "@hourly")
     fun tellAntallÅpneTask() {
-        if (LeaderClient.isLeader() == null || LeaderClient.isLeader() == true) {
+        if (prosesseringInfoProvider.isLeader() != false) {
             taskMaintenanceService.tellAntallÅpneTask()
         }
     }
