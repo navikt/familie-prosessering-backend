@@ -21,7 +21,7 @@
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <kotlin.version>1.9.0</kotlin.version>
+        <kotlin.version>1.9.10</kotlin.version>
         <spring.boot.version>3.1.2</spring.boot.version>
         <mockk.version>1.13.5</mockk.version>
         <nav.security.token.version>3.1.2</nav.security.token.version>
