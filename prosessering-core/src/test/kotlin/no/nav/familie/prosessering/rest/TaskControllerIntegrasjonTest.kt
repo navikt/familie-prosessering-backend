@@ -74,6 +74,24 @@ internal class TaskControllerIntegrasjonTest : IntegrationRunnerTest() {
     }
 
     @Test
+    fun `skal finne riktig antall tasker som har feilet og ligger til manuell oppfølging`() {
+        val feiletTask = Task(type = TaskStep2.TASK_2, payload = "{'a'='1'}", status = Status.FEILET)
+        val feiletTask2 = Task(type = TaskStep2.TASK_2, payload = "{'a'='1'}", status = Status.FEILET)
+        val feiletTask3 = Task(type = TaskStep2.TASK_2, payload = "{'a'='1'}", status = Status.FEILET)
+
+        val manuellOppfølgingTask =
+            Task(type = TaskStep2.TASK_2, payload = "{'a'='1'}", status = Status.MANUELL_OPPFØLGING)
+
+        taskService.saveAll(listOf(feiletTask, feiletTask2, feiletTask3))
+        taskService.save(manuellOppfølgingTask)
+
+        val response = taskController.antallFeiletOgManuellOppfølging()
+        assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
+        assertThat(response.body?.data?.antallFeilet).isEqualTo(3)
+        assertThat(response.body?.data?.antallManuellOppfølging).isEqualTo(1)
+    }
+
+    @Test
     fun `skal hente tasker av angitt type`() {
         val ubehandletTask = Task(type = TaskStep1.TASK_1, payload = "{'a'='b'}", status = Status.UBEHANDLET)
         val feiletTask = Task(type = TaskStep2.TASK_2, payload = "{'a'='1'}", status = Status.FEILET)

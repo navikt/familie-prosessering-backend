@@ -146,6 +146,13 @@ class TaskService internal constructor(
         return taskRepository.countByStatusIn(listOf(Status.MANUELL_OPPFØLGING, Status.FEILET))
     }
 
+    fun antallTaskerMedStatusFeiletOgManuellOppfølging(): TaskerMedStatusFeiletOgManuellOppfølging {
+        return TaskerMedStatusFeiletOgManuellOppfølging(
+            taskRepository.countByStatusIn(listOf(Status.FEILET)),
+            taskRepository.countByStatusIn(listOf(Status.MANUELL_OPPFØLGING)),
+        )
+    }
+
     internal fun tellAntallÅpneTasker(): List<AntallÅpneTask> {
         return taskRepository.countOpenTasks()
     }
