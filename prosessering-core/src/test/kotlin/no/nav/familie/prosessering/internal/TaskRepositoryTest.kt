@@ -8,10 +8,12 @@ import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.domene.TaskRepository
 import no.nav.familie.prosessering.task.TaskStep1
 import no.nav.familie.prosessering.task.TaskStep2
+import no.nav.familie.prosessering.util.MDCConstants
 import no.nav.familie.prosessering.util.isOptimisticLocking
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.catchThrowable
 import org.junit.jupiter.api.Test
+import org.slf4j.MDC
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
@@ -199,5 +201,25 @@ class TaskRepositoryTest : IntegrationRunnerTest() {
         taskService.ferdigstill(task)
         val tasks = repository.finnTasksSomErFerdigNåMenFeiletFør(Pageable.unpaged())
         assertThat(tasks).hasSize(1)
+    }
+
+    @Test
+    fun `skal finne tasker med gitt callId`() {
+        val task1 = taskService.save(Task(TaskStep1.TASK_1, "1"))
+        taskService.save(Task(TaskStep2.TASK_2, "1"))
+        taskService.save(Task(TaskStep1.TASK_1, "2"))
+
+        val taskMedCallId = taskService.finnAlleMedCallId(task1.callId)
+        assertThat(taskMedCallId).hasSize(1)
+        assertThat(taskMedCallId.first().id).isEqualTo(task1.id)
+
+        MDC.put(MDCConstants.MDC_CALL_ID, task1.callId)
+        val task4 = taskService.save(Task(TaskStep1.TASK_1, "3"))
+        MDC.remove(MDCConstants.MDC_CALL_ID)
+
+        val taskerMedCallId = taskService.finnAlleMedCallId(task1.callId)
+        assertThat(taskerMedCallId).hasSize(2)
+        assertThat(taskerMedCallId.first().id).isEqualTo(task1.id)
+        assertThat(taskerMedCallId.last().id).isEqualTo(task4.id)
     }
 }

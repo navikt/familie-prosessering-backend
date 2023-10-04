@@ -3,6 +3,7 @@ package no.nav.familie.prosessering.rest
 import no.nav.familie.prosessering.domene.Avvikstype
 import no.nav.familie.prosessering.domene.Status
 import no.nav.familie.prosessering.domene.Task
+import no.nav.familie.prosessering.domene.TaskLoggMetadata
 import no.nav.familie.prosessering.internal.TaskService
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -23,6 +24,22 @@ class RestTaskService(private val taskService: TaskService) {
             onFailure = { e ->
                 logger.error("Henting av antall tasker som krever oppfølging feilet", e)
                 Ressurs.failure(errorMessage = "Henting av antall tasker som krever oppfølging feilet.", error = e)
+            },
+        )
+    }
+
+    fun hentTasksForCallId(callId: String, saksbehandlerId: String): Ressurs<PaginableResponse<TaskDto>>? {
+        logger.info("$saksbehandlerId henter tasker for callId=$callId")
+        return hentTasksGittSpørring(0) {
+            taskService.finnAlleMedCallId(callId)
+        }.fold(
+            onSuccess = { Ressurs.success(data = it) },
+            onFailure = { e ->
+                logger.error("Henting av tasker feilet", e)
+                Ressurs.failure(
+                    errorMessage = "Kunne ikke hente ut tasker med callId=$callId.",
+                    error = e,
+                )
             },
         )
     }
@@ -77,20 +94,7 @@ class RestTaskService(private val taskService: TaskService) {
         PaginableResponse(
             tasks.map {
                 val taskLogg = taskLoggMetadata[it.id]
-                TaskDto(
-                    id = it.id,
-                    status = it.status,
-                    avvikstype = it.avvikstype,
-                    opprettetTidspunkt = it.opprettetTid,
-                    triggerTid = it.triggerTid,
-                    taskStepType = it.type,
-                    metadata = it.metadata,
-                    payload = it.payload,
-                    antallLogger = taskLogg?.antallLogger ?: 0,
-                    sistKjørt = taskLogg?.sistOpprettetTid,
-                    kommentar = taskLogg?.sisteKommentar,
-                    callId = it.callId,
-                )
+                tilTaskDto(it, taskLogg)
             },
         )
     }
@@ -193,6 +197,41 @@ class RestTaskService(private val taskService: TaskService) {
                 },
             )
     }
+
+    fun hentTaskMedId(id: Long, saksbehandlerId: String): Ressurs<TaskDto>? {
+        logger.info("$saksbehandlerId henter task med id=$id")
+        return Result.runCatching {
+            val task = taskService.findById(id)
+            val taskLoggMetadata = taskService.finnTaskLoggMetadata(listOf(id))[id]
+            tilTaskDto(task, taskLoggMetadata)
+        }.fold(
+            onSuccess = {
+                Ressurs.success(data = it)
+            },
+            onFailure = { e ->
+                logger.info("Fant ikke task med id=$id")
+                Ressurs.failure("Fant ikke task med id $id", error = e)
+            },
+        )
+    }
+
+    private fun tilTaskDto(
+        task: Task,
+        taskLogg: TaskLoggMetadata?,
+    ) = TaskDto(
+        id = task.id,
+        status = task.status,
+        avvikstype = task.avvikstype,
+        opprettetTidspunkt = task.opprettetTid,
+        triggerTid = task.triggerTid,
+        taskStepType = task.type,
+        metadata = task.metadata,
+        payload = task.payload,
+        antallLogger = taskLogg?.antallLogger ?: 0,
+        sistKjørt = taskLogg?.sistOpprettetTid,
+        kommentar = taskLogg?.sisteKommentar,
+        callId = task.callId,
+    )
 
     companion object {
 
