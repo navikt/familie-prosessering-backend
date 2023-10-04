@@ -78,10 +78,11 @@ internal class TaskControllerIntegrasjonTest : IntegrationRunnerTest() {
         val feiletTask = Task(type = TaskStep2.TASK_2, payload = "{'a'='1'}", status = Status.FEILET)
         val feiletTask2 = Task(type = TaskStep2.TASK_2, payload = "{'a'='1'}", status = Status.FEILET)
         val feiletTask3 = Task(type = TaskStep2.TASK_2, payload = "{'a'='1'}", status = Status.FEILET)
-
+        val ubehandletTask = Task(type = TaskStep1.TASK_1, payload = "{'a'='b'}", status = Status.UBEHANDLET)
         val manuellOppfølgingTask =
             Task(type = TaskStep2.TASK_2, payload = "{'a'='1'}", status = Status.MANUELL_OPPFØLGING)
 
+        taskService.save(ubehandletTask)
         taskService.saveAll(listOf(feiletTask, feiletTask2, feiletTask3))
         taskService.save(manuellOppfølgingTask)
 
