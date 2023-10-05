@@ -22,6 +22,13 @@ class TaskController(private val restTaskService: RestTaskService, private val p
         return prosesseringInfoProvider.hentBrukernavn()
     }
 
+    @GetMapping(path = ["/task/{id}"])
+    fun taskMedId(
+        @PathVariable id: Long,
+    ): ResponseEntity<Ressurs<TaskDto>> {
+        return ResponseEntity.ok(restTaskService.hentTaskMedId(id, hentBrukernavn()))
+    }
+
     @GetMapping(path = ["task/v2"])
     fun task2(
         @RequestParam status: Status?,
@@ -30,6 +37,13 @@ class TaskController(private val restTaskService: RestTaskService, private val p
     ): ResponseEntity<Ressurs<PaginableResponse<TaskDto>>> {
         val statuser: List<Status> = status?.let { listOf(it) } ?: Status.values().toList()
         return ResponseEntity.ok(restTaskService.hentTasks(statuser, hentBrukernavn(), page ?: 0, type))
+    }
+
+    @GetMapping(path = ["task/callId/{callId}"])
+    fun tasksForCallId(
+        @PathVariable callId: String,
+    ): ResponseEntity<Ressurs<PaginableResponse<TaskDto>>> {
+        return ResponseEntity.ok(restTaskService.hentTasksForCallId(callId, hentBrukernavn()))
     }
 
     @GetMapping(path = ["/task/ferdigNaaFeiletFoer"])
