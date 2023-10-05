@@ -106,7 +106,7 @@ class TaskService internal constructor(
     fun finnTasksSomErFerdigNåMenFeiletFør(page: Pageable): List<Task> =
         taskRepository.finnTasksSomErFerdigNåMenFeiletFør(page)
 
-    fun finnAlleMedCallId(callId: String): List<Task> =
+    fun finnAlleTasksMedCallId(callId: String): List<Task> =
         taskRepository.finnTaskerMedCallId(callId)
 
     internal fun finnTaskLoggMetadata(taskIds: List<Long>): Map<Long, TaskLoggMetadata> {

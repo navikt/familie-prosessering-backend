@@ -209,7 +209,7 @@ class TaskRepositoryTest : IntegrationRunnerTest() {
         taskService.save(Task(TaskStep2.TASK_2, "1"))
         taskService.save(Task(TaskStep1.TASK_1, "2"))
 
-        val taskMedCallId = taskService.finnAlleMedCallId(task1.callId)
+        val taskMedCallId = taskService.finnAlleTasksMedCallId(task1.callId)
         assertThat(taskMedCallId).hasSize(1)
         assertThat(taskMedCallId.first().id).isEqualTo(task1.id)
 
@@ -217,7 +217,7 @@ class TaskRepositoryTest : IntegrationRunnerTest() {
         val task4 = taskService.save(Task(TaskStep1.TASK_1, "3"))
         MDC.remove(MDCConstants.MDC_CALL_ID)
 
-        val taskerMedCallId = taskService.finnAlleMedCallId(task1.callId)
+        val taskerMedCallId = taskService.finnAlleTasksMedCallId(task1.callId)
         assertThat(taskerMedCallId).hasSize(2)
         assertThat(taskerMedCallId.first().id).isEqualTo(task1.id)
         assertThat(taskerMedCallId.last().id).isEqualTo(task4.id)

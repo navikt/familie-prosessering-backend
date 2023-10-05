@@ -31,7 +31,7 @@ class RestTaskService(private val taskService: TaskService) {
     fun hentTasksForCallId(callId: String, saksbehandlerId: String): Ressurs<PaginableResponse<TaskDto>>? {
         logger.info("$saksbehandlerId henter tasker for callId=$callId")
         return hentTasksGittSpørring(0) {
-            taskService.finnAlleMedCallId(callId)
+            taskService.finnAlleTasksMedCallId(callId)
         }.fold(
             onSuccess = { Ressurs.success(data = it) },
             onFailure = { e ->
