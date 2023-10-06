@@ -50,7 +50,7 @@ internal interface TaskRepository : PagingAndSortingRepository<Task, Long>, Crud
         """
         SELECT * 
         FROM task t 
-        WHERE t.metadata like concat('%callId=', concat(:callId, '%'))""",
+        WHERE t.metadata like concat('%callId=', concat(:callId::text, '%'))""",
     )
     fun finnTaskerMedCallId(callId: String): List<Task>
 
