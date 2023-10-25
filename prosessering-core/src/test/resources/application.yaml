@@ -23,4 +23,5 @@ spring:
       max-lifetime: 30000
       minimum-idle: 1
 
-prosessering.continuousRunning.enabled: true
+prosessering:
+  continuousRunning.enabled: true

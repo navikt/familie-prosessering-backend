@@ -11,17 +11,25 @@ import no.nav.familie.prosessering.domene.TaskLoggMetadata
 import no.nav.familie.prosessering.domene.TaskLoggRepository
 import no.nav.familie.prosessering.domene.TaskRepository
 import org.slf4j.LoggerFactory
+import org.springframework.context.annotation.Lazy
 import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
+import org.springframework.transaction.support.TransactionSynchronizationManager
 import java.io.IOException
 import java.time.LocalDateTime
 
+/**
+ * @param taskTransactionSynchronization lazy pga circular dependencies
+ * TaskX -> TaskService -> TaskTransactionSynchronization -> TaskStepExecutorService -> TaskWorker -> TaskX
+ */
 @Component
 class TaskService internal constructor(
     private val taskRepository: TaskRepository,
     private val taskLoggRepository: TaskLoggRepository,
+    @Lazy
+    private val taskTransactionSynchronization: TaskTransactionSynchronization
 ) {
 
     private val logger = LoggerFactory.getLogger(javaClass)
@@ -29,6 +37,15 @@ class TaskService internal constructor(
 
     fun findById(id: Long): Task {
         return taskRepository.findByIdOrNull(id) ?: error("Task med id: $id ikke funnet.")
+    }
+
+    /**
+     * Oppretter task og trigger kjøring av task etter commit
+     */
+    @Transactional
+    fun saveAndRun(task: Task): Task {
+        TransactionSynchronizationManager.registerSynchronization(taskTransactionSynchronization)
+        return save(task)
     }
 
     /**
@@ -85,7 +102,11 @@ class TaskService internal constructor(
         return taskRepository.findByStatusIn(status, page)
     }
 
-    fun finnTasksMedStatus(status: List<Status>, type: String? = null, page: Pageable = Pageable.unpaged()): List<Task> {
+    fun finnTasksMedStatus(
+        status: List<Status>,
+        type: String? = null,
+        page: Pageable = Pageable.unpaged(),
+    ): List<Task> {
         return if (type == null) {
             taskRepository.findByStatusIn(status, page)
         } else {

@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
+import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.math.min
 
 /**
@@ -49,7 +50,10 @@ class TaskStepExecutorService(
      * Pga [ThreadPoolTaskExecutor.setWaitForTasksToCompleteOnShutdown] som settes til true for å håndtere att tasker
      * har mulighet til å kjøre klart, så er også fortsatt mulig å legge til flere tasks, som vi ikke ønsker
      */
-    @Volatile private var isShuttingDown = false
+    @Volatile
+    private var isShuttingDown = false
+
+    private var isRunning = AtomicBoolean(false)
 
     override fun onApplicationEvent(event: ContextClosedEvent) {
         isShuttingDown = true
@@ -58,13 +62,20 @@ class TaskStepExecutorService(
     @Scheduled(fixedDelayString = "\${prosessering.fixedDelayString.in.milliseconds:30000}")
     fun pollAndExecute() {
         if (!enabled) return
+        if (!isRunning.compareAndSet(false, true)) {
+            log.debug("Kjører allerede")
+        }
 
-        while (true) {
-            if (isShuttingDown) {
-                log.info("Shutting down, does not start new pollAndExecuteTasks")
-                return
+        try {
+            while (true) {
+                if (isShuttingDown) {
+                    log.info("Shutting down, does not start new pollAndExecuteTasks")
+                    return
+                }
+                if (!pollAndExecuteTasks()) return
             }
-            if (!pollAndExecuteTasks()) return
+        } finally {
+            isRunning.set(false)
         }
     }
 
