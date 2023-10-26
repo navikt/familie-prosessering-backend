@@ -8,6 +8,7 @@ import no.nav.familie.prosessering.TaskStepBeskrivelse
 import no.nav.familie.prosessering.domene.Status
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.domene.TaskLogg.Companion.BRUKERNAVN_NÅR_SIKKERHETSKONTEKST_IKKE_FINNES
+import no.nav.familie.prosessering.error.MaxAntallRekjøringerException
 import no.nav.familie.prosessering.error.RekjørSenereException
 import org.slf4j.LoggerFactory
 import org.springframework.aop.framework.AopProxyUtils
@@ -46,8 +47,10 @@ class TaskWorker(
         }
         taskStepMap = tasksTilTaskStepBeskrivelse.entries.associate { it.value.taskStepType to it.key }
         maxAntallFeilMap = tasksTilTaskStepBeskrivelse.values.associate { it.taskStepType to it.maxAntallFeil }
-        triggerTidVedFeilMap = tasksTilTaskStepBeskrivelse.values.associate { it.taskStepType to it.triggerTidVedFeilISekunder }
-        settTilManuellOppfølgningVedFeil = tasksTilTaskStepBeskrivelse.values.associate { it.taskStepType to it.settTilManuellOppfølgning }
+        triggerTidVedFeilMap =
+            tasksTilTaskStepBeskrivelse.values.associate { it.taskStepType to it.triggerTidVedFeilISekunder }
+        settTilManuellOppfølgningVedFeil =
+            tasksTilTaskStepBeskrivelse.values.associate { it.taskStepType to it.settTilManuellOppfølgning }
         feiltellereForTaskSteps = tasksTilTaskStepBeskrivelse.values.associate {
             it.taskStepType to Metrics.counter(
                 "mottak.feilede.tasks",
@@ -96,13 +99,39 @@ class TaskWorker(
     fun rekjørSenere(taskId: Long, e: RekjørSenereException) {
         log.info("Rekjører task=$taskId senere, triggerTid=${e.triggerTid}")
         secureLog.info("Rekjører task=$taskId senere, årsak=${e.årsak}", e)
-        val taskMedNyTriggerTid = taskService.findById(taskId)
-            .medTriggerTid(e.triggerTid)
-        taskService.klarTilPlukk(
-            taskMedNyTriggerTid,
-            endretAv = BRUKERNAVN_NÅR_SIKKERHETSKONTEKST_IKKE_FINNES,
-            melding = e.årsak,
-        )
+
+        val taskMedNyTriggerTid = taskService.findById(taskId).medTriggerTid(e.triggerTid)
+
+        val maxAntallFeil = finnMaxAntallFeil(taskMedNyTriggerTid.type)
+        val antallGangerRekjørt = taskService.antallGangerPlukket(taskId)
+
+        if (antallGangerRekjørt >= maxAntallFeil) {
+            val settTilManuellOppfølgning = finnSettTilManuellOppfølgning(taskMedNyTriggerTid.type)
+            val taskFeil = TaskFeil(taskMedNyTriggerTid, MaxAntallRekjøringerException(maxAntallFeil))
+
+            val feiletTask = taskService.feilet(
+                task = taskMedNyTriggerTid,
+                feil = taskFeil,
+                tidligereAntallFeil = antallGangerRekjørt,
+                maxAntallFeil = maxAntallFeil,
+                settTilManuellOppfølgning = settTilManuellOppfølgning,
+            )
+            // lager metrikker på tasks som har feilet max antall ganger.
+            if (feiletTask.status == Status.FEILET || feiletTask.status == Status.MANUELL_OPPFØLGING) {
+                finnFeilteller(feiletTask.type).increment()
+                log.error(
+                    "Task ${feiletTask.id} av type ${feiletTask.type} har feilet/satt til manuell oppfølgning. " +
+                        "Sjekk familie-prosessering for detaljer",
+                )
+            }
+            secureLog.info("Feilhåndtering lagret ok {}", feiletTask)
+        } else {
+            taskService.klarTilPlukk(
+                taskMedNyTriggerTid,
+                endretAv = BRUKERNAVN_NÅR_SIKKERHETSKONTEKST_IKKE_FINNES,
+                melding = e.årsak,
+            )
+        }
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)

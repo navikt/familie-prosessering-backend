@@ -157,6 +157,10 @@ class TaskService internal constructor(
         return taskLoggRepository.countByTaskIdAndType(taskId, Loggtype.FEILET)
     }
 
+    fun antallGangerPlukket(taskId: Long): Int {
+        return taskLoggRepository.countByTaskIdAndType(taskId, Loggtype.PLUKKET)
+    }
+
     @Transactional
     internal fun avvikshåndter(task: Task, avvikstype: Avvikstype, årsak: String, endretAv: String): Task {
         val taskLogg = TaskLogg(
