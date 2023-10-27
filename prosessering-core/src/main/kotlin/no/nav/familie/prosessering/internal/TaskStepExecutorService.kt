@@ -64,6 +64,7 @@ class TaskStepExecutorService(
         if (!enabled) return
         if (!isRunning.compareAndSet(false, true)) {
             log.debug("Kjører allerede")
+            return
         }
 
         try {
