@@ -44,8 +44,8 @@ class TaskServiceIntegrationTest : IntegrationRunnerTest() {
     }
 
     @Test
-    fun `saveAndRun skal kjøre task direkte`() {
-        val task = taskService.saveAndRun(task)
+    fun `saveAndPoll skal polle etter nye tasks direkte`() {
+        val task = taskService.saveAndPoll(task)
         TestTransaction.flagForCommit()
         TestTransaction.end()
 
@@ -56,9 +56,9 @@ class TaskServiceIntegrationTest : IntegrationRunnerTest() {
     }
 
     @Test
-    fun `saveAndRun skal kjøre task direkte, og kun en gang per tråd`() {
-        taskService.saveAndRun(task)
-        taskService.saveAndRun(task)
+    fun `saveAndPoll skal polle etter tasks direkte, og kun en gang per tråd`() {
+        taskService.saveAndPoll(task)
+        taskService.saveAndPoll(task)
         TestTransaction.flagForCommit()
         TestTransaction.end()
 

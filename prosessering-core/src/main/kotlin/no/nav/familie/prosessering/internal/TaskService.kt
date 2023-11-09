@@ -29,7 +29,7 @@ class TaskService internal constructor(
     private val taskRepository: TaskRepository,
     private val taskLoggRepository: TaskLoggRepository,
     @Lazy
-    private val taskTransactionSynchronization: TaskTransactionSynchronization
+    private val taskTransactionSynchronization: TaskTransactionSynchronization,
 ) {
 
     private val logger = LoggerFactory.getLogger(javaClass)
@@ -43,7 +43,7 @@ class TaskService internal constructor(
      * Oppretter task og trigger kjøring av task etter commit
      */
     @Transactional
-    fun saveAndRun(task: Task): Task {
+    fun saveAndPoll(task: Task): Task {
         TransactionSynchronizationManager.registerSynchronization(taskTransactionSynchronization)
         return save(task)
     }
