@@ -5,6 +5,7 @@ import no.nav.familie.prosessering.domene.Status
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.domene.TaskLoggMetadata
 import no.nav.familie.prosessering.internal.TaskService
+import no.nav.familie.prosessering.internal.TaskerMedStatusFeiletOgManuellOppfølging
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.data.domain.PageRequest
@@ -24,6 +25,20 @@ class RestTaskService(private val taskService: TaskService) {
             onFailure = { e ->
                 logger.error("Henting av antall tasker som krever oppfølging feilet", e)
                 Ressurs.failure(errorMessage = "Henting av antall tasker som krever oppfølging feilet.", error = e)
+            },
+        )
+    }
+
+    fun finnAntallTaskerMedStatusFeiletOgManuellOppfølging():
+            Ressurs<TaskerMedStatusFeiletOgManuellOppfølging> {
+        val errorMelding = "Henting av antall tasker som har feilet eller er som satt til manuell oppføling feilet."
+        return Result.runCatching {
+            taskService.antallTaskerMedStatusFeiletOgManuellOppfølging()
+        }.fold(
+            onSuccess = { Ressurs.success(it) },
+            onFailure = { e ->
+                logger.error(errorMelding, e)
+                Ressurs.failure(errorMessage = errorMelding, error = e)
             },
         )
     }

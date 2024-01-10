@@ -2,6 +2,7 @@ package no.nav.familie.prosessering.rest
 
 import no.nav.familie.prosessering.config.ProsesseringInfoProvider
 import no.nav.familie.prosessering.domene.Status
+import no.nav.familie.prosessering.internal.TaskerMedStatusFeiletOgManuellOppfølging
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
@@ -16,7 +17,10 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 @RequestMapping("/api")
 @ProtectedWithClaims(issuer = "azuread")
-class TaskController(private val restTaskService: RestTaskService, private val prosesseringInfoProvider: ProsesseringInfoProvider) {
+class TaskController(
+    private val restTaskService: RestTaskService,
+    private val prosesseringInfoProvider: ProsesseringInfoProvider,
+) {
 
     fun hentBrukernavn(): String {
         return prosesseringInfoProvider.hentBrukernavn()
@@ -53,6 +57,11 @@ class TaskController(private val restTaskService: RestTaskService, private val p
     @GetMapping(path = ["/task/antall-til-oppfolging"])
     fun antallTilOppfølging(): ResponseEntity<Ressurs<Long>> {
         return ResponseEntity.ok(restTaskService.finnAntallTaskerSomKreverOppfølging())
+    }
+
+    @GetMapping(path = ["/task/antall-feilet-og-manuell-oppfolging"])
+    fun antallFeiletOgManuellOppfølging(): ResponseEntity<Ressurs<TaskerMedStatusFeiletOgManuellOppfølging>> {
+        return ResponseEntity.ok(restTaskService.finnAntallTaskerMedStatusFeiletOgManuellOppfølging())
     }
 
     @GetMapping(path = ["/task/logg/{id}"])
