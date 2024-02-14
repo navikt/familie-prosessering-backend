@@ -222,4 +222,27 @@ class TaskRepositoryTest : IntegrationRunnerTest() {
         assertThat(taskerMedCallId.first().id).isEqualTo(task1.id)
         assertThat(taskerMedCallId.last().id).isEqualTo(task4.id)
     }
+
+
+    @Test
+    fun `findAllByPayloadAndType - skal finne tasker for gitt payload og type`() {
+        val randomString = UUID.randomUUID().toString()
+
+        val task1 = Task(type = TaskStep2.TASK_2, payload = randomString)
+        val task2 = Task(type = TaskStep2.TASK_2, payload = "{'a'='1'}")
+        val task3 = Task(type = TaskStep2.TASK_2, payload = randomString)
+        val task4 = Task(type = TaskStep1.TASK_1, payload = "{'a'='b'}")
+
+        taskService.save(task1)
+        taskService.save(task2)
+        taskService.save(task3)
+        taskService.save(task4)
+
+        val funnedeTasker = repository.findAllByPayloadAndType(task1.payload, TaskStep2.TASK_2)
+
+        assertThat(funnedeTasker.size).isEqualTo(2)
+        assertThat(funnedeTasker.firstOrNull()?.payload).isEqualTo(task1.payload)
+        assertThat(funnedeTasker.firstOrNull()?.type).isEqualTo(task1.type)
+        assertThat(funnedeTasker.firstOrNull()?.status).isEqualTo(task1.status)
+    }
 }
