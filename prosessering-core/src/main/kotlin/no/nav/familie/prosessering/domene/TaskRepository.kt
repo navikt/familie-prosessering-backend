@@ -28,6 +28,9 @@ internal interface TaskRepository : PagingAndSortingRepository<Task, Long>, Crud
 
     fun findByPayloadAndType(payload: String, type: String): Task?
 
+    @Query("SELECT t FROM task t WHERE t.payload=:payload and t.type=:type")
+    fun findAllByPayloadAndType(payload: String, type: String): List<Task>
+
     @Query(
         """
         SELECT t.type,t.status, count(*) AS count 

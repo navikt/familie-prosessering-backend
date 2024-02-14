@@ -123,6 +123,11 @@ class TaskService internal constructor(
         return taskRepository.findByPayloadAndType(payload, type)
     }
 
+    @Suppress("unused") // brukes av klienter
+    fun finnAlleTaskerMedPayloadOgType(payload: String, type: String): List<Task> {
+        return taskRepository.findAllByPayloadAndType(payload, type)
+    }
+
     /**
      * Då taskRepository er internal så kan denne fortsatt være fin å bruke fra tests
      */
