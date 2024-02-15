@@ -174,6 +174,14 @@ class TaskService internal constructor(
     }
 
     @Transactional
+    fun settTilManuellOppfølging(task: Task, årsak: String? = null): Task {
+        val taskLogg =
+            TaskLogg(taskId = task.id, type = Loggtype.MANUELL_OPPFØLGING, melding = årsak)
+        taskLoggRepository.save(taskLogg)
+        return taskRepository.save(task.copy(status = Status.MANUELL_OPPFØLGING))
+    }
+
+    @Transactional
     internal fun avvikshåndter(task: Task, avvikstype: Avvikstype, årsak: String, endretAv: String): Task {
         val taskLogg = TaskLogg(
             taskId = task.id,
