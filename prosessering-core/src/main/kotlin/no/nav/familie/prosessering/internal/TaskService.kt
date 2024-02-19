@@ -232,7 +232,13 @@ class TaskService internal constructor(
         maxAntallFeil: Int,
         settTilManuellOppfølgning: Boolean,
     ): Task {
-        val nyStatus = nyFeiletStatus(tidligereAntallFeil, maxAntallFeil, settTilManuellOppfølgning)
+        val antallFeilendeForsøk = tidligereAntallFeil + 1
+        val harTaskFeiletMindreEnnMaksAntallFeil = maxAntallFeil > antallFeilendeForsøk
+
+        val nyStatus = nyFeiletStatus(
+            settTilManuellOppfølgning = settTilManuellOppfølgning,
+            harTaskFeiletMindreEnnMaksAntallFeil = harTaskFeiletMindreEnnMaksAntallFeil
+        )
 
         val feilmelding = try {
             feil.writeValueAsString()
@@ -241,20 +247,25 @@ class TaskService internal constructor(
             secureLog.warn("Feilet lagring av task=${task.id} med melding", e)
             "Feilet skriving av feil til json exceptionCauseMessage=${feil.exceptionCauseMessage} feilmelding=${feil.feilmelding} stacktrace=${feil.stackTrace}"
         }
-        taskLoggRepository.save(TaskLogg(taskId = task.id, type = Loggtype.FEILET, melding = feilmelding))
+        taskLoggRepository.save(
+            TaskLogg(
+                taskId = task.id,
+                type = if (harTaskFeiletMindreEnnMaksAntallFeil) Loggtype.REKJØRT else Loggtype.FEILET,
+                melding = feilmelding
+            )
+        )
         return taskRepository.save(task.copy(status = nyStatus))
     }
 
     private fun nyFeiletStatus(
-        tidligereAntallFeil: Int,
-        maxAntallFeil: Int,
         settTilManuellOppfølgning: Boolean,
+        harTaskFeiletMindreEnnMaksAntallFeil: Boolean,
     ): Status {
-        val antallFeilendeForsøk = tidligereAntallFeil + 1
         return when {
-            maxAntallFeil > antallFeilendeForsøk -> Status.KLAR_TIL_PLUKK
+            harTaskFeiletMindreEnnMaksAntallFeil -> Status.KLAR_TIL_PLUKK
             settTilManuellOppfølgning -> Status.MANUELL_OPPFØLGING
             else -> Status.FEILET
         }
     }
+
 }
