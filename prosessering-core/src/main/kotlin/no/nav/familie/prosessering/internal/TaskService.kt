@@ -250,7 +250,7 @@ class TaskService internal constructor(
         taskLoggRepository.save(
             TaskLogg(
                 taskId = task.id,
-                type = if (harTaskFeiletMindreEnnMaksAntallFeil) Loggtype.REKJØRT else Loggtype.FEILET,
+                type = if (harTaskFeiletMindreEnnMaksAntallFeil) Loggtype.FEILET_AUTOMATISK_REKJØRT else Loggtype.FEILET,
                 melding = feilmelding
             )
         )
