@@ -15,7 +15,7 @@ internal class MetricService(
     private val prosesseringInfoProvider: ProsesseringInfoProvider,
 ) {
 
-    private val feiledeTasks = MultiGauge.builder("prosessering_tasks_feilet").register(Metrics.globalRegistry)
+    private val feiledeTasks = MultiGauge.builder("prosessering.tasks.feilet").register(Metrics.globalRegistry)
 
     @Scheduled(initialDelay = FREKVENS_30_SEC, fixedDelay = FREKVENS_30_MIN)
     fun oppdatertFeiledeTasks() {
