@@ -29,8 +29,7 @@ class RestTaskService(private val taskService: TaskService) {
         )
     }
 
-    fun finnAntallTaskerMedStatusFeiletOgManuellOppfølging():
-            Ressurs<TaskerMedStatusFeiletOgManuellOppfølging> {
+    fun finnAntallTaskerMedStatusFeiletOgManuellOppfølging(): Ressurs<TaskerMedStatusFeiletOgManuellOppfølging> {
         val errorMelding = "Henting av antall tasker som har feilet eller er som satt til manuell oppføling feilet."
         return Result.runCatching {
             taskService.antallTaskerMedStatusFeiletOgManuellOppfølging()
