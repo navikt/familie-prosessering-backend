@@ -15,13 +15,13 @@ data class TaskLogg(
     val melding: String? = null,
     val opprettetTid: LocalDateTime = LocalDateTime.now(),
 ) {
-
     override fun toString(): String {
         return "TaskLogg(id=$id, type=$type, opprettetTid=$opprettetTid)"
     }
 
     companion object {
         const val BRUKERNAVN_NÅR_SIKKERHETSKONTEKST_IKKE_FINNES = "VL"
+
         private fun hentNodeNavn(): String {
             return System.getenv("HOSTNAME") ?: "node1"
         }

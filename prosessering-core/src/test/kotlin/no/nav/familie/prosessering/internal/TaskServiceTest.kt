@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Test
 import org.springframework.data.domain.Pageable
 
 internal class TaskServiceTest {
-
     private val taskRepository = mockk<TaskRepository>()
     private val taskLoggRepository = mockk<TaskLoggRepository>()
     private val service = TaskService(taskRepository, taskLoggRepository)

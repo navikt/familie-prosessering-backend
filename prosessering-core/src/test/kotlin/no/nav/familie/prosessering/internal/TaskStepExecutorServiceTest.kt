@@ -33,7 +33,6 @@ import java.util.concurrent.ExecutionException
 
 @EnableScheduling
 class TaskStepExecutorServiceTest : IntegrationRunnerTest() {
-
     @Autowired
     private lateinit var taskService: TaskService
 
@@ -101,12 +100,14 @@ class TaskStepExecutorServiceTest : IntegrationRunnerTest() {
         TestTransaction.end()
 
         runBlocking {
-            val launch = GlobalScope.launch {
-                repeat(10) { taskStepExecutorService.pollAndExecute() }
-            }
-            val launch2 = GlobalScope.launch {
-                repeat(10) { taskStepExecutorService.pollAndExecute() }
-            }
+            val launch =
+                GlobalScope.launch {
+                    repeat(10) { taskStepExecutorService.pollAndExecute() }
+                }
+            val launch2 =
+                GlobalScope.launch {
+                    repeat(10) { taskStepExecutorService.pollAndExecute() }
+                }
 
             launch.join()
             launch2.join()
@@ -177,7 +178,6 @@ class TaskStepExecutorServiceTest : IntegrationRunnerTest() {
     }
 
     companion object {
-
         val om = ObjectMapper()
     }
 }

@@ -21,9 +21,7 @@ import org.junit.jupiter.api.Test
 import java.net.InetAddress
 
 class LeaderClientTest {
-
     companion object {
-
         private lateinit var wireMockServer: WireMockServer
 
         @BeforeAll

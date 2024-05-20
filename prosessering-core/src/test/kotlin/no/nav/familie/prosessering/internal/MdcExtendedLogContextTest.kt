@@ -7,7 +7,6 @@ import org.junit.jupiter.api.Test
 import org.slf4j.MDC
 
 class MdcExtendedLogContextTest {
-
     private val paramName = "Bob"
 
     private var mdcExtendedLogContext: MdcExtendedLogContext = MdcExtendedLogContext.getContext(paramName)

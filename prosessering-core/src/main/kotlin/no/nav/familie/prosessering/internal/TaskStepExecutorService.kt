@@ -36,7 +36,6 @@ class TaskStepExecutorService(
     @Qualifier("taskExecutor") private val taskExecutor: TaskExecutor,
     private val taskService: TaskService,
 ) : ApplicationListener<ContextClosedEvent> {
-
     private val secureLog = LoggerFactory.getLogger("secureLogger")
 
     init {
@@ -94,9 +93,10 @@ class TaskStepExecutorService(
             tasks.forEach { taskExecutor.execute { executeWork(it) } }
             return false
         }
-        val futures = tasks.map { task ->
-            CompletableFuture.runAsync({ executeWork(task) }, taskExecutor)
-        }
+        val futures =
+            tasks.map { task ->
+                CompletableFuture.runAsync({ executeWork(task) }, taskExecutor)
+            }
         try {
             CompletableFuture.allOf(*futures.toTypedArray()).get(2, TimeUnit.MINUTES)
         } catch (e: TimeoutException) {
@@ -109,17 +109,18 @@ class TaskStepExecutorService(
         val startTidspunkt = System.currentTimeMillis()
         initLogContext(task)
 
-        val plukketTask = try {
-            taskWorker.markerPlukket(task.id) ?: return
-        } catch (e: Exception) {
-            if (isOptimisticLocking(e)) {
-                log.info("OptimisticLockingFailureException metode=executeWork for task=${task.id}")
-            } else {
-                log.error("Feilet metode=executeWork task=${task.id}. Se secure logs")
-                secureLog.info("Feilet metode=executeWork task=${task.id}", e)
+        val plukketTask =
+            try {
+                taskWorker.markerPlukket(task.id) ?: return
+            } catch (e: Exception) {
+                if (isOptimisticLocking(e)) {
+                    log.info("OptimisticLockingFailureException metode=executeWork for task=${task.id}")
+                } else {
+                    log.error("Feilet metode=executeWork task=${task.id}. Se secure logs")
+                    secureLog.info("Feilet metode=executeWork task=${task.id}", e)
+                }
+                return
             }
-            return
-        }
 
         try {
             taskWorker.doActualWork(plukketTask.id)
@@ -163,7 +164,6 @@ class TaskStepExecutorService(
     }
 
     companion object {
-
         private val LOG_CONTEXT = MdcExtendedLogContext.getContext("prosess")
         private val log = LoggerFactory.getLogger(TaskStepExecutorService::class.java)
     }

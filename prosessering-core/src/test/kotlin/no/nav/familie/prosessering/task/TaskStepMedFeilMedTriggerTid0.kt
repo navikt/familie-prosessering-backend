@@ -12,13 +12,11 @@ import org.springframework.stereotype.Service
     triggerTidVedFeilISekunder = 0,
 )
 class TaskStepMedFeilMedTriggerTid0 : AsyncTaskStep {
-
     override fun doTask(task: Task) {
         error("Feil")
     }
 
     companion object {
-
         const val TYPE = "taskMedFeilMedTriggerTid0"
     }
 }

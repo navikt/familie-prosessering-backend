@@ -14,7 +14,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 @ContextConfiguration(classes = [DbContainerInitializer::class, TestAppConfig::class])
 @DataJdbcTest(excludeAutoConfiguration = [TestDatabaseAutoConfiguration::class])
 abstract class IntegrationRunnerTest {
-
     @Autowired
     private lateinit var repository: TaskRepository
 

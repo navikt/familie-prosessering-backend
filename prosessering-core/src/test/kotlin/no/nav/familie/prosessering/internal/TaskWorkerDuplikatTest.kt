@@ -8,7 +8,6 @@ import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
 
 class TaskWorkerDuplikatTest {
-
     @Test
     fun `skal ikke kunne ha 2 tasker med samme taskStepType`() {
         assertThatThrownBy {

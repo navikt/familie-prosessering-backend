@@ -16,7 +16,6 @@ import java.time.LocalDateTime
 
 @Service
 class RestTaskService(private val taskService: TaskService) {
-
     fun finnAntallTaskerSomKreverOppfølging(): Ressurs<Long> {
         return Result.runCatching {
             taskService.antallTaskerTilOppfølging()
@@ -42,7 +41,10 @@ class RestTaskService(private val taskService: TaskService) {
         )
     }
 
-    fun hentTasksForCallId(callId: String, saksbehandlerId: String): Ressurs<PaginableResponse<TaskDto>>? {
+    fun hentTasksForCallId(
+        callId: String,
+        saksbehandlerId: String,
+    ): Ressurs<PaginableResponse<TaskDto>>? {
         logger.info("$saksbehandlerId henter tasker for callId=$callId")
         return hentTasksGittSpørring(0) {
             taskService.finnAlleTasksMedCallId(callId)
@@ -101,19 +103,23 @@ class RestTaskService(private val taskService: TaskService) {
     fun hentTasksGittSpørring(
         page: Int,
         spørring: (PageRequest) -> List<Task>,
-    ): Result<PaginableResponse<TaskDto>> = Result.runCatching {
-        val pageRequest = PageRequest.of(page, TASK_LIMIT, Sort.Direction.DESC, "opprettetTid")
-        val tasks = spørring.invoke(pageRequest)
-        val taskLoggMetadata = taskService.finnTaskLoggMetadata(tasks.map { it.id })
-        PaginableResponse(
-            tasks.map {
-                val taskLogg = taskLoggMetadata[it.id]
-                tilTaskDto(it, taskLogg)
-            },
-        )
-    }
+    ): Result<PaginableResponse<TaskDto>> =
+        Result.runCatching {
+            val pageRequest = PageRequest.of(page, TASK_LIMIT, Sort.Direction.DESC, "opprettetTid")
+            val tasks = spørring.invoke(pageRequest)
+            val taskLoggMetadata = taskService.finnTaskLoggMetadata(tasks.map { it.id })
+            PaginableResponse(
+                tasks.map {
+                    val taskLogg = taskLoggMetadata[it.id]
+                    tilTaskDto(it, taskLogg)
+                },
+            )
+        }
 
-    fun hentTaskLogg(id: Long, saksbehandlerId: String): Ressurs<List<TaskloggDto>> {
+    fun hentTaskLogg(
+        id: Long,
+        saksbehandlerId: String,
+    ): Ressurs<List<TaskloggDto>> {
         logger.info("$saksbehandlerId henter tasklogg til task=$id")
 
         return Result.runCatching {
@@ -131,7 +137,10 @@ class RestTaskService(private val taskService: TaskService) {
     }
 
     @Transactional
-    fun rekjørTask(taskId: Long, saksbehandlerId: String): Ressurs<String> {
+    fun rekjørTask(
+        taskId: Long,
+        saksbehandlerId: String,
+    ): Ressurs<String> {
         val task: Task = taskService.findById(taskId)
 
         taskService.klarTilPlukk(task.medTriggerTid(LocalDateTime.now()), saksbehandlerId)
@@ -141,7 +150,10 @@ class RestTaskService(private val taskService: TaskService) {
     }
 
     @Transactional
-    fun rekjørTasks(status: Status, saksbehandlerId: String): Ressurs<String> {
+    fun rekjørTasks(
+        status: Status,
+        saksbehandlerId: String,
+    ): Ressurs<String> {
         logger.info("$saksbehandlerId rekjører alle tasks med status $status")
 
         return Result.runCatching {
@@ -188,7 +200,11 @@ class RestTaskService(private val taskService: TaskService) {
     }
 
     @Transactional
-    fun kommenterTask(taskId: Long, kommentarDTO: KommentarDTO, saksbehandlerId: String): Ressurs<String> {
+    fun kommenterTask(
+        taskId: Long,
+        kommentarDTO: KommentarDTO,
+        saksbehandlerId: String,
+    ): Ressurs<String> {
         val task: Task = taskService.findById(taskId)
 
         logger.info("$saksbehandlerId legger inn kommentar på task $taskId", taskId)
@@ -212,7 +228,10 @@ class RestTaskService(private val taskService: TaskService) {
             )
     }
 
-    fun hentTaskMedId(id: Long, saksbehandlerId: String): Ressurs<TaskDto>? {
+    fun hentTaskMedId(
+        id: Long,
+        saksbehandlerId: String,
+    ): Ressurs<TaskDto>? {
         logger.info("$saksbehandlerId henter task med id=$id")
         return Result.runCatching {
             val task = taskService.findById(id)
@@ -248,7 +267,6 @@ class RestTaskService(private val taskService: TaskService) {
     )
 
     companion object {
-
         val logger: Logger = LoggerFactory.getLogger(RestTaskService::class.java)
         const val TASK_LIMIT: Int = 100
     }

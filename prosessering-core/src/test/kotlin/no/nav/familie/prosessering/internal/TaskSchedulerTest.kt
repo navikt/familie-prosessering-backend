@@ -15,7 +15,6 @@ import org.springframework.test.context.transaction.TestTransaction
 import java.time.LocalDateTime
 
 class TaskSchedulerTest : IntegrationRunnerTest() {
-
     @Autowired
     private lateinit var tasksScheduler: TaskScheduler
 

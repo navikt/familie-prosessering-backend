@@ -21,7 +21,6 @@ class TaskController(
     private val restTaskService: RestTaskService,
     private val prosesseringInfoProvider: ProsesseringInfoProvider,
 ) {
-
     fun hentBrukernavn(): String {
         return prosesseringInfoProvider.hentBrukernavn()
     }
@@ -73,12 +72,16 @@ class TaskController(
     }
 
     @PutMapping(path = ["/task/rekjor"])
-    fun rekjørTask(@RequestParam taskId: Long): ResponseEntity<Ressurs<String>> {
+    fun rekjørTask(
+        @RequestParam taskId: Long,
+    ): ResponseEntity<Ressurs<String>> {
         return ResponseEntity.ok(restTaskService.rekjørTask(taskId, hentBrukernavn()))
     }
 
     @PutMapping(path = ["task/rekjorAlle"])
-    fun rekjørTasks(@RequestHeader status: Status): ResponseEntity<Ressurs<String>> {
+    fun rekjørTasks(
+        @RequestHeader status: Status,
+    ): ResponseEntity<Ressurs<String>> {
         return ResponseEntity.ok(restTaskService.rekjørTasks(status, hentBrukernavn()))
     }
 

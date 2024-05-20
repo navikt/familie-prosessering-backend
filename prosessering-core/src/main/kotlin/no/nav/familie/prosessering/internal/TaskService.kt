@@ -23,7 +23,6 @@ class TaskService internal constructor(
     private val taskRepository: TaskRepository,
     private val taskLoggRepository: TaskLoggRepository,
 ) {
-
     private val logger = LoggerFactory.getLogger(javaClass)
     private val secureLog = LoggerFactory.getLogger("secureLogger")
 
@@ -81,11 +80,18 @@ class TaskService internal constructor(
     }
 
     @Deprecated("Bruk finnTasksMedStatus", ReplaceWith("finnTasksMedStatus(status, type, page)"))
-    fun finnTasksMedStatus(status: List<Status>, page: Pageable): List<Task> {
+    fun finnTasksMedStatus(
+        status: List<Status>,
+        page: Pageable,
+    ): List<Task> {
         return taskRepository.findByStatusIn(status, page)
     }
 
-    fun finnTasksMedStatus(status: List<Status>, type: String? = null, page: Pageable = Pageable.unpaged()): List<Task> {
+    fun finnTasksMedStatus(
+        status: List<Status>,
+        type: String? = null,
+        page: Pageable = Pageable.unpaged(),
+    ): List<Task> {
         return if (type == null) {
             taskRepository.findByStatusIn(status, page)
         } else {
@@ -94,7 +100,10 @@ class TaskService internal constructor(
     }
 
     @Transactional
-    internal fun slettTasks(eldreEnnDato: LocalDateTime, antall: Int): Int {
+    internal fun slettTasks(
+        eldreEnnDato: LocalDateTime,
+        antall: Int,
+    ): Int {
         val taskIds = taskRepository.finnTasksTilSletting(eldreEnnDato, antall)
         if (taskIds.isEmpty()) return 0
 
@@ -103,11 +112,9 @@ class TaskService internal constructor(
         return taskIds.size
     }
 
-    fun finnTasksSomErFerdigNåMenFeiletFør(page: Pageable): List<Task> =
-        taskRepository.finnTasksSomErFerdigNåMenFeiletFør(page)
+    fun finnTasksSomErFerdigNåMenFeiletFør(page: Pageable): List<Task> = taskRepository.finnTasksSomErFerdigNåMenFeiletFør(page)
 
-    fun finnAlleTasksMedCallId(callId: String): List<Task> =
-        taskRepository.finnTaskerMedCallId(callId)
+    fun finnAlleTasksMedCallId(callId: String): List<Task> = taskRepository.finnTaskerMedCallId(callId)
 
     internal fun finnTaskLoggMetadata(taskIds: List<Long>): Map<Long, TaskLoggMetadata> {
         if (taskIds.isEmpty()) return emptyMap()
@@ -119,12 +126,18 @@ class TaskService internal constructor(
     }
 
     @Suppress("unused") // brukes av klienter
-    fun finnTaskMedPayloadOgType(payload: String, type: String): Task? {
+    fun finnTaskMedPayloadOgType(
+        payload: String,
+        type: String,
+    ): Task? {
         return taskRepository.findByPayloadAndType(payload, type)
     }
 
     @Suppress("unused") // brukes av klienter
-    fun finnAlleTaskerMedPayloadOgType(payload: String, type: String): List<Task> {
+    fun finnAlleTaskerMedPayloadOgType(
+        payload: String,
+        type: String,
+    ): List<Task> {
         return taskRepository.findAllByPayloadAndType(payload, type)
     }
 
@@ -174,19 +187,30 @@ class TaskService internal constructor(
     }
 
     @Transactional
-    internal fun avvikshåndter(task: Task, avvikstype: Avvikstype, årsak: String, endretAv: String): Task {
-        val taskLogg = TaskLogg(
-            taskId = task.id,
-            type = Loggtype.AVVIKSHÅNDTERT,
-            melding = årsak,
-            endretAv = endretAv,
-        )
+    internal fun avvikshåndter(
+        task: Task,
+        avvikstype: Avvikstype,
+        årsak: String,
+        endretAv: String,
+    ): Task {
+        val taskLogg =
+            TaskLogg(
+                taskId = task.id,
+                type = Loggtype.AVVIKSHÅNDTERT,
+                melding = årsak,
+                endretAv = endretAv,
+            )
         taskLoggRepository.save(taskLogg)
         return taskRepository.save(task.copy(status = Status.AVVIKSHÅNDTERT, avvikstype = avvikstype))
     }
 
     @Transactional
-    internal fun kommenter(task: Task, kommentar: String, endretAv: String, settTilManuellOppfølgning: Boolean): Task {
+    internal fun kommenter(
+        task: Task,
+        kommentar: String,
+        endretAv: String,
+        settTilManuellOppfølgning: Boolean,
+    ): Task {
         val taskLogg =
             TaskLogg(taskId = task.id, type = Loggtype.KOMMENTAR, melding = kommentar, endretAv = endretAv)
         taskLoggRepository.save(taskLogg)
@@ -200,7 +224,11 @@ class TaskService internal constructor(
     }
 
     @Transactional
-    internal fun klarTilPlukk(task: Task, endretAv: String, melding: String? = null): Task {
+    internal fun klarTilPlukk(
+        task: Task,
+        endretAv: String,
+        melding: String? = null,
+    ): Task {
         val taskLogg =
             TaskLogg(
                 taskId = task.id,
@@ -234,13 +262,14 @@ class TaskService internal constructor(
     ): Task {
         val nyStatus = nyFeiletStatus(tidligereAntallFeil, maxAntallFeil, settTilManuellOppfølgning)
 
-        val feilmelding = try {
-            feil.writeValueAsString()
-        } catch (e: IOException) {
-            logger.warn("Feilet lagring av task=${task.id} med melding. Se secure logs")
-            secureLog.warn("Feilet lagring av task=${task.id} med melding", e)
-            "Feilet skriving av feil til json exceptionCauseMessage=${feil.exceptionCauseMessage} feilmelding=${feil.feilmelding} stacktrace=${feil.stackTrace}"
-        }
+        val feilmelding =
+            try {
+                feil.writeValueAsString()
+            } catch (e: IOException) {
+                logger.warn("Feilet lagring av task=${task.id} med melding. Se secure logs")
+                secureLog.warn("Feilet lagring av task=${task.id} med melding", e)
+                "Feilet skriving av feil til json exceptionCauseMessage=${feil.exceptionCauseMessage} feilmelding=${feil.feilmelding} stacktrace=${feil.stackTrace}"
+            }
         taskLoggRepository.save(TaskLogg(taskId = task.id, type = Loggtype.FEILET, melding = feilmelding))
         return taskRepository.save(task.copy(status = nyStatus))
     }

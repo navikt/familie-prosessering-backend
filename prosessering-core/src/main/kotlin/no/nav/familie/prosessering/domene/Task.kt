@@ -22,17 +22,17 @@ data class Task(
     val triggerTid: LocalDateTime = LocalDateTime.now(),
     val type: String,
     @Column("metadata")
-    val metadataWrapper: PropertiesWrapper = PropertiesWrapper(
-        Properties().apply {
-            this[MDCConstants.MDC_CALL_ID] =
-                MDC.get(MDCConstants.MDC_CALL_ID)
-                    ?: IdUtils.generateId()
-        },
-    ),
+    val metadataWrapper: PropertiesWrapper =
+        PropertiesWrapper(
+            Properties().apply {
+                this[MDCConstants.MDC_CALL_ID] =
+                    MDC.get(MDCConstants.MDC_CALL_ID)
+                        ?: IdUtils.generateId()
+            },
+        ),
     @Version
     val versjon: Long = 0,
 ) {
-
     @Transient
     val metadata: Properties = metadataWrapper.properties
 
@@ -43,13 +43,14 @@ data class Task(
         this(
             type = type,
             payload = payload,
-            metadataWrapper = PropertiesWrapper(
-                properties.apply {
-                    this[MDCConstants.MDC_CALL_ID] =
-                        MDC.get(MDCConstants.MDC_CALL_ID)
-                            ?: IdUtils.generateId()
-                },
-            ),
+            metadataWrapper =
+                PropertiesWrapper(
+                    properties.apply {
+                        this[MDCConstants.MDC_CALL_ID] =
+                            MDC.get(MDCConstants.MDC_CALL_ID)
+                                ?: IdUtils.generateId()
+                    },
+                ),
         )
 
     fun medTriggerTid(triggerTid: LocalDateTime): Task {

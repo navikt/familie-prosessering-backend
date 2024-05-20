@@ -10,14 +10,14 @@ import java.net.http.HttpResponse
 import java.time.Duration
 
 internal object LeaderClient {
-
     private val logger = LoggerFactory.getLogger(javaClass)
 
     private val TIMEOUT = Duration.ofSeconds(3)
 
-    private val client = HttpClient.newBuilder()
-        .connectTimeout(TIMEOUT)
-        .build()
+    private val client =
+        HttpClient.newBuilder()
+            .connectTimeout(TIMEOUT)
+            .build()
 
     private val handler = HttpResponse.BodyHandlers.ofString()
 
@@ -25,11 +25,12 @@ internal object LeaderClient {
     fun isLeader(): Boolean? {
         val electorPath = hentLeaderSystemEnv() ?: return null
 
-        val request = HttpRequest.newBuilder()
-            .timeout(TIMEOUT)
-            .uri(URI.create("http://$electorPath"))
-            .GET()
-            .build()
+        val request =
+            HttpRequest.newBuilder()
+                .timeout(TIMEOUT)
+                .uri(URI.create("http://$electorPath"))
+                .GET()
+                .build()
 
         try {
             val response = client.send(request, handler)

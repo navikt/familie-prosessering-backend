@@ -19,7 +19,6 @@ class TaskMaintenanceService(
     @Value("\${prosessering.delete.after.weeks:2}") private val deleteTasksAfterWeeks: Long,
     @Value("\${prosessering.delete.pagesize:10000}") private val deleteTasksPageSize: Int,
 ) {
-
     val antallÅpneTaskGague = MultiGauge.builder("openTasks").register(Metrics.globalRegistry)
 
     @Transactional
@@ -76,7 +75,6 @@ class TaskMaintenanceService(
     }
 
     companion object {
-
         val logger: Logger = LoggerFactory.getLogger(TaskScheduler::class.java)
     }
 }

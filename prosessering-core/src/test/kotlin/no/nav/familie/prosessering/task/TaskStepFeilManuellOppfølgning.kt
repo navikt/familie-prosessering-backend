@@ -13,13 +13,11 @@ import org.springframework.stereotype.Service
     triggerTidVedFeilISekunder = 0,
 )
 class TaskStepFeilManuellOppfølgning : AsyncTaskStep {
-
     override fun doTask(task: Task) {
         error("Feiler")
     }
 
     companion object {
-
         const val TASK_FEIL_1 = "taskFeilManuellOppfølgning1"
     }
 }

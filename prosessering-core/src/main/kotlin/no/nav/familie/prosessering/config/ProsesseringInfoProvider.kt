@@ -3,7 +3,6 @@ package no.nav.familie.prosessering.config
 import no.nav.familie.prosessering.util.LeaderClient
 
 interface ProsesseringInfoProvider {
-
     /**
      * Brukes for logging av ident som gjør requester
      */

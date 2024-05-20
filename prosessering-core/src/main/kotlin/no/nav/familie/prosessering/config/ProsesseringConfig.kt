@@ -17,7 +17,6 @@ class ProsesseringConfig(
     @Value("\${prosessering.queue.capacity:20}") private val køstørrelse: Int,
     @Value("\${prosessering.pool.size:4}") private val poolSize: Int,
 ) : SchedulingConfigurer {
-
     private val log = LoggerFactory.getLogger(javaClass)
     private val secureLog = LoggerFactory.getLogger("secureLogger")
 
@@ -36,12 +35,13 @@ class ProsesseringConfig(
 
     @Bean
     fun threadPoolTaskScheduler(): ThreadPoolTaskScheduler {
-        val executor = object : ThreadPoolTaskScheduler() {
-            override fun destroy() {
-                this.scheduledThreadPoolExecutor.executeExistingDelayedTasksAfterShutdownPolicy = false
-                super.destroy()
+        val executor =
+            object : ThreadPoolTaskScheduler() {
+                override fun destroy() {
+                    this.scheduledThreadPoolExecutor.executeExistingDelayedTasksAfterShutdownPolicy = false
+                    super.destroy()
+                }
             }
-        }
         executor.threadNamePrefix = "TaskScheduler-"
         executor.setWaitForTasksToCompleteOnShutdown(true)
         executor.setAwaitTerminationSeconds(20)

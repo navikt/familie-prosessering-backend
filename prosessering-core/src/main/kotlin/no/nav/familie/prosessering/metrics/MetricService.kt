@@ -14,15 +14,15 @@ internal class MetricService(
     private val taskMetricRepository: TaskMetricRepository,
     private val prosesseringInfoProvider: ProsesseringInfoProvider,
 ) {
-
     private val feiledeTasks = MultiGauge.builder("prosessering.tasks.feilet").register(Metrics.globalRegistry)
 
     @Scheduled(initialDelay = FREKVENS_30_SEC, fixedDelay = FREKVENS_30_MIN)
     fun oppdatertFeiledeTasks() {
         if (prosesseringInfoProvider.isLeader() != false) {
-            val rows = taskMetricRepository.finnAntallFeiledeTasksPerTypeOgStatus().map {
-                MultiGauge.Row.of(Tags.of(Tag.of("type", it.type), Tag.of("status", it.status.name)), it.count)
-            }
+            val rows =
+                taskMetricRepository.finnAntallFeiledeTasksPerTypeOgStatus().map {
+                    MultiGauge.Row.of(Tags.of(Tag.of("type", it.type), Tag.of("status", it.status.name)), it.count)
+                }
             feiledeTasks.register(rows, true)
         }
     }

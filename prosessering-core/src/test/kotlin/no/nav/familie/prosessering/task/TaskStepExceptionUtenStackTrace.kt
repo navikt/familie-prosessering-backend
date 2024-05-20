@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service
 @Service
 @TaskStepBeskrivelse(taskStepType = TaskStepExceptionUtenStackTrace.TYPE, beskrivelse = "")
 class TaskStepExceptionUtenStackTrace : AsyncTaskStep {
-
     override fun doTask(task: Task) {
         throw TaskExceptionUtenStackTrace("feilmelding")
     }
@@ -17,7 +16,6 @@ class TaskStepExceptionUtenStackTrace : AsyncTaskStep {
     override fun onCompletion(task: Task) {}
 
     companion object {
-
         const val TYPE = "TaskStepExceptionUtenStackTrace"
     }
 }

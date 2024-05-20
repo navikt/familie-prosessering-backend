@@ -16,15 +16,15 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor
 @EnableJdbcRepositories("no.nav.familie")
 @ComponentScan("no.nav.familie")
 class TestAppConfig : JdbcRepositoryConfigExtension() {
-
     @Bean
-    fun prosesseringInfoProvider() = object : ProsesseringInfoProvider {
-        override fun hentBrukernavn(): String = "id"
+    fun prosesseringInfoProvider() =
+        object : ProsesseringInfoProvider {
+            override fun hentBrukernavn(): String = "id"
 
-        override fun harTilgang(): Boolean = true
+            override fun harTilgang(): Boolean = true
 
-        override fun isLeader(): Boolean = true
-    }
+            override fun isLeader(): Boolean = true
+        }
 
     /**
      * Mocker ut TaskStepExecutor, hvis ikke kjører den runnables async
@@ -32,11 +32,12 @@ class TestAppConfig : JdbcRepositoryConfigExtension() {
     @Primary
     @Bean(name = ["taskExecutor"])
     fun threadPoolTaskExecutor(): TaskExecutor {
-        val taskExecutor1 = spyk<TaskExecutor>(
-            ThreadPoolTaskExecutor().also {
-                it.initialize()
-            },
-        )
+        val taskExecutor1 =
+            spyk<TaskExecutor>(
+                ThreadPoolTaskExecutor().also {
+                    it.initialize()
+                },
+            )
         every { taskExecutor1.execute(any()) } answers {
             firstArg<Runnable>().run()
         }

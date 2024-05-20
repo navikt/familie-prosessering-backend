@@ -17,19 +17,35 @@ internal interface TaskRepository : PagingAndSortingRepository<Task, Long>, Crud
 
     fun findByStatus(status: Status): List<Task>
 
-    fun findByStatusIn(status: List<Status>, page: Pageable): List<Task>
+    fun findByStatusIn(
+        status: List<Status>,
+        page: Pageable,
+    ): List<Task>
 
     @Query("SELECT id FROM task WHERE status='FERDIG' AND trigger_tid < :triggerTid LIMIT :limit")
-    fun finnTasksTilSletting(triggerTid: LocalDateTime, limit: Int): List<Long>
+    fun finnTasksTilSletting(
+        triggerTid: LocalDateTime,
+        limit: Int,
+    ): List<Long>
 
     fun countByStatusIn(status: List<Status>): Long
 
-    fun findByStatusInAndType(status: List<Status>, type: String, page: Pageable): List<Task>
+    fun findByStatusInAndType(
+        status: List<Status>,
+        type: String,
+        page: Pageable,
+    ): List<Task>
 
-    fun findByPayloadAndType(payload: String, type: String): Task?
+    fun findByPayloadAndType(
+        payload: String,
+        type: String,
+    ): Task?
 
     @Query("SELECT * FROM task t WHERE t.payload=:payload and t.type=:type")
-    fun findAllByPayloadAndType(payload: String, type: String): List<Task>
+    fun findAllByPayloadAndType(
+        payload: String,
+        type: String,
+    ): List<Task>
 
     @Query(
         """
@@ -76,5 +92,8 @@ internal interface TaskRepository : PagingAndSortingRepository<Task, Long>, Crud
           AND t2.opprettet_tid < :tid
     """,
     )
-    fun findAllByStatusAndLastProcessed(status: Status, tid: LocalDateTime): List<Task>
+    fun findAllByStatusAndLastProcessed(
+        status: Status,
+        tid: LocalDateTime,
+    ): List<Task>
 }
