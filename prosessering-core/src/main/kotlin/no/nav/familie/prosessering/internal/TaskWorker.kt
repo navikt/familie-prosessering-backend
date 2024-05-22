@@ -22,7 +22,6 @@ class TaskWorker(
     private val taskService: TaskService,
     taskStepTyper: List<AsyncTaskStep>,
 ) {
-
     private val taskStepMap: Map<String, AsyncTaskStep>
 
     private val maxAntallFeilMap: Map<String, Int>
@@ -51,24 +50,28 @@ class TaskWorker(
             tasksTilTaskStepBeskrivelse.values.associate { it.taskStepType to it.triggerTidVedFeilISekunder }
         settTilManuellOppfølgningVedFeil =
             tasksTilTaskStepBeskrivelse.values.associate { it.taskStepType to it.settTilManuellOppfølgning }
-        feiltellereForTaskSteps = tasksTilTaskStepBeskrivelse.values.associate {
-            it.taskStepType to Metrics.counter(
-                "mottak.feilede.tasks",
-                "status",
-                it.taskStepType,
-                "beskrivelse",
-                it.beskrivelse,
-            )
-        }
-        fullførttellereForTaskSteps = tasksTilTaskStepBeskrivelse.values.associate {
-            it.taskStepType to Metrics.counter(
-                "mottak.fullfort.tasks",
-                "status",
-                it.taskStepType,
-                "beskrivelse",
-                it.beskrivelse,
-            )
-        }
+        feiltellereForTaskSteps =
+            tasksTilTaskStepBeskrivelse.values.associate {
+                it.taskStepType to
+                    Metrics.counter(
+                        "mottak.feilede.tasks",
+                        "status",
+                        it.taskStepType,
+                        "beskrivelse",
+                        it.beskrivelse,
+                    )
+            }
+        fullførttellereForTaskSteps =
+            tasksTilTaskStepBeskrivelse.values.associate {
+                it.taskStepType to
+                    Metrics.counter(
+                        "mottak.fullfort.tasks",
+                        "status",
+                        it.taskStepType,
+                        "beskrivelse",
+                        it.beskrivelse,
+                    )
+            }
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -96,7 +99,10 @@ class TaskWorker(
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    fun rekjørSenere(taskId: Long, e: RekjørSenereException) {
+    fun rekjørSenere(
+        taskId: Long,
+        e: RekjørSenereException,
+    ) {
         log.info("Rekjører task=$taskId senere, triggerTid=${e.triggerTid}")
         secureLog.info("Rekjører task=$taskId senere, årsak=${e.årsak}", e)
 
@@ -109,13 +115,14 @@ class TaskWorker(
             val settTilManuellOppfølgning = finnSettTilManuellOppfølgning(taskMedNyTriggerTid.type)
             val taskFeil = TaskFeil(taskMedNyTriggerTid, MaxAntallRekjøringerException(maxAntallFeil))
 
-            val feiletTask = taskService.feilet(
-                task = taskMedNyTriggerTid,
-                feil = taskFeil,
-                tidligereAntallFeil = antallGangerRekjørt,
-                maxAntallFeil = maxAntallFeil,
-                settTilManuellOppfølgning = settTilManuellOppfølgning,
-            )
+            val feiletTask =
+                taskService.feilet(
+                    task = taskMedNyTriggerTid,
+                    feil = taskFeil,
+                    tidligereAntallFeil = antallGangerRekjørt,
+                    maxAntallFeil = maxAntallFeil,
+                    settTilManuellOppfølgning = settTilManuellOppfølgning,
+                )
             // lager metrikker på tasks som har feilet max antall ganger.
             if (feiletTask.status == Status.FEILET || feiletTask.status == Status.MANUELL_OPPFØLGING) {
                 finnFeilteller(feiletTask.type).increment()
@@ -135,7 +142,10 @@ class TaskWorker(
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    fun doFeilhåndtering(taskId: Long, e: Throwable) {
+    fun doFeilhåndtering(
+        taskId: Long,
+        e: Throwable,
+    ) {
         var task = taskService.findById(taskId)
         val maxAntallFeil = finnMaxAntallFeil(task.type)
         val settTilManuellOppfølgning = finnSettTilManuellOppfølgning(task.type)
@@ -143,13 +153,14 @@ class TaskWorker(
         val antallFeil = taskService.antallFeil(taskId)
         val taskFeil = TaskFeil(task, e)
         val triggerTid = task.triggerTid.plusSeconds(finnTriggerTidVedFeil(task.type))
-        task = taskService.feilet(
-            task.medTriggerTid(triggerTid),
-            taskFeil,
-            antallFeil,
-            maxAntallFeil,
-            settTilManuellOppfølgning,
-        )
+        task =
+            taskService.feilet(
+                task.medTriggerTid(triggerTid),
+                taskFeil,
+                antallFeil,
+                maxAntallFeil,
+                settTilManuellOppfølgning,
+            )
         // lager metrikker på tasks som har feilet max antall ganger.
         if (task.status == Status.FEILET || task.status == Status.MANUELL_OPPFØLGING) {
             finnFeilteller(task.type).increment()
@@ -196,7 +207,6 @@ class TaskWorker(
     }
 
     companion object {
-
         private val secureLog = LoggerFactory.getLogger("secureLogger")
         private val log = LoggerFactory.getLogger(this::class.java)
     }

@@ -11,13 +11,11 @@ import org.springframework.stereotype.Service
     beskrivelse = "Task med feil",
 )
 class TaskStepMedFeil : AsyncTaskStep {
-
     override fun doTask(task: Task) {
         error("Feil")
     }
 
     companion object {
-
         const val TYPE = "taskMedFeil"
     }
 }

@@ -7,7 +7,6 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface TaskMetricRepository : org.springframework.data.repository.Repository<Task, String> {
-
     @Query(
         """SELECT t.type, t.status, count(t.id) as count FROM task t
                     WHERE t.status IN ('FEILET', 'MANUELL_OPPFØLGING')

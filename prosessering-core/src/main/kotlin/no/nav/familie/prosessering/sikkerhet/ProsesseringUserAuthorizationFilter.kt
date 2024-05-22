@@ -11,7 +11,6 @@ import org.springframework.web.filter.OncePerRequestFilter
 class ProsesseringUserAuthorizationFilter(
     private val prosesseringInfoProvider: ProsesseringInfoProvider,
 ) : OncePerRequestFilter() {
-
     override fun doFilterInternal(
         request: HttpServletRequest,
         response: HttpServletResponse,

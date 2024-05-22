@@ -7,7 +7,6 @@ import org.springframework.data.jdbc.repository.config.AbstractJdbcConfiguration
 
 @Configuration
 class DatabaseConfiguration : AbstractJdbcConfiguration() {
-
     @Bean
     override fun jdbcCustomConversions(): JdbcCustomConversions {
         return JdbcCustomConversions(

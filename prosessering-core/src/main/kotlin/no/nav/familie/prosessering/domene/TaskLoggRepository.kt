@@ -8,7 +8,6 @@ import org.springframework.stereotype.Repository
 
 @Repository
 internal interface TaskLoggRepository : PagingAndSortingRepository<TaskLogg, Long>, CrudRepository<TaskLogg, Long> {
-
     @Query
     fun findByTaskId(taskId: Long): List<TaskLogg>
 
@@ -27,7 +26,10 @@ internal interface TaskLoggRepository : PagingAndSortingRepository<TaskLogg, Lon
     )
     fun finnTaskLoggMetadata(taskIds: List<Long>): List<TaskLoggMetadata>
 
-    fun countByTaskIdAndType(taskId: Long, type: Loggtype): Int
+    fun countByTaskIdAndType(
+        taskId: Long,
+        type: Loggtype,
+    ): Int
 
     @Modifying
     @Query("""DELETE FROM task_logg WHERE task_id = :taskId""")

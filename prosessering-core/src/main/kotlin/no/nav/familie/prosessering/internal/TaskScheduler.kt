@@ -16,7 +16,6 @@ class TaskScheduler(
     private val taskMaintenanceService: TaskMaintenanceService,
     private val prosesseringInfoProvider: ProsesseringInfoProvider,
 ) {
-
     @Scheduled(cron = "\${prosessering.cronRetryTasks:$CRON_DAILY_0700}")
     fun retryFeilendeTask() {
         try {
@@ -53,7 +52,10 @@ class TaskScheduler(
         }
     }
 
-    private fun loggFeil(e: Exception, metode: String) {
+    private fun loggFeil(
+        e: Exception,
+        metode: String,
+    ) {
         if (isOptimisticLocking(e)) {
             logger.warn("OptimisticLockingFailureException metode=$metode")
         } else {
@@ -63,7 +65,6 @@ class TaskScheduler(
     }
 
     companion object {
-
         val logger: Logger = LoggerFactory.getLogger(TaskScheduler::class.java)
         val secureLog: Logger = LoggerFactory.getLogger("secureLogger")
     }

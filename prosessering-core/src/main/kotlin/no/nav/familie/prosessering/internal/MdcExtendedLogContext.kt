@@ -8,8 +8,10 @@ import java.util.regex.Pattern
  * Kan dermed legge til og fjerne ekstra-kontekst data dynamisk.
  */
 class MdcExtendedLogContext private constructor(private val paramName: String) {
-
-    fun add(key: String, value: String) {
+    fun add(
+        key: String,
+        value: String,
+    ) {
         val currentValues = currentValueMap()
         currentValues[key] = value
         MDC.put(paramName, toParamValue(currentValues))
@@ -50,7 +52,6 @@ class MdcExtendedLogContext private constructor(private val paramName: String) {
     }
 
     companion object {
-
         private val ILLEGAL_CHARS = Pattern.compile("[\\[\\];=]")
 
         fun getContext(kontekstParamNavn: String): MdcExtendedLogContext {

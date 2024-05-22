@@ -40,7 +40,6 @@ data class TaskFeil(
     @JsonProperty("feilkode")
     var feilkode: String? = null,
 ) {
-
     constructor(taskInfo: Task, feil: Throwable?) : this(
         taskInfo.id,
         taskInfo.type,
@@ -56,7 +55,6 @@ data class TaskFeil(
     }
 
     companion object {
-
         private var objectWriter: ObjectWriter? = null
         private var objectReader: ObjectReader? = null
 

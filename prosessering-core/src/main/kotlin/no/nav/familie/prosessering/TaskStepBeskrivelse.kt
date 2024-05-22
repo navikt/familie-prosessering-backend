@@ -25,12 +25,10 @@ annotation class TaskStepBeskrivelse(
      * @return beskrivelsen
      */
     val beskrivelse: String,
-
     /**
      * Hvor lenge man skal vente ved feil.
      */
     val triggerTidVedFeilISekunder: Long = 15,
-
     /**
      * Sett til manuell behandling etter maksAntallFeil
      */

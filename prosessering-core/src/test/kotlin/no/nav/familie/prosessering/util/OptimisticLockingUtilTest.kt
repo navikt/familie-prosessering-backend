@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test
 import org.springframework.dao.OptimisticLockingFailureException
 
 internal class OptimisticLockingUtilTest {
-
     @Test
     internal fun `skal sjekke om exception eller cause er OptimisticLockingFailureException`() {
         assertThat(isOptimisticLocking(RuntimeException(OptimisticLockingFailureException("")))).isTrue

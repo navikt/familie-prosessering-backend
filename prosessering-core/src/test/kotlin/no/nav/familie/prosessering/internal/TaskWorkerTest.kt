@@ -13,7 +13,6 @@ import org.springframework.data.repository.findByIdOrNull
 import org.springframework.test.context.transaction.TestTransaction
 
 class TaskWorkerTest : IntegrationRunnerTest() {
-
     @Autowired
     private lateinit var taskService: TaskService
 

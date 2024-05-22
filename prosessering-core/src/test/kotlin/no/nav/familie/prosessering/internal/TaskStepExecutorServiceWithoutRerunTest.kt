@@ -30,7 +30,6 @@ import java.util.UUID
 
 @EnableScheduling
 class TaskStepExecutorServiceWithoutRerunTest : IntegrationRunnerTest() {
-
     @Autowired
     private lateinit var taskService: TaskService
 
@@ -87,12 +86,14 @@ class TaskStepExecutorServiceWithoutRerunTest : IntegrationRunnerTest() {
         TestTransaction.end()
 
         runBlocking {
-            val launch = GlobalScope.launch {
-                repeat(10) { taskStepExecutorService.pollAndExecute() }
-            }
-            val launch2 = GlobalScope.launch {
-                repeat(10) { taskStepExecutorService.pollAndExecute() }
-            }
+            val launch =
+                GlobalScope.launch {
+                    repeat(10) { taskStepExecutorService.pollAndExecute() }
+                }
+            val launch2 =
+                GlobalScope.launch {
+                    repeat(10) { taskStepExecutorService.pollAndExecute() }
+                }
 
             launch.join()
             launch2.join()
@@ -165,7 +166,6 @@ class TaskStepExecutorServiceWithoutRerunTest : IntegrationRunnerTest() {
     }
 
     companion object {
-
         val om = ObjectMapper()
     }
 }

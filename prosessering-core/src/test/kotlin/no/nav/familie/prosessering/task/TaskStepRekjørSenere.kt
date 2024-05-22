@@ -10,7 +10,6 @@ import java.time.LocalDate
 @Service
 @TaskStepBeskrivelse(taskStepType = TaskStepRekjørSenere.TYPE, beskrivelse = "")
 class TaskStepRekjørSenere : AsyncTaskStep {
-
     override fun doTask(task: Task) {
         throw RekjørSenereException("årsak", LocalDate.of(2088, 1, 1).atStartOfDay())
     }
@@ -18,7 +17,6 @@ class TaskStepRekjørSenere : AsyncTaskStep {
     override fun onCompletion(task: Task) {}
 
     companion object {
-
         const val TYPE = "TaskStepRekjørSenere"
     }
 }

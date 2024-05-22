@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.annotation.AnnotationUtils
 
 class AsyncTaskStepTest : IntegrationRunnerTest() {
-
     @Autowired
     private lateinit var tasker: List<AsyncTaskStep>
 

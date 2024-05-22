@@ -4,7 +4,7 @@ import no.nav.familie.prosessering.domene.Avvikstype
 import no.nav.familie.prosessering.domene.Loggtype
 import no.nav.familie.prosessering.domene.Status
 import java.time.LocalDateTime
-import java.util.*
+import java.util.Properties
 
 // Legger opp for fremtidlig mulighet for å legge inn metadata som sidnummer, etc
 data class PaginableResponse<T>(val tasks: List<T>)

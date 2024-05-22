@@ -24,7 +24,6 @@ import java.util.Properties
 import java.util.UUID
 
 class TaskRepositoryTest : IntegrationRunnerTest() {
-
     @Autowired
     private lateinit var taskService: TaskService
 
@@ -108,10 +107,11 @@ class TaskRepositoryTest : IntegrationRunnerTest() {
         taskService.save(task2)
         taskService.save(task3)
 
-        val message = repository.findByStatusIn(
-            listOf(Status.UBEHANDLET),
-            PageRequest.of(0, 3, Sort.Direction.DESC, "opprettetTid"),
-        )
+        val message =
+            repository.findByStatusIn(
+                listOf(Status.UBEHANDLET),
+                PageRequest.of(0, 3, Sort.Direction.DESC, "opprettetTid"),
+            )
         assertThat(message.map { it.payload }).containsExactly("3", "1", "2")
     }
 
@@ -119,11 +119,12 @@ class TaskRepositoryTest : IntegrationRunnerTest() {
     fun `findByStatusInAndTriggerTidBeforeOrderByOpprettetTid - skal returnere tasks sortert etter opprettet_tid - eldst først`() {
         val task1 =
             Task(type = TaskStep1.TASK_1, payload = "task med opprettetTid nå", opprettetTid = LocalDateTime.now())
-        val task2 = Task(
-            type = TaskStep2.TASK_2,
-            payload = "task med tidligst oppprettetTid",
-            opprettetTid = LocalDateTime.now().minusDays(1),
-        )
+        val task2 =
+            Task(
+                type = TaskStep2.TASK_2,
+                payload = "task med tidligst oppprettetTid",
+                opprettetTid = LocalDateTime.now().minusDays(1),
+            )
         val task3 =
             Task(
                 type = TaskStep2.TASK_2,
@@ -135,11 +136,12 @@ class TaskRepositoryTest : IntegrationRunnerTest() {
         taskService.save(task2)
         taskService.save(task3)
 
-        val message = repository.findByStatusInAndTriggerTidBeforeOrderByOpprettetTid(
-            listOf(Status.UBEHANDLET),
-            LocalDateTime.now(),
-            PageRequest.of(0, 5),
-        )
+        val message =
+            repository.findByStatusInAndTriggerTidBeforeOrderByOpprettetTid(
+                listOf(Status.UBEHANDLET),
+                LocalDateTime.now(),
+                PageRequest.of(0, 5),
+            )
 
         assertThat(message.map { it.payload }).containsExactly(
             "task med tidligst oppprettetTid",
@@ -168,15 +170,17 @@ class TaskRepositoryTest : IntegrationRunnerTest() {
     @Test
     fun `skal håndtere properties`() {
         val property = "PROPERTY"
-        val lagretTask = taskService.save(
-            Task(
-                type = TaskStep1.TASK_1,
-                payload = "{'a'='b'}",
-                properties = Properties().apply {
-                    this[property] = property
-                },
-            ),
-        )
+        val lagretTask =
+            taskService.save(
+                Task(
+                    type = TaskStep1.TASK_1,
+                    payload = "{'a'='b'}",
+                    properties =
+                        Properties().apply {
+                            this[property] = property
+                        },
+                ),
+            )
         val task = repository.findByIdOrNull(lagretTask.id)!!
         assertThat(task.metadata.getProperty(property)).isEqualTo(property)
     }
@@ -222,7 +226,6 @@ class TaskRepositoryTest : IntegrationRunnerTest() {
         assertThat(taskerMedCallId.first().id).isEqualTo(task1.id)
         assertThat(taskerMedCallId.last().id).isEqualTo(task4.id)
     }
-
 
     @Test
     fun `findAllByPayloadAndType - skal finne tasker for gitt payload og type`() {
