@@ -12,7 +12,7 @@ import org.springframework.data.domain.Pageable
 internal class TaskServiceTest {
     private val taskRepository = mockk<TaskRepository>()
     private val taskLoggRepository = mockk<TaskLoggRepository>()
-    private val service = TaskService(taskRepository, taskLoggRepository)
+    private val service = TaskService(taskRepository, taskLoggRepository, mockk())
 
     @Test
     fun tomListeGirTomtResultat() {
