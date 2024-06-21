@@ -8,7 +8,9 @@ import org.springframework.stereotype.Repository
 import java.time.LocalDateTime
 
 @Repository
-internal interface TaskRepository : PagingAndSortingRepository<Task, Long>, CrudRepository<Task, Long> {
+internal interface TaskRepository :
+    PagingAndSortingRepository<Task, Long>,
+    CrudRepository<Task, Long> {
     fun findByStatusInAndTriggerTidBeforeOrderByOpprettetTid(
         status: List<Status>,
         triggerTid: LocalDateTime,

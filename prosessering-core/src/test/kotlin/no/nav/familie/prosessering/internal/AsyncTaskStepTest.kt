@@ -15,25 +15,26 @@ class AsyncTaskStepTest : IntegrationRunnerTest() {
 
     @Test
     fun `skal ha annotasjon`() {
-        Assertions.assertThat(
-            tasker.any {
-                harIkkePåkrevdAnnotasjon(it)
-            },
-        ).isFalse()
+        Assertions
+            .assertThat(
+                tasker.any {
+                    harIkkePåkrevdAnnotasjon(it)
+                },
+            ).isFalse()
     }
 
-    private fun harIkkePåkrevdAnnotasjon(it: AsyncTaskStep): Boolean {
-        return !AnnotationUtils.isAnnotationDeclaredLocally(
+    private fun harIkkePåkrevdAnnotasjon(it: AsyncTaskStep): Boolean =
+        !AnnotationUtils.isAnnotationDeclaredLocally(
             TaskStepBeskrivelse::class.java,
             it.javaClass,
         )
-    }
 
     @Test
     fun `skal ha unike navn`() {
         val taskTyper = tasker.map { taskStep: AsyncTaskStep -> finnAnnotasjon(taskStep).taskStepType }
 
-        Assertions.assertThat(taskTyper)
+        Assertions
+            .assertThat(taskTyper)
             .isEqualTo(taskTyper.distinct())
     }
 

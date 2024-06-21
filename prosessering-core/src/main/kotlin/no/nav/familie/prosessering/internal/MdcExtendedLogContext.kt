@@ -7,7 +7,9 @@ import java.util.regex.Pattern
  * [MDC] backet parameter som tillater en semi-colon separert liste av sub-keys.
  * Kan dermed legge til og fjerne ekstra-kontekst data dynamisk.
  */
-class MdcExtendedLogContext private constructor(private val paramName: String) {
+class MdcExtendedLogContext private constructor(
+    private val paramName: String,
+) {
     fun add(
         key: String,
         value: String,
@@ -43,9 +45,12 @@ class MdcExtendedLogContext private constructor(private val paramName: String) {
             .toMutableMap()
     }
 
-    private fun toParamValue(elements: Map<String, String>): String {
-        return paramName + "[" + elements.map { it.key + '=' + it.value }.joinToString(";") + "]"
-    }
+    private fun toParamValue(elements: Map<String, String>): String =
+        paramName + "[" +
+            elements
+                .map {
+                    it.key + '=' + it.value
+                }.joinToString(";") + "]"
 
     fun clear() {
         MDC.remove(paramName)
@@ -54,8 +59,6 @@ class MdcExtendedLogContext private constructor(private val paramName: String) {
     companion object {
         private val ILLEGAL_CHARS = Pattern.compile("[\\[\\];=]")
 
-        fun getContext(kontekstParamNavn: String): MdcExtendedLogContext {
-            return MdcExtendedLogContext(kontekstParamNavn)
-        }
+        fun getContext(kontekstParamNavn: String): MdcExtendedLogContext = MdcExtendedLogContext(kontekstParamNavn)
     }
 }

@@ -53,11 +53,8 @@ data class Task(
                 ),
         )
 
-    fun medTriggerTid(triggerTid: LocalDateTime): Task {
-        return this.copy(triggerTid = triggerTid)
-    }
+    fun medTriggerTid(triggerTid: LocalDateTime): Task = this.copy(triggerTid = triggerTid)
 
-    override fun toString(): String {
-        return "Task(id=$id, status=$status, opprettetTid=$opprettetTid, triggerTid=$triggerTid, type='$type', versjon=$versjon)"
-    }
+    override fun toString(): String =
+        "Task(id=$id, status=$status, opprettetTid=$opprettetTid, triggerTid=$triggerTid, type='$type', versjon=$versjon)"
 }

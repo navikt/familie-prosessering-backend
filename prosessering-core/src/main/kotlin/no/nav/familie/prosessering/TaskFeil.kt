@@ -50,9 +50,7 @@ data class TaskFeil(
     )
 
     @Throws(IOException::class)
-    fun writeValueAsString(): String {
-        return objectWriter!!.writeValueAsString(this)
-    }
+    fun writeValueAsString(): String = objectWriter!!.writeValueAsString(this)
 
     companion object {
         private var objectWriter: ObjectWriter? = null

@@ -36,7 +36,8 @@ class TaskSchedulerTest : IntegrationRunnerTest() {
 
         assertThat(taskRepository.findAll())
             .hasSize(1)
-            .extracting("status").containsOnly(Status.KLAR_TIL_PLUKK)
+            .extracting("status")
+            .containsOnly(Status.KLAR_TIL_PLUKK)
         assertThat(taskLoggRepository.findAll().map { it.taskId }).containsOnly(1000002)
     }
 
