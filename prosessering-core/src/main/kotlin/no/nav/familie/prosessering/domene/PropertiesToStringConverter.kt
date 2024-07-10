@@ -11,7 +11,13 @@ fun Properties.asString(): String {
     }
     val stringWriter = StringWriter(512)
     // custom i stedet for Properties.store slik at vi ikke får med default timestamp
-    this.forEach { key, value -> stringWriter.append(key as String).append('=').append(value as String).append('\n') }
+    this.forEach { key, value ->
+        stringWriter
+            .append(key as String)
+            .append('=')
+            .append(value as String)
+            .append('\n')
+    }
     return stringWriter.toString()
 }
 

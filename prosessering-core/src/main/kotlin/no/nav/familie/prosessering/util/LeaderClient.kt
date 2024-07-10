@@ -15,7 +15,8 @@ internal object LeaderClient {
     private val TIMEOUT = Duration.ofSeconds(3)
 
     private val client =
-        HttpClient.newBuilder()
+        HttpClient
+            .newBuilder()
             .connectTimeout(TIMEOUT)
             .build()
 
@@ -26,7 +27,8 @@ internal object LeaderClient {
         val electorPath = hentLeaderSystemEnv() ?: return null
 
         val request =
-            HttpRequest.newBuilder()
+            HttpRequest
+                .newBuilder()
                 .timeout(TIMEOUT)
                 .uri(URI.create("http://$electorPath"))
                 .GET()

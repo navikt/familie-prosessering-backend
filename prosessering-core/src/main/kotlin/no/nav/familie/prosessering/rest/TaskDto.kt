@@ -7,7 +7,9 @@ import java.time.LocalDateTime
 import java.util.Properties
 
 // Legger opp for fremtidlig mulighet for å legge inn metadata som sidnummer, etc
-data class PaginableResponse<T>(val tasks: List<T>)
+data class PaginableResponse<T>(
+    val tasks: List<T>,
+)
 
 data class TaskDto(
     val id: Long,

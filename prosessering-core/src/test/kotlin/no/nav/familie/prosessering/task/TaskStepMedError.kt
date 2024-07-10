@@ -11,9 +11,7 @@ import org.springframework.stereotype.Service
     beskrivelse = "Task med error",
 )
 class TaskStepMedError : AsyncTaskStep {
-    override fun doTask(task: Task) {
-        throw NotImplementedError("Ikke implementert")
-    }
+    override fun doTask(task: Task): Unit = throw NotImplementedError("Ikke implementert")
 
     companion object {
         const val TYPE = "taskMedError"

@@ -1,3 +1,5 @@
 package no.nav.familie.prosessering.error
 
-class TaskExceptionUtenStackTrace(melding: String) : RuntimeException(melding)
+class TaskExceptionUtenStackTrace(
+    melding: String,
+) : RuntimeException(melding)

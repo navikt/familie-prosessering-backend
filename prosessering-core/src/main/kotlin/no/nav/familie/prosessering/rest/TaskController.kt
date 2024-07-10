@@ -21,16 +21,12 @@ class TaskController(
     private val restTaskService: RestTaskService,
     private val prosesseringInfoProvider: ProsesseringInfoProvider,
 ) {
-    fun hentBrukernavn(): String {
-        return prosesseringInfoProvider.hentBrukernavn()
-    }
+    fun hentBrukernavn(): String = prosesseringInfoProvider.hentBrukernavn()
 
     @GetMapping(path = ["/task/{id}"])
     fun taskMedId(
         @PathVariable id: Long,
-    ): ResponseEntity<Ressurs<TaskDto>> {
-        return ResponseEntity.ok(restTaskService.hentTaskMedId(id, hentBrukernavn()))
-    }
+    ): ResponseEntity<Ressurs<TaskDto>> = ResponseEntity.ok(restTaskService.hentTaskMedId(id, hentBrukernavn()))
 
     @GetMapping(path = ["task/v2"])
     fun task2(
@@ -45,52 +41,41 @@ class TaskController(
     @GetMapping(path = ["task/callId/{callId}"])
     fun tasksForCallId(
         @PathVariable callId: String,
-    ): ResponseEntity<Ressurs<PaginableResponse<TaskDto>>> {
-        return ResponseEntity.ok(restTaskService.hentTasksForCallId(callId, hentBrukernavn()))
-    }
+    ): ResponseEntity<Ressurs<PaginableResponse<TaskDto>>> = ResponseEntity.ok(restTaskService.hentTasksForCallId(callId, hentBrukernavn()))
 
     @GetMapping(path = ["/task/ferdigNaaFeiletFoer"])
     fun tasksSomErFerdigNåMenFeiletFør(): ResponseEntity<Ressurs<PaginableResponse<TaskDto>>> =
         ResponseEntity.ok(restTaskService.hentTasksSomErFerdigNåMenFeiletFør(hentBrukernavn()))
 
     @GetMapping(path = ["/task/antall-til-oppfolging"])
-    fun antallTilOppfølging(): ResponseEntity<Ressurs<Long>> {
-        return ResponseEntity.ok(restTaskService.finnAntallTaskerSomKreverOppfølging())
-    }
+    fun antallTilOppfølging(): ResponseEntity<Ressurs<Long>> = ResponseEntity.ok(restTaskService.finnAntallTaskerSomKreverOppfølging())
 
     @GetMapping(path = ["/task/antall-feilet-og-manuell-oppfolging"])
-    fun antallFeiletOgManuellOppfølging(): ResponseEntity<Ressurs<TaskerMedStatusFeiletOgManuellOppfølging>> {
-        return ResponseEntity.ok(restTaskService.finnAntallTaskerMedStatusFeiletOgManuellOppfølging())
-    }
+    fun antallFeiletOgManuellOppfølging(): ResponseEntity<Ressurs<TaskerMedStatusFeiletOgManuellOppfølging>> =
+        ResponseEntity.ok(restTaskService.finnAntallTaskerMedStatusFeiletOgManuellOppfølging())
 
     @GetMapping(path = ["/task/logg/{id}"])
     fun tasklogg(
         @PathVariable id: Long,
         @RequestParam(required = false) page: Int?,
-    ): ResponseEntity<Ressurs<List<TaskloggDto>>> {
-        return ResponseEntity.ok(restTaskService.hentTaskLogg(id, hentBrukernavn()))
-    }
+    ): ResponseEntity<Ressurs<List<TaskloggDto>>> = ResponseEntity.ok(restTaskService.hentTaskLogg(id, hentBrukernavn()))
 
     @PutMapping(path = ["/task/rekjor"])
     fun rekjørTask(
         @RequestParam taskId: Long,
-    ): ResponseEntity<Ressurs<String>> {
-        return ResponseEntity.ok(restTaskService.rekjørTask(taskId, hentBrukernavn()))
-    }
+    ): ResponseEntity<Ressurs<String>> = ResponseEntity.ok(restTaskService.rekjørTask(taskId, hentBrukernavn()))
 
     @PutMapping(path = ["task/rekjorAlle"])
     fun rekjørTasks(
         @RequestHeader status: Status,
-    ): ResponseEntity<Ressurs<String>> {
-        return ResponseEntity.ok(restTaskService.rekjørTasks(status, hentBrukernavn()))
-    }
+    ): ResponseEntity<Ressurs<String>> = ResponseEntity.ok(restTaskService.rekjørTasks(status, hentBrukernavn()))
 
     @PutMapping(path = ["/task/avvikshaandter"])
     fun avvikshåndterTask(
         @RequestParam taskId: Long,
         @RequestBody avvikshåndterDTO: AvvikshåndterDTO,
-    ): ResponseEntity<Ressurs<String>> {
-        return ResponseEntity.ok(
+    ): ResponseEntity<Ressurs<String>> =
+        ResponseEntity.ok(
             restTaskService.avvikshåndterTask(
                 taskId,
                 avvikshåndterDTO.avvikstype,
@@ -98,19 +83,17 @@ class TaskController(
                 hentBrukernavn(),
             ),
         )
-    }
 
     @PutMapping(path = ["/task/kommenter"])
     fun kommenterTask(
         @RequestParam taskId: Long,
         @RequestBody kommentarDTO: KommentarDTO,
-    ): ResponseEntity<Ressurs<String>> {
-        return ResponseEntity.ok(
+    ): ResponseEntity<Ressurs<String>> =
+        ResponseEntity.ok(
             restTaskService.kommenterTask(
                 taskId,
                 kommentarDTO,
                 hentBrukernavn(),
             ),
         )
-    }
 }
