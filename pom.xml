@@ -80,6 +80,12 @@
                 <scope>test</scope>
             </dependency>
             <dependency>
+                <groupId>org.flywaydb</groupId>
+                <artifactId>flyway-database-postgresql</artifactId>
+                <version>10.15.2</version>
+                <scope>runtime</scope>
+            </dependency>
+            <dependency>
                 <groupId>com.github.tomakehurst</groupId>
                 <artifactId>wiremock-jre8-standalone</artifactId>
                 <version>3.0.1</version>

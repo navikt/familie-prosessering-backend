@@ -9,7 +9,9 @@ import java.util.concurrent.TimeUnit
 
 @Service
 @TaskStepBeskrivelse(taskStepType = TaskStep1.TASK_1, beskrivelse = "Dette er task 1")
-class TaskStep1 constructor(private val taskService: TaskService) : AsyncTaskStep {
+class TaskStep1 constructor(
+    private val taskService: TaskService,
+) : AsyncTaskStep {
     override fun doTask(task: Task) {
         try {
             TimeUnit.MICROSECONDS.sleep(1)

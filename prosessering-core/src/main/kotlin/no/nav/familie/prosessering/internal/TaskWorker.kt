@@ -172,29 +172,18 @@ class TaskWorker(
         secureLog.info("Feilhåndtering lagret ok {}", task)
     }
 
-    private fun finnTriggerTidVedFeil(taskType: String): Long {
-        return triggerTidVedFeilMap[taskType] ?: error("Ukjent tasktype $taskType")
-    }
+    private fun finnTriggerTidVedFeil(taskType: String): Long = triggerTidVedFeilMap[taskType] ?: error("Ukjent tasktype $taskType")
 
-    private fun finnFeilteller(taskType: String): Counter {
-        return feiltellereForTaskSteps[taskType] ?: error("Ukjent tasktype $taskType")
-    }
+    private fun finnFeilteller(taskType: String): Counter = feiltellereForTaskSteps[taskType] ?: error("Ukjent tasktype $taskType")
 
-    private fun finnFullførtteller(taskType: String): Counter {
-        return fullførttellereForTaskSteps[taskType] ?: error("Ukjent tasktype $taskType")
-    }
+    private fun finnFullførtteller(taskType: String): Counter = fullførttellereForTaskSteps[taskType] ?: error("Ukjent tasktype $taskType")
 
-    private fun finnMaxAntallFeil(taskType: String): Int {
-        return maxAntallFeilMap[taskType] ?: error("Ukjent tasktype $taskType")
-    }
+    private fun finnMaxAntallFeil(taskType: String): Int = maxAntallFeilMap[taskType] ?: error("Ukjent tasktype $taskType")
 
-    private fun finnTaskStep(taskType: String): AsyncTaskStep {
-        return taskStepMap[taskType] ?: error("Ukjent tasktype $taskType")
-    }
+    private fun finnTaskStep(taskType: String): AsyncTaskStep = taskStepMap[taskType] ?: error("Ukjent tasktype $taskType")
 
-    private fun finnSettTilManuellOppfølgning(taskType: String): Boolean {
-        return settTilManuellOppfølgningVedFeil[taskType] ?: error("Ukjent tasktype $taskType")
-    }
+    private fun finnSettTilManuellOppfølgning(taskType: String): Boolean =
+        settTilManuellOppfølgningVedFeil[taskType] ?: error("Ukjent tasktype $taskType")
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     fun markerPlukket(id: Long): Task? {

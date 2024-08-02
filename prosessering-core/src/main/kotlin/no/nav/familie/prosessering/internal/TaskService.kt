@@ -26,9 +26,7 @@ class TaskService internal constructor(
     private val logger = LoggerFactory.getLogger(javaClass)
     private val secureLog = LoggerFactory.getLogger("secureLogger")
 
-    fun findById(id: Long): Task {
-        return taskRepository.findByIdOrNull(id) ?: error("Task med id: $id ikke funnet.")
-    }
+    fun findById(id: Long): Task = taskRepository.findByIdOrNull(id) ?: error("Task med id: $id ikke funnet.")
 
     /**
      * Brukes for å opprette task
@@ -49,9 +47,7 @@ class TaskService internal constructor(
      */
     @Suppress("unused") // brukes av klienter
     @Transactional
-    fun saveAll(tasks: Collection<Task>): List<Task> {
-        return tasks.map { save(it) }
-    }
+    fun saveAll(tasks: Collection<Task>): List<Task> = tasks.map { save(it) }
 
     private fun validerTask(task: Task) {
         if ((task.versjon == 0L && task.id != 0L) || (task.id == 0L && task.versjon != 0L)) {
@@ -59,8 +55,8 @@ class TaskService internal constructor(
         }
     }
 
-    fun finnAlleTasksKlareForProsessering(page: Pageable): List<Task> {
-        return taskRepository.findByStatusInAndTriggerTidBeforeOrderByOpprettetTid(
+    fun finnAlleTasksKlareForProsessering(page: Pageable): List<Task> =
+        taskRepository.findByStatusInAndTriggerTidBeforeOrderByOpprettetTid(
             listOf(
                 Status.KLAR_TIL_PLUKK,
                 Status.UBEHANDLET,
@@ -68,36 +64,29 @@ class TaskService internal constructor(
             LocalDateTime.now(),
             page,
         )
-    }
 
-    fun finnAlleFeiledeTasks(): List<Task> {
-        return taskRepository.findByStatus(Status.FEILET)
-    }
+    fun finnAlleFeiledeTasks(): List<Task> = taskRepository.findByStatus(Status.FEILET)
 
-    internal fun finnAllePlukkedeTasks(tid: LocalDateTime): Pair<Long, List<Task>> {
-        return taskRepository.countByStatusIn(listOf(Status.PLUKKET)) to
+    internal fun finnAllePlukkedeTasks(tid: LocalDateTime): Pair<Long, List<Task>> =
+        taskRepository.countByStatusIn(listOf(Status.PLUKKET)) to
             taskRepository.findAllByStatusAndLastProcessed(Status.PLUKKET, tid)
-    }
 
     @Deprecated("Bruk finnTasksMedStatus", ReplaceWith("finnTasksMedStatus(status, type, page)"))
     fun finnTasksMedStatus(
         status: List<Status>,
         page: Pageable,
-    ): List<Task> {
-        return taskRepository.findByStatusIn(status, page)
-    }
+    ): List<Task> = taskRepository.findByStatusIn(status, page)
 
     fun finnTasksMedStatus(
         status: List<Status>,
         type: String? = null,
         page: Pageable = Pageable.unpaged(),
-    ): List<Task> {
-        return if (type == null) {
+    ): List<Task> =
+        if (type == null) {
             taskRepository.findByStatusIn(status, page)
         } else {
             taskRepository.findByStatusInAndType(status, type, page)
         }
-    }
 
     @Transactional
     internal fun slettTasks(
@@ -121,33 +110,25 @@ class TaskService internal constructor(
         return taskLoggRepository.finnTaskLoggMetadata(taskIds).associateBy { it.taskId }
     }
 
-    fun findTaskLoggByTaskId(taskId: Long): List<TaskLogg> {
-        return taskLoggRepository.findByTaskId(taskId)
-    }
+    fun findTaskLoggByTaskId(taskId: Long): List<TaskLogg> = taskLoggRepository.findByTaskId(taskId)
 
     @Suppress("unused") // brukes av klienter
     fun finnTaskMedPayloadOgType(
         payload: String,
         type: String,
-    ): Task? {
-        return taskRepository.findByPayloadAndType(payload, type)
-    }
+    ): Task? = taskRepository.findByPayloadAndType(payload, type)
 
     @Suppress("unused") // brukes av klienter
     fun finnAlleTaskerMedPayloadOgType(
         payload: String,
         type: String,
-    ): List<Task> {
-        return taskRepository.findAllByPayloadAndType(payload, type)
-    }
+    ): List<Task> = taskRepository.findAllByPayloadAndType(payload, type)
 
     /**
      * Då taskRepository er internal så kan denne fortsatt være fin å bruke fra tests
      */
     @Suppress("unused") // brukes av klienter
-    fun findAll(): List<Task> {
-        return taskRepository.findAll().toList()
-    }
+    fun findAll(): List<Task> = taskRepository.findAll().toList()
 
     @Transactional
     fun delete(task: Task) {
@@ -163,28 +144,19 @@ class TaskService internal constructor(
         taskRepository.deleteAll(tasks)
     }
 
-    internal fun antallTaskerTilOppfølging(): Long {
-        return taskRepository.countByStatusIn(listOf(Status.MANUELL_OPPFØLGING, Status.FEILET))
-    }
+    internal fun antallTaskerTilOppfølging(): Long = taskRepository.countByStatusIn(listOf(Status.MANUELL_OPPFØLGING, Status.FEILET))
 
-    fun antallTaskerMedStatusFeiletOgManuellOppfølging(): TaskerMedStatusFeiletOgManuellOppfølging {
-        return TaskerMedStatusFeiletOgManuellOppfølging(
+    fun antallTaskerMedStatusFeiletOgManuellOppfølging(): TaskerMedStatusFeiletOgManuellOppfølging =
+        TaskerMedStatusFeiletOgManuellOppfølging(
             taskRepository.countByStatusIn(listOf(Status.FEILET)),
             taskRepository.countByStatusIn(listOf(Status.MANUELL_OPPFØLGING)),
         )
-    }
 
-    internal fun tellAntallÅpneTasker(): List<AntallÅpneTask> {
-        return taskRepository.countOpenTasks()
-    }
+    internal fun tellAntallÅpneTasker(): List<AntallÅpneTask> = taskRepository.countOpenTasks()
 
-    fun antallFeil(taskId: Long): Int {
-        return taskLoggRepository.countByTaskIdAndType(taskId, Loggtype.FEILET)
-    }
+    fun antallFeil(taskId: Long): Int = taskLoggRepository.countByTaskIdAndType(taskId, Loggtype.FEILET)
 
-    fun antallGangerPlukket(taskId: Long): Int {
-        return taskLoggRepository.countByTaskIdAndType(taskId, Loggtype.PLUKKET)
-    }
+    fun antallGangerPlukket(taskId: Long): Int = taskLoggRepository.countByTaskIdAndType(taskId, Loggtype.PLUKKET)
 
     @Transactional
     internal fun avvikshåndter(
