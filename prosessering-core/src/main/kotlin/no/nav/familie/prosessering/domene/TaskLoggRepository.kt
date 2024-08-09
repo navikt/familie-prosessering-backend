@@ -7,7 +7,9 @@ import org.springframework.data.repository.PagingAndSortingRepository
 import org.springframework.stereotype.Repository
 
 @Repository
-internal interface TaskLoggRepository : PagingAndSortingRepository<TaskLogg, Long>, CrudRepository<TaskLogg, Long> {
+internal interface TaskLoggRepository :
+    PagingAndSortingRepository<TaskLogg, Long>,
+    CrudRepository<TaskLogg, Long> {
     @Query
     fun findByTaskId(taskId: Long): List<TaskLogg>
 

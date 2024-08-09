@@ -15,4 +15,8 @@ interface TaskMetricRepository : org.springframework.data.repository.Repository<
     fun finnAntallFeiledeTasksPerTypeOgStatus(): List<AntallTaskAvTypeOgStatus>
 }
 
-data class AntallTaskAvTypeOgStatus(val type: String, val status: Status, val count: Long)
+data class AntallTaskAvTypeOgStatus(
+    val type: String,
+    val status: Status,
+    val count: Long,
+)

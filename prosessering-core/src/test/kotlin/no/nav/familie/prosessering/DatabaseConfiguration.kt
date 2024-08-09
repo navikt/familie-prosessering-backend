@@ -8,12 +8,11 @@ import org.springframework.data.jdbc.repository.config.AbstractJdbcConfiguration
 @Configuration
 class DatabaseConfiguration : AbstractJdbcConfiguration() {
     @Bean
-    override fun jdbcCustomConversions(): JdbcCustomConversions {
-        return JdbcCustomConversions(
+    override fun jdbcCustomConversions(): JdbcCustomConversions =
+        JdbcCustomConversions(
             listOf(
                 StringTilPropertiesWrapperConverter(),
                 PropertiesWrapperTilStringConverter(),
             ),
         )
-    }
 }
