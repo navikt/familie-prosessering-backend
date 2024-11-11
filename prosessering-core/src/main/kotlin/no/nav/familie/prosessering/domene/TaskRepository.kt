@@ -71,7 +71,8 @@ internal interface TaskRepository :
         """
         SELECT * 
         FROM task t 
-        WHERE t.metadata like concat('%callId=', concat(:callId::text, '%'))""",
+        WHERE t.metadata like concat('%callId=', concat(:callId::text, '%'))
+        ORDER BY t.id DESC""",
     )
     fun finnTaskerMedCallId(callId: String): List<Task>
 

@@ -211,8 +211,7 @@ class TaskRepositoryTest : IntegrationRunnerTest() {
     fun `skal finne tasker med gitt callId`() {
         val task1 = taskService.save(Task(TaskStep1.TASK_1, "1"))
         taskService.save(Task(TaskStep2.TASK_2, "1"))
-        // SQL som henter ut sorterer på opprettetTid, og for å få forventet rekkefølge må de være forskjellig
-        taskService.save(Task(type = TaskStep1.TASK_1, payload = "2", opprettetTid = LocalDateTime.now().plusSeconds(1)))
+        taskService.save(Task(TaskStep1.TASK_1, "2"))
 
         val taskMedCallId = taskService.finnAlleTasksMedCallId(task1.callId)
         assertThat(taskMedCallId).hasSize(1)
@@ -224,8 +223,8 @@ class TaskRepositoryTest : IntegrationRunnerTest() {
 
         val taskerMedCallId = taskService.finnAlleTasksMedCallId(task1.callId)
         assertThat(taskerMedCallId).hasSize(2)
-        assertThat(taskerMedCallId.first().id).isEqualTo(task1.id)
-        assertThat(taskerMedCallId.last().id).isEqualTo(task4.id)
+        assertThat(taskerMedCallId.first().id).isEqualTo(task4.id)
+        assertThat(taskerMedCallId.last().id).isEqualTo(task1.id)
     }
 
     @Test
