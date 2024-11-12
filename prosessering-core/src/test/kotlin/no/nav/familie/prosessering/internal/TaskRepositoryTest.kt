@@ -223,8 +223,8 @@ class TaskRepositoryTest : IntegrationRunnerTest() {
 
         val taskerMedCallId = taskService.finnAlleTasksMedCallId(task1.callId)
         assertThat(taskerMedCallId).hasSize(2)
-        assertThat(taskerMedCallId.first().id).isEqualTo(task1.id)
-        assertThat(taskerMedCallId.last().id).isEqualTo(task4.id)
+        assertThat(taskerMedCallId.first().id).isEqualTo(task4.id)
+        assertThat(taskerMedCallId.last().id).isEqualTo(task1.id)
     }
 
     @Test
