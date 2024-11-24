@@ -22,7 +22,7 @@
         <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <kotlin.version>2.0.21</kotlin.version>
-        <spring.boot.version>3.3.5</spring.boot.version>
+        <spring.boot.version>3.4.0</spring.boot.version>
         <mockk.version>1.13.13</mockk.version>
 
         <nav.security.token.version>5.0.11</nav.security.token.version>
@@ -76,13 +76,13 @@
             <dependency>
                 <groupId>org.testcontainers</groupId>
                 <artifactId>postgresql</artifactId>
-                <version>1.20.3</version>
+                <version>1.20.4</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.flywaydb</groupId>
                 <artifactId>flyway-database-postgresql</artifactId>
-                <version>10.21.0</version>
+                <version>11.0.0</version>
                 <scope>runtime</scope>
             </dependency>
             <dependency>
