@@ -27,7 +27,7 @@ class TaskMaintenanceService(
         logger.info("Rekjører ${tasks.size} tasks")
 
         tasks.forEach {
-            taskService.klarTilPlukk(it, TaskLogg.BRUKERNAVN_NÅR_SIKKERHETSKONTEKST_IKKE_FINNES)
+            taskService.klarTilPlukk(it.medTriggerTid(LocalDateTime.now()), TaskLogg.BRUKERNAVN_NÅR_SIKKERHETSKONTEKST_IKKE_FINNES)
         }
     }
 
