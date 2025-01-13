@@ -51,16 +51,32 @@ class FooTask(
 }
 ```
 
+## [TaskStepBeskrivelse](prosessering-core/src/main/kotlin/no/nav/familie/prosessering/TaskStepBeskrivelse.kt)
+#### `maxAntallFeil`
+* Tasken rekjøres `maxAntallFeil` ganger før den settes til `FEILET` eller `MANUELL_OPPFØLGING`
+
+#### `taskStepType`
+* Unikt tasknavn som lagres ned i databasen (`Task.type`) og brukes for å finne riktig klasse som skal utføre tasken. 
+
+#### `beskrivelse`
+* Enkel beskrivelse av hva tasken er ment å utføre. 
+
+#### `triggerTidVedFeilISekunder`
+* Dersom tasken feiler vil den vente i `triggerTidVedFeilISekunder` sekunder før den (tidligst) prøver å rekjøre neste gang
+
+#### `settTilManuellOppfølgning`
+* Dersom tasken feiler og ikke lenger skal rekjøres får den status `FEILET` som utgangspunkt. Da vil den bli forsøkt rekjørt neste dag, men for noen tasker må det en manuell prosess til før noe går igjennom. Da kan man sette `settTilManuellOppfølgning` så vil den gå direkte til `MANUELL_OPPFØLGING` istedenfor `FEILET`
+
 ## Prosessering av tasks
 * [TaskStepExecutorService](prosessering-core/src/main/kotlin/no/nav/familie/prosessering/internal/TaskStepExecutorService.kt)
 plukker opp tasks som skal prosesseres, basert på status og trigger-tid, og køer opp de . 
 
 Håndtering av tasks fra køen
 * `ThreadPoolTaskExecutor` tar en task fra køen
-* Setter LogContext på tråden, setter `callId` i `MDC` sånn at man får spåret all logg for den tasken
+* Setter LogContext på tråden, setter `callId` i `MDC` sånn at man får sporet all logg for den tasken
 * Markerer den som plukket sånn at ikke andre tråder eller podder plukker samme task
 * Sender tasken til `TaskWorker` for prosessering av tasken
-  * Vid en ev. feil kalles `doFeilhåndtering`
+  * Ved en ev. feil kalles `doFeilhåndtering`
 
 ### [TaskWorker](prosessering-core/src/main/kotlin/no/nav/familie/prosessering/internal/TaskWorker.kt)
 TaskWorker har metoder for prosessering av tasken
@@ -69,21 +85,22 @@ TaskWorker har metoder for prosessering av tasken
 * Setter status `BEHANDLER` på tasken
 * Finner riktig `AsyncTaskStep` for gitt tasktype og kaller på de ulike metodene for å behandle tasken
 * Setter status `FERDIG` på tasken
+* PS: Siden `transactional` benyttes, så vil aldri tasken ha status `BEHANDLER` i databasen. Den går rett fra `PLUKKET` til `FERDIG` 
 
 ### doFeilhåndtering
 * Lagrer en TaskLogg om at tasken har feilet
 
-Hvis en task ikke har feilet fler ganger enn hva som er definiert som maks antall feil i `TaskStepBeskrivelse`, 
+Hvis en task ikke har feilet flere ganger enn hva som er definiert som maks antall feil i `TaskStepBeskrivelse`, 
 så vil tasken få ny status `KLAR_TIL_PLUKK` og bli rekjørt senere.
 
 ## [Task](prosessering-core/src/main/kotlin/no/nav/familie/prosessering/domene/Task.kt)
 
-Hver task får en callId som settes settes i `MDC` for å kunne spåre logger og kall for den tasken.
+Hver task får en callId som settes settes i `MDC` for å kunne spore logger og kall for den tasken.
 
 ### CallId
 
 Dersom man har en task som skal opprette flere nye tasks, så kan det ofte være hensiktsmessig å gi hver ny task en ny
-callId, for å enklere kunne spåre hver task.
+callId, for å enklere kunne spore hver task.
 For å gjøre dette må man erstatte properties etter at man opprettet tasken fordi konstruktorn alltid overskriver callId.
 
 ```kotlin
@@ -103,10 +120,10 @@ Hvis man ønsker å kaste en exception uten noen stacktrace fra sin `AsyncTaskSt
 `TaskExceptionUtenStackTrace` som ikke gir en lang stack trace i prosessering-GUI'et når man ser på en task.
 
 #### [RekjørSenereException](prosessering-core/src/main/kotlin/no/nav/familie/prosessering/error/RekjørSenereException.kt)
-I noen tilfeller ønsker man å rekjøre tasken senere og ikke med det direkte
+I noen tilfeller ønsker man å rekjøre tasken senere og ikke med en gang. Da kan tasken kaste denne feilen og spesifisere triggertid for når den skal kjøres neste gang.
 
 #### [MaxAntallRekjøringerException](prosessering-core/src/main/kotlin/no/nav/familie/prosessering/error/RekjørSenereException.kt)
-TODO 
+Denne skal ikke kastes, men er egentlig en dto for å serialisere og dokumentere i TaskLogg at en task har feilet og nådd maks antall rekjøringer.  
 
 ## Oppsett
 
@@ -142,9 +159,9 @@ prosessering:
 
 #### Property `continuousRunning.enabled`
 Tasks blir plukket opp hver `fixedDelayString.in.milliseconds` ms. 
-Når man plukket opp 20 tasks og de har kjørt klart, så venter man til neste jobb skal kjøre.
+Når tasks er plukket og kjørt ferdig, så venter systemet `fixedDelayString.in.milliseconds` til neste plukk av tasker.
 
-Hvis man setter denne property til true, så vill man polle direkt etter at man har behandlet de tidligere taskene.
+Hvis `continuousRunning.enabled` settes til true, så poller systemet umiddelbart etter kjøring av de forrige taskene.
 
 ### SQL
 [Eksempel på oppsett av skjema](prosessering-core/src/test/resources/db/migration/V1__schema.sql)
