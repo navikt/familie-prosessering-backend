@@ -128,7 +128,7 @@ class TaskWorker(
                 finnFeilteller(feiletTask.type).increment()
                 log.error(
                     "Task ${feiletTask.id} av type ${feiletTask.type} har feilet/satt til manuell oppfølgning. " +
-                        "Sjekk familie-prosessering for detaljer",
+                        "Sjekk prosessering for detaljer",
                 )
             }
             secureLog.info("Feilhåndtering lagret ok {}", feiletTask)
@@ -166,7 +166,7 @@ class TaskWorker(
             finnFeilteller(task.type).increment()
             log.error(
                 "Task ${task.id} av type ${task.type} har feilet/satt til manuell oppfølgning. " +
-                    "Sjekk familie-prosessering for detaljer",
+                    "Sjekk prosessering for detaljer",
             )
         }
         secureLog.info("Feilhåndtering lagret ok {}", task)
