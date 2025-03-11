@@ -246,6 +246,8 @@ class TaskService internal constructor(
         return taskRepository.save(task.copy(status = nyStatus))
     }
 
+    internal fun hentAlleTasktyper(): List<String> = taskRepository.hentAlleTasktyper()
+
     private fun nyFeiletStatus(
         tidligereAntallFeil: Int,
         maxAntallFeil: Int,

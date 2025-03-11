@@ -84,6 +84,9 @@ class TaskController(
             ),
         )
 
+    @GetMapping(path = ["/task/tasktyper"])
+    fun hentAlleTasktyper(): ResponseEntity<Ressurs<List<String>>> = ResponseEntity.ok(restTaskService.hentAlleTasktyper())
+
     @PutMapping(path = ["/task/kommenter"])
     fun kommenterTask(
         @RequestParam taskId: Long,

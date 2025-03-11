@@ -99,4 +99,11 @@ internal interface TaskRepository :
         status: Status,
         tid: LocalDateTime,
     ): List<Task>
+
+    @Query(
+        """
+        SELECT DISTINCT t.type 
+        FROM task t """,
+    )
+    fun hentAlleTasktyper(): List<String>
 }
