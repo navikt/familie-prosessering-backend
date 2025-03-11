@@ -28,6 +28,12 @@ data class Task(
                 this[MDCConstants.MDC_CALL_ID] =
                     MDC.get(MDCConstants.MDC_CALL_ID)
                         ?: IdUtils.generateId()
+                this[MDCConstants.MDC_FAGSAK_ID] =
+                    MDC.get(MDCConstants.MDC_FAGSAK_ID)
+                        ?: "IKKE_SATT"
+                this[MDCConstants.MDC_BEHANDLING_ID] =
+                    MDC.get(MDCConstants.MDC_BEHANDLING_ID)
+                        ?: "IKKE_SATT"
             },
         ),
     @Version
@@ -38,6 +44,10 @@ data class Task(
 
     val callId: String
         get() = metadata.getProperty(MDCConstants.MDC_CALL_ID)
+    val fagsakId: String
+        get() = metadata.getProperty(MDCConstants.MDC_FAGSAK_ID)
+    val behandlingId: String
+        get() = metadata.getProperty(MDCConstants.MDC_BEHANDLING_ID)
 
     constructor (type: String, payload: String, properties: Properties = Properties()) :
         this(
@@ -49,6 +59,12 @@ data class Task(
                         this[MDCConstants.MDC_CALL_ID] =
                             MDC.get(MDCConstants.MDC_CALL_ID)
                                 ?: IdUtils.generateId()
+                        this[MDCConstants.MDC_FAGSAK_ID] =
+                            MDC.get(MDCConstants.MDC_FAGSAK_ID)
+                                ?: "IKKE_SATT"
+                        this[MDCConstants.MDC_BEHANDLING_ID] =
+                            MDC.get(MDCConstants.MDC_BEHANDLING_ID)
+                                ?: "IKKE_SATT"
                     },
                 ),
         )
@@ -56,5 +72,5 @@ data class Task(
     fun medTriggerTid(triggerTid: LocalDateTime): Task = this.copy(triggerTid = triggerTid)
 
     override fun toString(): String =
-        "Task(id=$id, status=$status, opprettetTid=$opprettetTid, triggerTid=$triggerTid, type='$type', versjon=$versjon)"
+        "Task(id=$id, status=$status, opprettetTid=$opprettetTid, fagsakId=$fagsakId, behandlingId=$behandlingId, triggerTid=$triggerTid, type='$type', versjon=$versjon)"
 }
