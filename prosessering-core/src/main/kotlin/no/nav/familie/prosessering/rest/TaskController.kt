@@ -84,7 +84,7 @@ class TaskController(
             ),
         )
 
-    @GetMapping(path = ["/task/tasktyper"])
+    @GetMapping(path = ["/task/type/alle"])
     fun hentAlleTasktyper(): ResponseEntity<Ressurs<List<String>>> = ResponseEntity.ok(restTaskService.hentAlleTasktyper())
 
     @PutMapping(path = ["/task/kommenter"])
