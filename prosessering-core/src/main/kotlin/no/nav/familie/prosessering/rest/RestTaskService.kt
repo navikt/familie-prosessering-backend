@@ -252,6 +252,20 @@ class RestTaskService(
             )
     }
 
+    fun hentAlleTasktyper(): Ressurs<List<String>> =
+        Result
+            .runCatching {
+                taskService.hentAlleTasktyper()
+            }.fold(
+                onSuccess = {
+                    Ressurs.success(data = it)
+                },
+                onFailure = { e ->
+                    logger.warn("Feil ved henting av tasktyper", e)
+                    Ressurs.failure("Feil ved henting av tasktyper", error = e)
+                },
+            )
+
     private fun tilTaskDto(
         task: Task,
         taskLogg: TaskLoggMetadata?,

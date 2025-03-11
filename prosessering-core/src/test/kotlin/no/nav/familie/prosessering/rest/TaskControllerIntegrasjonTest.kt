@@ -141,4 +141,16 @@ internal class TaskControllerIntegrasjonTest : IntegrationRunnerTest() {
         assertThat((((response.body.data as PaginableResponse<*>).tasks).first() as TaskDto).kommentar.equals("dette er en test"))
         assertThat((((response.body.data as PaginableResponse<*>).tasks).first() as TaskDto).status.equals(Status.MANUELL_OPPFØLGING))
     }
+
+    @Test
+    fun `skal hente alle tasktyper`() {
+        Task(type = TaskStep1.TASK_1, payload = "{'a'='b'}", status = Status.UBEHANDLET).apply { taskService.save(this) }
+        Task(type = TaskStep2.TASK_2, payload = "{'a'='1'}", status = Status.FEILET).apply { taskService.save(this) }
+        Task(type = TaskStep2.TASK_2, payload = "{'a'='1'}", status = Status.AVVIKSHÅNDTERT).apply { taskService.save(this) }
+
+        val response = taskController.hentAlleTasktyper()
+
+        assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
+        assertThat(response.body?.data).hasSize(2).contains(TaskStep1.TASK_1, TaskStep2.TASK_2)
+    }
 }
