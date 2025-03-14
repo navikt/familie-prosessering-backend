@@ -14,7 +14,7 @@ internal class TaskTest {
             Task("Type", "payload", Properties().also { it.put("key", "value") })
                 .copy(opprettetTid = tid, triggerTid = tid)
         assertThat(task.toString())
-            .isEqualTo("Task(id=0, status=UBEHANDLET, opprettetTid=2021-01-01T00:00, fagsakId=IKKE_SATT, behandlingId=IKKE_SATT, triggerTid=2021-01-01T00:00, type='Type', versjon=0)")
+            .isEqualTo("Task(id=0, status=UBEHANDLET, opprettetTid=2021-01-01T00:00, fagsakId=null, behandlingId=null, triggerTid=2021-01-01T00:00, type='Type', versjon=0)")
     }
 
     @Test

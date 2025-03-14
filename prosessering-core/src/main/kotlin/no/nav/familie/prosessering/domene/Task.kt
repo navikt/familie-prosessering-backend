@@ -44,9 +44,9 @@ data class Task(
 
     val callId: String
         get() = metadata.getProperty(MDCConstants.MDC_CALL_ID)
-    val fagsakId: String
+    val fagsakId: String?
         get() = metadata.getProperty(MDCConstants.MDC_FAGSAK_ID)
-    val behandlingId: String
+    val behandlingId: String?
         get() = metadata.getProperty(MDCConstants.MDC_BEHANDLING_ID)
 
     constructor (type: String, payload: String, properties: Properties = Properties()) :
@@ -59,12 +59,12 @@ data class Task(
                         this[MDCConstants.MDC_CALL_ID] =
                             MDC.get(MDCConstants.MDC_CALL_ID)
                                 ?: IdUtils.generateId()
-                        this[MDCConstants.MDC_FAGSAK_ID] =
-                            MDC.get(MDCConstants.MDC_FAGSAK_ID)
-                                ?: "IKKE_SATT"
-                        this[MDCConstants.MDC_BEHANDLING_ID] =
-                            MDC.get(MDCConstants.MDC_BEHANDLING_ID)
-                                ?: "IKKE_SATT"
+                        if (!MDC.get(MDCConstants.MDC_FAGSAK_ID).isNullOrEmpty()) {
+                            this[MDCConstants.MDC_FAGSAK_ID] = MDC.get(MDCConstants.MDC_FAGSAK_ID)
+                        }
+                        if (!MDC.get(MDCConstants.MDC_BEHANDLING_ID).isNullOrEmpty()) {
+                            this[MDCConstants.MDC_BEHANDLING_ID] = MDC.get(MDCConstants.MDC_BEHANDLING_ID)
+                        }
                     },
                 ),
         )
