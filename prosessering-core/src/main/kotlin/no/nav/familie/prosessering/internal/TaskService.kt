@@ -82,7 +82,7 @@ class TaskService internal constructor(
         type: String? = null,
         page: Pageable = Pageable.unpaged(),
     ): List<Task> =
-        if (type == null) {
+        if (type.isNullOrBlank()) {
             taskRepository.findByStatusIn(status, page)
         } else {
             taskRepository.findByStatusInAndType(status, type, page)

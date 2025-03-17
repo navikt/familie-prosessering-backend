@@ -154,20 +154,22 @@ class RestTaskService(
     @Transactional
     fun rekjørTasks(
         status: Status,
+        type: String?,
         saksbehandlerId: String,
     ): Ressurs<String> {
-        logger.info("$saksbehandlerId rekjører alle tasks med status $status")
+        val taskInfo = "med status '$status'${if (type.isNullOrBlank()) "" else " og type '$type'"}"
+        logger.info("$saksbehandlerId rekjører alle tasker $taskInfo")
 
         return Result
             .runCatching {
                 taskService
-                    .finnTasksMedStatus(listOf(status))
+                    .finnTasksMedStatus(listOf(status), type)
                     .map { taskService.klarTilPlukk(it.medTriggerTid(LocalDateTime.now()), saksbehandlerId) }
             }.fold(
                 onSuccess = { Ressurs.success(data = "") },
                 onFailure = { e ->
-                    logger.error("Rekjøring av tasker med status '$status' feilet", e)
-                    Ressurs.failure(errorMessage = "Rekjøring av tasker med status '$status' feilet", error = e)
+                    logger.error("Rekjøring av tasker $taskInfo feilet", e)
+                    Ressurs.failure(errorMessage = "Rekjøring av tasker $taskInfo feilet", error = e)
                 },
             )
     }

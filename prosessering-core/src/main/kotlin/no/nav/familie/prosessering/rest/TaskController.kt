@@ -68,7 +68,8 @@ class TaskController(
     @PutMapping(path = ["task/rekjorAlle"])
     fun rekjørTasks(
         @RequestHeader status: Status,
-    ): ResponseEntity<Ressurs<String>> = ResponseEntity.ok(restTaskService.rekjørTasks(status, hentBrukernavn()))
+        @RequestHeader(required = false) type: String? = null,
+    ): ResponseEntity<Ressurs<String>> = ResponseEntity.ok(restTaskService.rekjørTasks(status, type, hentBrukernavn()))
 
     @PutMapping(path = ["/task/avvikshaandter"])
     fun avvikshåndterTask(
