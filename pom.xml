@@ -21,11 +21,11 @@
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <kotlin.version>2.1.10</kotlin.version>
-        <spring.boot.version>3.4.3</spring.boot.version>
+        <kotlin.version>2.1.20</kotlin.version>
+        <spring.boot.version>3.4.4</spring.boot.version>
         <mockk.version>1.13.17</mockk.version>
 
-        <nav.security.token.version>5.0.19</nav.security.token.version>
+        <nav.security.token.version>5.0.20</nav.security.token.version>
 
         <!--suppress UnresolvedMavenProperty  Ligger som secret i github-->
         <sonar.projectKey>${SONAR_PROJECTKEY}</sonar.projectKey>
@@ -82,7 +82,7 @@
             <dependency>
                 <groupId>org.flywaydb</groupId>
                 <artifactId>flyway-database-postgresql</artifactId>
-                <version>11.4.0</version>
+                <version>11.4.1</version>
                 <scope>runtime</scope>
             </dependency>
             <dependency>
