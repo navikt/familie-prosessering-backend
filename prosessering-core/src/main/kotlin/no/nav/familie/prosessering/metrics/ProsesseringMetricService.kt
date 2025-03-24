@@ -9,7 +9,7 @@ import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 
 @Service
-internal class MetricService(
+internal class ProsesseringMetricService(
     private val taskMetricRepository: TaskMetricRepository,
     private val prosesseringInfoProvider: ProsesseringInfoProvider,
 ) {
