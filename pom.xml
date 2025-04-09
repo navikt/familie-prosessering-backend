@@ -23,7 +23,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <kotlin.version>2.1.20</kotlin.version>
         <spring.boot.version>3.4.4</spring.boot.version>
-        <mockk.version>1.13.17</mockk.version>
+        <mockk.version>1.14.0</mockk.version>
 
         <nav.security.token.version>5.0.24</nav.security.token.version>
 
@@ -82,7 +82,7 @@
             <dependency>
                 <groupId>org.flywaydb</groupId>
                 <artifactId>flyway-database-postgresql</artifactId>
-                <version>11.6.0</version>
+                <version>11.7.0</version>
                 <scope>runtime</scope>
             </dependency>
             <dependency>
