@@ -1,5 +1,6 @@
 package no.nav.familie.prosessering.rest
 
+import no.nav.familie.prosessering.config.KotlinTransactional
 import no.nav.familie.prosessering.domene.Avvikstype
 import no.nav.familie.prosessering.domene.Status
 import no.nav.familie.prosessering.domene.Task
@@ -11,7 +12,6 @@ import org.slf4j.LoggerFactory
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
-import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
 
 @Service
@@ -138,7 +138,7 @@ class RestTaskService(
             )
     }
 
-    @Transactional
+    @KotlinTransactional
     fun rekjørTask(
         taskId: Long,
         saksbehandlerId: String,
@@ -151,7 +151,7 @@ class RestTaskService(
         return Ressurs.success(data = "")
     }
 
-    @Transactional
+    @KotlinTransactional
     fun rekjørTasks(
         status: Status,
         type: String?,
@@ -174,7 +174,7 @@ class RestTaskService(
             )
     }
 
-    @Transactional
+    @KotlinTransactional
     fun avvikshåndterTask(
         taskId: Long,
         avvikstype: Avvikstype,
@@ -204,7 +204,7 @@ class RestTaskService(
             )
     }
 
-    @Transactional
+    @KotlinTransactional
     fun kommenterTask(
         taskId: Long,
         kommentarDTO: KommentarDTO,

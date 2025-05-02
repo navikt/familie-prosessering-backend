@@ -3,12 +3,12 @@ package no.nav.familie.prosessering.internal
 import io.micrometer.core.instrument.Metrics
 import io.micrometer.core.instrument.MultiGauge
 import io.micrometer.core.instrument.Tags
+import no.nav.familie.prosessering.config.KotlinTransactional
 import no.nav.familie.prosessering.domene.TaskLogg
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
-import org.springframework.transaction.annotation.Transactional
 import org.springframework.transaction.support.TransactionTemplate
 import java.time.LocalDateTime
 
@@ -21,7 +21,7 @@ class TaskMaintenanceService(
 ) {
     val antallÅpneTaskGague = MultiGauge.builder("openTasks").register(Metrics.globalRegistry)
 
-    @Transactional
+    @KotlinTransactional
     fun retryFeilendeTask() {
         val tasks = taskService.finnAlleFeiledeTasks()
         logger.info("Rekjører ${tasks.size} tasks")
@@ -31,7 +31,7 @@ class TaskMaintenanceService(
         }
     }
 
-    @Transactional
+    @KotlinTransactional
     fun settPermanentPlukketTilKlarTilPlukk() {
         val enTimeSiden = LocalDateTime.now().minusHours(1)
         val (antallPlukkende, tasks) = taskService.finnAllePlukkedeTasks(enTimeSiden)

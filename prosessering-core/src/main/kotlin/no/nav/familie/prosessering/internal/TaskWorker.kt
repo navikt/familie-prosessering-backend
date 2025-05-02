@@ -5,6 +5,7 @@ import io.micrometer.core.instrument.Metrics
 import no.nav.familie.prosessering.AsyncTaskStep
 import no.nav.familie.prosessering.TaskFeil
 import no.nav.familie.prosessering.TaskStepBeskrivelse
+import no.nav.familie.prosessering.config.KotlinTransactional
 import no.nav.familie.prosessering.domene.Status
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.domene.TaskLogg.Companion.BRUKERNAVN_NÅR_SIKKERHETSKONTEKST_IKKE_FINNES
@@ -15,7 +16,6 @@ import org.springframework.aop.framework.AopProxyUtils
 import org.springframework.core.annotation.AnnotationUtils
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Propagation
-import org.springframework.transaction.annotation.Transactional
 
 @Service
 class TaskWorker(
@@ -74,7 +74,7 @@ class TaskWorker(
             }
     }
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @KotlinTransactional(propagation = Propagation.REQUIRES_NEW)
     fun doActualWork(taskId: Long) {
         var task = taskService.findById(taskId)
 
@@ -98,7 +98,7 @@ class TaskWorker(
         finnFullførtteller(task.type).increment()
     }
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @KotlinTransactional(propagation = Propagation.REQUIRES_NEW)
     fun rekjørSenere(
         taskId: Long,
         e: RekjørSenereException,
@@ -141,7 +141,7 @@ class TaskWorker(
         }
     }
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @KotlinTransactional(propagation = Propagation.REQUIRES_NEW)
     fun doFeilhåndtering(
         taskId: Long,
         e: Throwable,
@@ -185,7 +185,7 @@ class TaskWorker(
     private fun finnSettTilManuellOppfølgning(taskType: String): Boolean =
         settTilManuellOppfølgningVedFeil[taskType] ?: error("Ukjent tasktype $taskType")
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @KotlinTransactional(propagation = Propagation.REQUIRES_NEW)
     fun markerPlukket(id: Long): Task? {
         val task = taskService.findById(id)
 

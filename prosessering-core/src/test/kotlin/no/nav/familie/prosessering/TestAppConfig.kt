@@ -10,7 +10,10 @@ import org.springframework.context.annotation.Primary
 import org.springframework.core.task.TaskExecutor
 import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories
 import org.springframework.data.jdbc.repository.config.JdbcRepositoryConfigExtension
+import org.springframework.jdbc.datasource.DataSourceTransactionManager
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor
+import org.springframework.transaction.PlatformTransactionManager
+import javax.sql.DataSource
 
 @SpringBootConfiguration
 @EnableJdbcRepositories("no.nav.familie")
@@ -43,4 +46,7 @@ class TestAppConfig : JdbcRepositoryConfigExtension() {
         }
         return taskExecutor1
     }
+
+    @Bean
+    fun transactionManager(dataSource: DataSource): PlatformTransactionManager = DataSourceTransactionManager(dataSource)
 }

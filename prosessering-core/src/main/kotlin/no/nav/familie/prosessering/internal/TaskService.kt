@@ -1,6 +1,7 @@
 package no.nav.familie.prosessering.internal
 
 import no.nav.familie.prosessering.TaskFeil
+import no.nav.familie.prosessering.config.KotlinTransactional
 import no.nav.familie.prosessering.domene.AntallÅpneTask
 import no.nav.familie.prosessering.domene.Avvikstype
 import no.nav.familie.prosessering.domene.Loggtype
@@ -14,7 +15,6 @@ import org.slf4j.LoggerFactory
 import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Component
-import org.springframework.transaction.annotation.Transactional
 import java.io.IOException
 import java.time.LocalDateTime
 
@@ -32,7 +32,7 @@ class TaskService internal constructor(
      * Brukes for å opprette task
      */
     @Suppress("unused") // brukes av klienter
-    @Transactional
+    @KotlinTransactional
     fun save(task: Task): Task {
         val lagretTask = taskRepository.save(task)
         validerTask(lagretTask)
@@ -46,7 +46,7 @@ class TaskService internal constructor(
      * Brukes for å opprette flere tasks
      */
     @Suppress("unused") // brukes av klienter
-    @Transactional
+    @KotlinTransactional
     fun saveAll(tasks: Collection<Task>): List<Task> = tasks.map { save(it) }
 
     private fun validerTask(task: Task) {
@@ -88,7 +88,7 @@ class TaskService internal constructor(
             taskRepository.findByStatusInAndType(status, type, page)
         }
 
-    @Transactional
+    @KotlinTransactional
     internal fun slettTasks(
         eldreEnnDato: LocalDateTime,
         antall: Int,
@@ -130,13 +130,13 @@ class TaskService internal constructor(
     @Suppress("unused") // brukes av klienter
     fun findAll(): List<Task> = taskRepository.findAll().toList()
 
-    @Transactional
+    @KotlinTransactional
     fun delete(task: Task) {
         taskLoggRepository.deleteAllByTaskId(task.id)
         taskRepository.delete(task)
     }
 
-    @Transactional
+    @KotlinTransactional
     @Suppress("unused") // brukes av klienter
     fun deleteAll(tasks: Collection<Task>) {
         if (tasks.toList().isEmpty()) return
@@ -158,7 +158,7 @@ class TaskService internal constructor(
 
     fun antallGangerPlukket(taskId: Long): Int = taskLoggRepository.countByTaskIdAndType(taskId, Loggtype.PLUKKET)
 
-    @Transactional
+    @KotlinTransactional
     internal fun avvikshåndter(
         task: Task,
         avvikstype: Avvikstype,
@@ -176,7 +176,7 @@ class TaskService internal constructor(
         return taskRepository.save(task.copy(status = Status.AVVIKSHÅNDTERT, avvikstype = avvikstype))
     }
 
-    @Transactional
+    @KotlinTransactional
     internal fun kommenter(
         task: Task,
         kommentar: String,
@@ -189,13 +189,13 @@ class TaskService internal constructor(
         return taskRepository.save(task.copy(status = if (settTilManuellOppfølgning) Status.MANUELL_OPPFØLGING else task.status))
     }
 
-    @Transactional
+    @KotlinTransactional
     internal fun behandler(task: Task): Task {
         taskLoggRepository.save(TaskLogg(taskId = task.id, type = Loggtype.BEHANDLER))
         return taskRepository.save(task.copy(status = Status.BEHANDLER))
     }
 
-    @Transactional
+    @KotlinTransactional
     internal fun klarTilPlukk(
         task: Task,
         endretAv: String,
@@ -212,19 +212,19 @@ class TaskService internal constructor(
         return taskRepository.save(task.copy(status = Status.KLAR_TIL_PLUKK))
     }
 
-    @Transactional
+    @KotlinTransactional
     internal fun plukker(task: Task): Task {
         taskLoggRepository.save(TaskLogg(taskId = task.id, type = Loggtype.PLUKKET))
         return taskRepository.save(task.copy(status = Status.PLUKKET))
     }
 
-    @Transactional
+    @KotlinTransactional
     internal fun ferdigstill(task: Task): Task {
         taskLoggRepository.save(TaskLogg(taskId = task.id, type = Loggtype.FERDIG))
         return taskRepository.save(task.copy(status = Status.FERDIG))
     }
 
-    @Transactional
+    @KotlinTransactional
     internal fun feilet(
         task: Task,
         feil: TaskFeil,
