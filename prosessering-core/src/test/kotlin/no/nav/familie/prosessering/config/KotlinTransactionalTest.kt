@@ -1,11 +1,14 @@
 package no.nav.familie.prosessering.config
 
 import no.nav.familie.prosessering.IntegrationRunnerTest
+import no.nav.familie.prosessering.domene.Task
+import no.nav.familie.prosessering.domene.TaskLoggRepository
+import no.nav.familie.prosessering.domene.TaskRepository
+import no.nav.familie.prosessering.task.TaskStep1
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Propagation
 import java.io.IOException
@@ -14,48 +17,55 @@ class KotlinTransactionalTest : IntegrationRunnerTest() {
     @Autowired
     private lateinit var service: KotlinTransactionalTestService
 
-    @Autowired
-    private lateinit var jdbcTemplate: JdbcTemplate
-
-    @BeforeEach
-    fun setUp() {
-        jdbcTemplate.execute("DROP TABLE IF EXISTS TEST_TABLE")
-        jdbcTemplate.execute("CREATE TABLE TEST_TABLE (id SERIAL PRIMARY KEY, data VARCHAR(255))")
+    @AfterEach
+    fun tearDown() {
+        service.slettAlle()
+        super.clear()
     }
 
     @Test
     fun `happy case`() {
-        service.lagre("testverdi")
+        service.lagre()
 
-        assertThat(hentAntallRader()).isEqualTo(1)
+        assertThat(service.antall()).isEqualTo(1)
     }
 
     @Test
     fun `skal rulle tilbake når checked exception IOException kastes`() {
-        try {
-            service.lagreMedFeil("testverdi")
-        } catch (_: Exception) {
-            // Forventet unntak, ingen handling nødvendig
-        }
+        val exception =
+            try {
+                service.lagreMedFeil()
+            } catch (e: Exception) {
+                e
+            }
 
-        assertThat(hentAntallRader()).isEqualTo(0)
+        assertThat(service.antall()).isEqualTo(0)
+        assertThat(exception).isInstanceOf(IOException::class.java)
     }
-
-    private fun hentAntallRader(): Int? = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM TEST_TABLE", Int::class.java)
 }
 
 @Service
-class KotlinTransactionalTestService(
-    private val jdbcTemplate: JdbcTemplate,
+internal class KotlinTransactionalTestService(
+    private val taskRepository: TaskRepository,
+    private val taskLoggRepository: TaskLoggRepository,
 ) {
     @KotlinTransactional(propagation = Propagation.REQUIRES_NEW)
-    fun lagre(data: String) {
-        jdbcTemplate.update("INSERT INTO TEST_TABLE (data) VALUES (?)", data)
+    fun lagre() {
+        taskRepository.save(Task(TaskStep1.TASK_1, "1"))
     }
 
     @KotlinTransactional(propagation = Propagation.REQUIRES_NEW)
-    fun lagreMedFeil(data: String) {
-        jdbcTemplate.update("INSERT INTO TEST_TABLE (data) VALUES (?)", data)
+    fun lagreMedFeil() {
+        taskRepository.save(Task(TaskStep1.TASK_1, "1"))
         throw IOException("Simulert feil")
+    }
+
+    @KotlinTransactional(propagation = Propagation.REQUIRES_NEW)
+    fun antall(): Long = taskRepository.count()
+
+    @KotlinTransactional(propagation = Propagation.REQUIRES_NEW)
+    fun slettAlle() {
+        taskLoggRepository.deleteAll()
+        taskRepository.deleteAll()
     }
 }
