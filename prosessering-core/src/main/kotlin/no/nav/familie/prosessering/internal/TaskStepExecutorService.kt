@@ -148,12 +148,16 @@ class TaskStepExecutorService(
 
     private fun initLogContext(taskDetails: Task) {
         MDC.put(MDCConstants.MDC_CALL_ID, taskDetails.callId)
+        MDC.put(MDCConstants.MDC_FAGSAK_ID, taskDetails.fagsakId)
+        MDC.put(MDCConstants.MDC_BEHANDLING_ID, taskDetails.behandlingId)
         LOG_CONTEXT.add("task", taskDetails.type)
     }
 
     private fun clearLogContext() {
         LOG_CONTEXT.clear()
         MDC.remove(MDCConstants.MDC_CALL_ID)
+        MDC.remove(MDCConstants.MDC_FAGSAK_ID)
+        MDC.remove(MDCConstants.MDC_BEHANDLING_ID)
     }
 
     private fun calculatePollingSize(maxAntall: Int): Int {
