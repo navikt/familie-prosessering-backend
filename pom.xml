@@ -22,10 +22,10 @@
         <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <kotlin.version>2.1.21</kotlin.version>
-        <spring.boot.version>3.4.5</spring.boot.version>
+        <spring.boot.version>3.5.0</spring.boot.version>
         <mockk.version>1.14.2</mockk.version>
 
-        <nav.security.token.version>5.0.27</nav.security.token.version>
+        <nav.security.token.version>5.0.28</nav.security.token.version>
 
         <!--suppress UnresolvedMavenProperty  Ligger som secret i github-->
         <sonar.projectKey>${SONAR_PROJECTKEY}</sonar.projectKey>
@@ -252,7 +252,7 @@
                     <dependency>
                         <groupId>com.pinterest.ktlint</groupId>
                         <artifactId>ktlint-cli</artifactId>
-                        <version>1.5.0</version>
+                        <version>1.6.0</version>
                     </dependency>
                     <!-- additional 3rd party ruleset(s) can be specified here -->
                 </dependencies>
