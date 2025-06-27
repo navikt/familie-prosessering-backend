@@ -53,6 +53,11 @@
                 <artifactId>token-validation-core</artifactId>
                 <version>${nav.security.token.version}</version>
             </dependency>
+            <dependency>
+                <groupId>io.opentelemetry.instrumentation</groupId>
+                <artifactId>opentelemetry-instrumentation-annotations</artifactId>
+                <version>2.16.0</version>
+            </dependency>
 
             <!--Test-->
             <dependency>

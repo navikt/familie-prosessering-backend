@@ -1,5 +1,6 @@
 package no.nav.familie.prosessering.internal
 
+import io.opentelemetry.instrumentation.annotations.WithSpan
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.error.RekjørSenereException
 import no.nav.familie.prosessering.util.MDCConstants
@@ -105,6 +106,7 @@ class TaskStepExecutorService(
         return true
     }
 
+    @WithSpan(inheritContext = false, value = "prosesserTask")
     private fun executeWork(task: Task) {
         val startTidspunkt = System.currentTimeMillis()
         initLogContext(task)

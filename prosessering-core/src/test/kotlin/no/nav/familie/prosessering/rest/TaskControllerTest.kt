@@ -4,7 +4,6 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
 import no.nav.familie.prosessering.domene.Status
-import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.internal.TaskService
 import no.nav.familie.prosessering.task.TaskStep1
 import org.assertj.core.api.Assertions.assertThat
@@ -62,6 +61,8 @@ internal class TaskControllerTest {
 
         assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
         assertThat(response.body!!.data).isNull()
-        assertThat(response.body!!.melding).isEqualTo("Rekjøring av tasker med status '${Status.FEILET}' og type '${TaskStep1.TASK_1}' feilet")
+        assertThat(
+            response.body!!.melding,
+        ).isEqualTo("Rekjøring av tasker med status '${Status.FEILET}' og type '${TaskStep1.TASK_1}' feilet")
     }
 }
