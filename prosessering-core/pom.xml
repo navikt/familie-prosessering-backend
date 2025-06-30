@@ -52,6 +52,10 @@
             <groupId>org.springframework.data</groupId>
             <artifactId>spring-data-jdbc</artifactId>
         </dependency>
+        <dependency>
+            <groupId>io.opentelemetry.instrumentation</groupId>
+            <artifactId>opentelemetry-instrumentation-annotations</artifactId>
+        </dependency>
         <!--Test-->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
