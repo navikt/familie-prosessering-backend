@@ -9,7 +9,4 @@ enum class Status {
     UBEHANDLET,
     AVVIKSHÅNDTERT,
     MANUELL_OPPFØLGING,
-    ;
-
-    fun kanPlukkes() = listOf(KLAR_TIL_PLUKK, UBEHANDLET).contains(this)
 }
