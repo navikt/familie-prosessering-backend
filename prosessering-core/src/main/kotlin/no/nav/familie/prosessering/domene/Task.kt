@@ -1,6 +1,5 @@
 package no.nav.familie.prosessering.domene
 
-import no.nav.familie.prosessering.domene.Status.*
 import no.nav.familie.prosessering.util.IdUtils
 import no.nav.familie.prosessering.util.MDCConstants
 import org.slf4j.MDC
@@ -17,7 +16,7 @@ data class Task(
     @Id
     val id: Long = 0L,
     val payload: String,
-    val status: Status = UBEHANDLET,
+    val status: Status = Status.UBEHANDLET,
     val avvikstype: Avvikstype? = null,
     val opprettetTid: LocalDateTime = LocalDateTime.now(),
     val triggerTid: LocalDateTime = LocalDateTime.now(),
@@ -72,7 +71,7 @@ data class Task(
 
     fun medTriggerTid(triggerTid: LocalDateTime): Task = this.copy(triggerTid = triggerTid)
 
-    fun kanPlukkes(): Boolean = status in setOf(UBEHANDLET, KLAR_TIL_PLUKK) && triggerTid.isBefore(LocalDateTime.now())
+    fun kanPlukkes(): Boolean = status in setOf(Status.UBEHANDLET, Status.KLAR_TIL_PLUKK) && triggerTid.isBefore(LocalDateTime.now())
 
     override fun toString(): String =
         "Task(id=$id, status=$status, opprettetTid=$opprettetTid, triggerTid=$triggerTid, type='$type', versjon=$versjon)"
