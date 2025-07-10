@@ -71,6 +71,8 @@ data class Task(
 
     fun medTriggerTid(triggerTid: LocalDateTime): Task = this.copy(triggerTid = triggerTid)
 
+    fun kanPlukkes(): Boolean = status in setOf(Status.UBEHANDLET, Status.KLAR_TIL_PLUKK) && triggerTid.isBefore(LocalDateTime.now())
+
     override fun toString(): String =
         "Task(id=$id, status=$status, opprettetTid=$opprettetTid, triggerTid=$triggerTid, type='$type', versjon=$versjon)"
 }

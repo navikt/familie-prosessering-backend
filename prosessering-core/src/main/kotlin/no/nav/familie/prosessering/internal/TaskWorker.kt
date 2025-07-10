@@ -189,7 +189,7 @@ class TaskWorker(
     fun markerPlukket(id: Long): Task? {
         val task = taskService.findById(id)
 
-        if (task.status.kanPlukkes()) {
+        if (task.kanPlukkes()) {
             return taskService.plukker(task)
         }
         return null
