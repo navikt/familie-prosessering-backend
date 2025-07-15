@@ -7,11 +7,11 @@
     <parent>
         <groupId>no.nav.familie</groupId>
         <artifactId>familie-prosessering</artifactId>
-        <version>${revision}${sha1}${changelist}</version>
+        <version>1.0.0</version>
     </parent>
 
     <artifactId>prosessering-core</artifactId>
-    <version>${revision}${sha1}${changelist}</version>
+    <version>1.0.0</version>
     <name>Prosessering - Core</name>
     <packaging>jar</packaging>
 
