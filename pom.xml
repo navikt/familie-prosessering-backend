@@ -8,14 +8,11 @@
     <artifactId>familie-prosessering</artifactId>
 
     <name>Prosessering - Root</name>
-    <version>${revision}${sha1}${changelist}</version>
+    <version>1.0.0</version>
     <packaging>pom</packaging>
     <url>https://github.com/navikt/familie-prosessering-backend</url>
 
     <properties>
-        <revision>2.2</revision>
-        <sha1>1.0-SNAPSHOT</sha1>
-        <changelist>-SNAPSHOT</changelist>
         <java.version>21</java.version>
         <maven.compiler.release>21</maven.compiler.release>
         <maven.compiler.source>21</maven.compiler.source>
