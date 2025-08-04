@@ -22,7 +22,7 @@
         <spring.boot.version>3.5.4</spring.boot.version>
         <mockk.version>1.14.5</mockk.version>
 
-        <nav.security.token.version>5.0.33</nav.security.token.version>
+        <nav.security.token.version>5.0.34</nav.security.token.version>
 
         <!--suppress UnresolvedMavenProperty  Ligger som secret i github-->
         <sonar.projectKey>${SONAR_PROJECTKEY}</sonar.projectKey>
@@ -84,7 +84,7 @@
             <dependency>
                 <groupId>org.flywaydb</groupId>
                 <artifactId>flyway-database-postgresql</artifactId>
-                <version>11.10.4</version>
+                <version>11.10.5</version>
                 <scope>runtime</scope>
             </dependency>
             <dependency>
@@ -181,7 +181,7 @@
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>flatten-maven-plugin</artifactId>
-                    <version>1.7.1</version>
+                    <version>1.7.2</version>
                 </plugin>
             </plugins>
         </pluginManagement>
