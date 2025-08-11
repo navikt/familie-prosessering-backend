@@ -49,6 +49,11 @@ internal interface TaskRepository :
         type: String,
     ): List<Task>
 
+    @Query("SELECT * FROM task t WHERE t.type=:type")
+    fun findAllByType(
+        type: String,
+    ): List<Task>
+
     @Query(
         """
         SELECT t.type,t.status, count(*) AS count 

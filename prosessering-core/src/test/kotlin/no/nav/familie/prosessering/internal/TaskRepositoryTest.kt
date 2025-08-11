@@ -248,4 +248,24 @@ class TaskRepositoryTest : IntegrationRunnerTest() {
         assertThat(funnedeTasker.firstOrNull()?.type).isEqualTo(task1.type)
         assertThat(funnedeTasker.firstOrNull()?.status).isEqualTo(task1.status)
     }
+
+    @Test
+    fun `findAllByType - skal finne tasker for gitt type`() {
+        val randomString = UUID.randomUUID().toString()
+
+        val task1 = Task(type = TaskStep2.TASK_2, payload = randomString)
+        val task2 = Task(type = TaskStep2.TASK_2, payload = "{'a'='1'}")
+        val task3 = Task(type = TaskStep2.TASK_2, payload = randomString)
+        val task4 = Task(type = TaskStep1.TASK_1, payload = randomString)
+
+        taskService.save(task1)
+        taskService.save(task2)
+        taskService.save(task3)
+        taskService.save(task4)
+
+        val funnedeTasker = repository.findAllByType(TaskStep2.TASK_2)
+
+        assertThat(funnedeTasker.size).isEqualTo(3)
+    }
+
 }
