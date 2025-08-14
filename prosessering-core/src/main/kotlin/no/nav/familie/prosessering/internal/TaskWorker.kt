@@ -126,7 +126,7 @@ class TaskWorker(
             // lager metrikker på tasks som har feilet max antall ganger.
             if (feiletTask.status == Status.FEILET || feiletTask.status == Status.MANUELL_OPPFØLGING) {
                 finnFeilteller(feiletTask.type).increment()
-                log.error(
+                log.warn(
                     "Task ${feiletTask.id} av type ${feiletTask.type} har feilet/satt til manuell oppfølgning. " +
                         "Sjekk prosessering for detaljer",
                 )
@@ -164,7 +164,7 @@ class TaskWorker(
         // lager metrikker på tasks som har feilet max antall ganger.
         if (task.status == Status.FEILET || task.status == Status.MANUELL_OPPFØLGING) {
             finnFeilteller(task.type).increment()
-            log.error(
+            log.warn(
                 "Task ${task.id} av type ${task.type} har feilet/satt til manuell oppfølgning. " +
                     "Sjekk prosessering for detaljer",
             )
