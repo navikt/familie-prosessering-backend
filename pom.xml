@@ -22,7 +22,7 @@
         <spring.boot.version>3.5.5</spring.boot.version>
         <mockk.version>1.14.5</mockk.version>
 
-        <nav.security.token.version>5.0.34</nav.security.token.version>
+        <nav.security.token.version>5.0.36</nav.security.token.version>
 
         <!--suppress UnresolvedMavenProperty  Ligger som secret i github-->
         <sonar.projectKey>${SONAR_PROJECTKEY}</sonar.projectKey>
@@ -84,7 +84,7 @@
             <dependency>
                 <groupId>org.flywaydb</groupId>
                 <artifactId>flyway-database-postgresql</artifactId>
-                <version>11.11.2</version>
+                <version>11.12.0</version>
                 <scope>runtime</scope>
             </dependency>
             <dependency>
@@ -109,7 +109,7 @@
                 <plugin>
                     <groupId>org.sonarsource.scanner.maven</groupId>
                     <artifactId>sonar-maven-plugin</artifactId>
-                    <version>5.1.0.4751</version>
+                    <version>5.2.0.4988</version>
                 </plugin>
                 <plugin>
                     <groupId>org.jacoco</groupId>
