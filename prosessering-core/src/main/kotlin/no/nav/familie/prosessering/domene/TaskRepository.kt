@@ -50,9 +50,7 @@ internal interface TaskRepository :
     ): List<Task>
 
     @Query("SELECT * FROM task t WHERE t.type=:type")
-    fun findAllByType(
-        type: String,
-    ): List<Task>
+    fun findAllByType(type: String): List<Task>
 
     @Query(
         """

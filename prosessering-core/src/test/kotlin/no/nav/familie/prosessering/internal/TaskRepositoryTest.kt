@@ -267,5 +267,4 @@ class TaskRepositoryTest : IntegrationRunnerTest() {
 
         assertThat(funnedeTasker.size).isEqualTo(3)
     }
-
 }
