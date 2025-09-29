@@ -53,7 +53,7 @@
             <dependency>
                 <groupId>io.opentelemetry.instrumentation</groupId>
                 <artifactId>opentelemetry-instrumentation-annotations</artifactId>
-                <version>2.20.0</version>
+                <version>2.20.1</version>
             </dependency>
 
             <!--Test-->
@@ -84,7 +84,7 @@
             <dependency>
                 <groupId>org.flywaydb</groupId>
                 <artifactId>flyway-database-postgresql</artifactId>
-                <version>11.13.1</version>
+                <version>11.13.2</version>
                 <scope>runtime</scope>
             </dependency>
             <dependency>
