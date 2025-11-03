@@ -23,7 +23,7 @@
         <spring.boot.version>3.5.7</spring.boot.version>
         <mockk.version>1.14.6</mockk.version>
 
-        <nav.security.token.version>5.0.37</nav.security.token.version>
+        <nav.security.token.version>5.0.39</nav.security.token.version>
 
         <!--suppress UnresolvedMavenProperty  Ligger som secret i github-->
         <sonar.projectKey>${SONAR_PROJECTKEY}</sonar.projectKey>
