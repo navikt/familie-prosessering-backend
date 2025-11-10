@@ -14,7 +14,7 @@
 
     <properties>
         <java.version>21</java.version>
-        <flyway.version>11.15.0</flyway.version>
+        <flyway.version>11.16.0</flyway.version>
         <maven.compiler.release>21</maven.compiler.release>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
@@ -131,7 +131,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-release-plugin</artifactId>
-                    <version>3.1.1</version>
+                    <version>3.2.0</version>
                     <configuration>
                         <autoVersionSubmodules>true</autoVersionSubmodules>
                         <useReleaseProfile>true</useReleaseProfile>
