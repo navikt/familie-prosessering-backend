@@ -4,11 +4,11 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.ObjectReader
-import com.fasterxml.jackson.databind.ObjectWriter
 import no.nav.familie.prosessering.domene.Task
 import no.nav.familie.prosessering.error.TaskExceptionUtenStackTrace
+import tools.jackson.databind.ObjectMapper
+import tools.jackson.databind.ObjectReader
+import tools.jackson.databind.ObjectWriter
 import java.io.IOException
 import java.io.PrintWriter
 import java.io.StringWriter

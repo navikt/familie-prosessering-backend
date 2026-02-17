@@ -1,7 +1,5 @@
 package no.nav.familie.prosessering.internal
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.kotlin.readValue
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -27,6 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.scheduling.annotation.EnableScheduling
 import org.springframework.test.context.transaction.TestTransaction
+import tools.jackson.databind.ObjectMapper
 import java.time.LocalDate
 import java.util.UUID
 import java.util.concurrent.ExecutionException
@@ -132,7 +131,7 @@ class TaskStepExecutorServiceTest : IntegrationRunnerTest() {
         val feiletTask = repository.findByIdOrNull(task.id)!!
         val taskLogg = taskLoggRepository.findByTaskId(task.id).sortedBy { it.opprettetTid }
         assertThat(feiletTask.status).isEqualTo(Status.MANUELL_OPPFØLGING)
-        assertThat(om.readValue<TaskFeil>(taskLogg.last().melding!!).stackTrace).isNotNull
+        assertThat(om.readValue<TaskFeil>(taskLogg.last().melding!!, TaskFeil::class.java).stackTrace).isNotNull
     }
 
     @Test
@@ -159,7 +158,7 @@ class TaskStepExecutorServiceTest : IntegrationRunnerTest() {
         val taskLogg = taskLoggRepository.findByTaskId(task.id).sortedBy { it.opprettetTid }
 
         assertThat(taskLogg).hasSize(3)
-        val melding = om.readValue<TaskFeil>(taskLogg.last().melding!!)
+        val melding = om.readValue<TaskFeil>(taskLogg.last().melding!!, TaskFeil::class.java)
         assertThat(melding.feilmelding).isEqualTo("feilmelding")
         assertThat(melding.stackTrace).isEqualTo(null)
     }
