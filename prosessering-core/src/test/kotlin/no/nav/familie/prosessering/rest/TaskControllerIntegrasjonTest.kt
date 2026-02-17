@@ -124,7 +124,7 @@ internal class TaskControllerIntegrasjonTest : IntegrationRunnerTest() {
         val response = taskController.antallTilOppfølging()
 
         assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
-        assertThat(response.body.data).isEqualTo(2)
+        assertThat(response.body?.data).isEqualTo(2)
     }
 
     @Test
@@ -165,7 +165,7 @@ internal class TaskControllerIntegrasjonTest : IntegrationRunnerTest() {
         val response = taskController.task2(null, null, TaskStep1.TASK_1)
 
         assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
-        assertThat((response.body.data as PaginableResponse<*>).tasks).hasSize(2)
+        assertThat((response.body?.data as PaginableResponse<*>).tasks).hasSize(2)
     }
 
     @Test
@@ -179,7 +179,7 @@ internal class TaskControllerIntegrasjonTest : IntegrationRunnerTest() {
         val response = taskController.task2(null, null, TaskStep1.TASK_1)
 
         assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
-        assertThat((((response.body.data as PaginableResponse<*>).tasks).first() as TaskDto).kommentar.equals("dette er en test"))
+        assertThat((((response.body?.data as PaginableResponse<*>).tasks).first() as TaskDto).kommentar.equals("dette er en test"))
     }
 
     @Test
@@ -193,8 +193,8 @@ internal class TaskControllerIntegrasjonTest : IntegrationRunnerTest() {
         val response = taskController.task2(null, null, TaskStep1.TASK_1)
 
         assertThat(response.statusCode).isEqualTo(HttpStatus.OK)
-        assertThat((((response.body.data as PaginableResponse<*>).tasks).first() as TaskDto).kommentar.equals("dette er en test"))
-        assertThat((((response.body.data as PaginableResponse<*>).tasks).first() as TaskDto).status.equals(Status.MANUELL_OPPFØLGING))
+        assertThat((((response.body?.data as PaginableResponse<*>).tasks).first() as TaskDto).kommentar.equals("dette er en test"))
+        assertThat((((response.body?.data as PaginableResponse<*>).tasks).first() as TaskDto).status.equals(Status.MANUELL_OPPFØLGING))
     }
 
     @Test

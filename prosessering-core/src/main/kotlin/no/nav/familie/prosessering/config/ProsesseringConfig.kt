@@ -25,7 +25,7 @@ class ProsesseringConfig(
         val executor = ThreadPoolTaskExecutor()
         executor.corePoolSize = poolSize
         executor.maxPoolSize = poolSize
-        executor.threadNamePrefix = "TaskWorker-"
+        executor.setThreadNamePrefix("TaskWorker-")
         executor.setWaitForTasksToCompleteOnShutdown(true)
         executor.setAwaitTerminationSeconds(20)
         executor.setQueueCapacity(køstørrelse)
@@ -42,7 +42,7 @@ class ProsesseringConfig(
                     super.destroy()
                 }
             }
-        executor.threadNamePrefix = "TaskScheduler-"
+        executor.setThreadNamePrefix("TaskScheduler-")
         executor.setWaitForTasksToCompleteOnShutdown(true)
         executor.setAwaitTerminationSeconds(20)
         executor.setErrorHandler { e ->
