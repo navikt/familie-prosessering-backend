@@ -14,16 +14,16 @@
 
     <properties>
         <java.version>21</java.version>
-        <flyway.version>12.0.1</flyway.version>
+        <flyway.version>12.0.2</flyway.version>
         <maven.compiler.release>21</maven.compiler.release>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <kotlin.version>2.3.0</kotlin.version>
-        <spring.boot.version>4.0.2</spring.boot.version>
+        <kotlin.version>2.3.10</kotlin.version>
+        <spring.boot.version>4.0.3</spring.boot.version>
         <mockk.version>1.14.9</mockk.version>
 
-        <nav.security.token.version>6.0.2</nav.security.token.version>
+        <nav.security.token.version>6.0.3</nav.security.token.version>
 
         <!--suppress UnresolvedMavenProperty  Ligger som secret i github-->
         <sonar.projectKey>${SONAR_PROJECTKEY}</sonar.projectKey>
@@ -165,12 +165,12 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <version>3.5.4</version>
+                    <version>3.5.5</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-failsafe-plugin</artifactId>
-                    <version>3.5.4</version>
+                    <version>3.5.5</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
