@@ -1,7 +1,5 @@
 package no.nav.familie.prosessering.internal
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.kotlin.readValue
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -25,6 +23,8 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.scheduling.annotation.EnableScheduling
 import org.springframework.test.context.transaction.TestTransaction
+import tools.jackson.databind.ObjectMapper
+import tools.jackson.module.kotlin.readValue
 import java.time.LocalDate
 import java.util.UUID
 
@@ -147,7 +147,7 @@ class TaskStepExecutorServiceWithoutRerunTest : IntegrationRunnerTest() {
         val taskLogg = taskLoggRepository.findByTaskId(task.id).sortedBy { it.opprettetTid }
 
         assertThat(taskLogg).hasSize(3)
-        val melding = om.readValue<TaskFeil>(taskLogg.last().melding!!)
+        val melding = om.readValue(taskLogg.last().melding!!, TaskFeil::class.java)
         assertThat(melding.feilmelding).isEqualTo("feilmelding")
         assertThat(melding.stackTrace).isEqualTo(null)
     }
