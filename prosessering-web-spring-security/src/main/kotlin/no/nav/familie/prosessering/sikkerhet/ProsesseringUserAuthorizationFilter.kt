@@ -24,7 +24,7 @@ class ProsesseringUserAuthorizationFilter(
     }
 
     /*
-     * Skal kun kjøre på for /api/task
+     * Skal kun kjore pa for /api/task
      */
     override fun shouldNotFilter(request: HttpServletRequest): Boolean {
         val path = request.requestURI.substring(request.contextPath.length)
