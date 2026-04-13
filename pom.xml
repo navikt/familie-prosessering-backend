@@ -49,11 +49,6 @@
                 <type>pom</type>
             </dependency>
             <dependency>
-                <groupId>no.nav.security</groupId>
-                <artifactId>token-validation-core</artifactId>
-                <version>${nav.security.token.version}</version>
-            </dependency>
-            <dependency>
                 <groupId>io.opentelemetry.instrumentation</groupId>
                 <artifactId>opentelemetry-instrumentation-annotations</artifactId>
                 <version>2.26.1</version>

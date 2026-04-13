@@ -1,7 +1,6 @@
 package no.nav.familie.prosessering.rest
 
 import no.nav.familie.prosessering.api.TaskApiFasade
-import no.nav.familie.prosessering.config.ProsesseringInfoProvider
 import no.nav.familie.prosessering.domene.Status
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
@@ -16,11 +15,8 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 @RequestMapping("/api")
 class TaskControllerSpringSecurity(
-    restTaskService: RestTaskService,
-    prosesseringInfoProvider: ProsesseringInfoProvider,
+    private val api: TaskApiFasade,
 ) {
-    private val api = TaskApiFasade(restTaskService, prosesseringInfoProvider)
-
     @GetMapping(path = ["/task/{id}"])
     fun taskMedId(
         @PathVariable id: Long,

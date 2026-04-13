@@ -3,6 +3,7 @@ package no.nav.familie.prosessering.rest
 import no.nav.familie.prosessering.api.TaskApiFasade
 import no.nav.familie.prosessering.config.ProsesseringInfoProvider
 import no.nav.familie.prosessering.domene.Status
+import no.nav.familie.prosessering.internal.TaskerMedStatusFeiletOgManuellOppfølging
 import no.nav.security.token.support.core.api.ProtectedWithClaims
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
@@ -18,11 +19,8 @@ import org.springframework.web.bind.annotation.RestController
 @RequestMapping("/api")
 @ProtectedWithClaims(issuer = "azuread")
 class TaskControllerNavTokenSupport(
-    restTaskService: RestTaskService,
-    prosesseringInfoProvider: ProsesseringInfoProvider,
+    private val api: TaskApiFasade,
 ) {
-    private val api = TaskApiFasade(restTaskService, prosesseringInfoProvider)
-
     @GetMapping(path = ["/task/{id}"])
     fun taskMedId(
         @PathVariable id: Long,
@@ -48,9 +46,7 @@ class TaskControllerNavTokenSupport(
     fun antallTilOppfølging(): ResponseEntity<Ressurs<Long>> = ResponseEntity.ok(api.finnAntallTaskerSomKreverOppfølging())
 
     @GetMapping(path = ["/task/antall-feilet-og-manuell-oppfolging"])
-    fun antallFeiletOgManuellOppfølging(): ResponseEntity<
-        Ressurs<no.nav.familie.prosessering.internal.TaskerMedStatusFeiletOgManuellOppfølging>,
-    > =
+    fun antallFeiletOgManuellOppfølging(): ResponseEntity<Ressurs<TaskerMedStatusFeiletOgManuellOppfølging>> =
         ResponseEntity.ok(
             api.finnAntallTaskerMedStatusFeiletOgManuellOppfølging(),
         )
