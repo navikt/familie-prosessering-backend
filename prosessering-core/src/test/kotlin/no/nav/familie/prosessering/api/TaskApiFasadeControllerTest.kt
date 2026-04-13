@@ -11,18 +11,18 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
-internal class TaskApiFacadeControllerTest {
+internal class TaskApiFasadeControllerTest {
     private val taskService: TaskService = mockk()
 
     private lateinit var restTaskService: RestTaskService
-    private lateinit var api: TaskApiFacade
+    private lateinit var api: TaskApiFasade
 
     @BeforeEach
     fun setup() {
         restTaskService = RestTaskService(taskService)
         val infoProvider = mockk<ProsesseringInfoProvider>()
         every { infoProvider.hentBrukernavn() } returns ""
-        api = TaskApiFacade(restTaskService, infoProvider)
+        api = TaskApiFasade(restTaskService, infoProvider)
     }
 
     @Test

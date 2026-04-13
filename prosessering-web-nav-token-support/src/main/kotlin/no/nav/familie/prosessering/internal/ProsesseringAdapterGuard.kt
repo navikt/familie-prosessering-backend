@@ -7,16 +7,16 @@ import org.springframework.util.ClassUtils
 @Component
 internal class ProsesseringAdapterGuard {
     @PostConstruct
-    fun verifySingleAdapterPresent() {
-        val otherPresent =
+    fun verifiserKunEttWebAdapter() {
+        val springSecurityErTilstede =
             ClassUtils.isPresent(
                 "no.nav.familie.prosessering.rest.TaskControllerSpringSecurity",
                 javaClass.classLoader,
             )
 
-        check(!otherPresent) {
-            "Both prosessering-web-nav-token-support and prosessering-web-spring-security are on the classpath. " +
-                "Choose exactly one adapter dependency."
+        check(!springSecurityErTilstede) {
+            "Både prosessering-web-spring-security og prosessering-web-nav-token-support er i classpathen. " +
+                    "Velg nøyaktig én adapter-dependency."
         }
     }
 }

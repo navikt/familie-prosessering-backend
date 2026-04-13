@@ -1,6 +1,6 @@
 package no.nav.familie.prosessering.rest
 
-import no.nav.familie.prosessering.api.TaskApiFacade
+import no.nav.familie.prosessering.api.TaskApiFasade
 import no.nav.familie.prosessering.config.ProsesseringInfoProvider
 import no.nav.familie.prosessering.domene.Status
 import org.springframework.http.ResponseEntity
@@ -19,7 +19,7 @@ class TaskControllerSpringSecurity(
     restTaskService: RestTaskService,
     prosesseringInfoProvider: ProsesseringInfoProvider,
 ) {
-    private val api = TaskApiFacade(restTaskService, prosesseringInfoProvider)
+    private val api = TaskApiFasade(restTaskService, prosesseringInfoProvider)
 
     @GetMapping(path = ["/task/{id}"])
     fun taskMedId(

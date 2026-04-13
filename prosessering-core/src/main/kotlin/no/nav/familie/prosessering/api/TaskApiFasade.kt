@@ -12,11 +12,11 @@ import no.nav.familie.prosessering.rest.TaskDto
 import no.nav.familie.prosessering.rest.TaskloggDto
 
 /**
- * Web-free facade for the Task API.
+ * Web-free fasade for Task API-et.
  *
- * Consuming applications choose their own web + security stack and call this from controllers.
+ * Konsumenter kan selv velge hvilken web-security stack de vil bruke, og kalle dette fra controllers.
  */
-class TaskApiFacade(
+class TaskApiFasade(
     private val restTaskService: RestTaskService,
     private val prosesseringInfoProvider: ProsesseringInfoProvider,
 ) {

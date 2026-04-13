@@ -18,7 +18,7 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
 import org.springframework.beans.factory.annotation.Autowired
 
-internal class TaskApiFacadeIntegrasjonTest : IntegrationRunnerTest() {
+internal class TaskApiFasadeIntegrasjonTest : IntegrationRunnerTest() {
     @Autowired
     lateinit var restTaskService: RestTaskService
 
@@ -28,7 +28,7 @@ internal class TaskApiFacadeIntegrasjonTest : IntegrationRunnerTest() {
     @Autowired
     lateinit var repository: TaskRepository
 
-    private lateinit var api: TaskApiFacade
+    private lateinit var api: TaskApiFasade
 
     @BeforeEach
     fun setup() {
@@ -38,7 +38,7 @@ internal class TaskApiFacadeIntegrasjonTest : IntegrationRunnerTest() {
 
                 override fun harTilgang(): Boolean = true
             }
-        api = TaskApiFacade(restTaskService, infoProvider)
+        api = TaskApiFasade(restTaskService, infoProvider)
     }
 
     @Test
