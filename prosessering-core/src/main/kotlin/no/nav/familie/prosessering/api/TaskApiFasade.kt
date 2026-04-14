@@ -10,12 +10,14 @@ import no.nav.familie.prosessering.rest.Ressurs
 import no.nav.familie.prosessering.rest.RestTaskService
 import no.nav.familie.prosessering.rest.TaskDto
 import no.nav.familie.prosessering.rest.TaskloggDto
+import org.springframework.stereotype.Component
 
 /**
  * Web-free fasade for Task API-et.
  *
  * Konsumenter kan selv velge hvilken web-security stack de vil bruke, og kalle dette fra controllers.
  */
+@Component
 class TaskApiFasade(
     private val restTaskService: RestTaskService,
     private val prosesseringInfoProvider: ProsesseringInfoProvider,
