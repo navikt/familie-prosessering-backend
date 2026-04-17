@@ -55,7 +55,7 @@ class TaskControllerNavTokenSupport(
     fun tasklogg(
         @PathVariable id: Long,
         @RequestParam(required = false) page: Int?,
-    ): ResponseEntity<Ressurs<List<TaskloggDto>>> = ResponseEntity.ok(api.hentTaskLogg(id, page))
+    ): ResponseEntity<Ressurs<List<TaskloggDto>>> = ResponseEntity.ok(api.hentTaskLogg(id))
 
     @PutMapping(path = ["/task/rekjor"])
     fun rekjørTask(

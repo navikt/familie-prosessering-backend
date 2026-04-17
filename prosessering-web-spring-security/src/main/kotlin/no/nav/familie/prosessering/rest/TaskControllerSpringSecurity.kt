@@ -2,6 +2,7 @@ package no.nav.familie.prosessering.rest
 
 import no.nav.familie.prosessering.api.TaskApiFasade
 import no.nav.familie.prosessering.domene.Status
+import no.nav.familie.prosessering.internal.TaskerMedStatusFeiletOgManuellOppfølging
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -43,7 +44,7 @@ class TaskControllerSpringSecurity(
 
     @GetMapping(path = ["/task/antall-feilet-og-manuell-oppfolging"])
     fun antallFeiletOgManuellOppfølging(): ResponseEntity<
-        Ressurs<no.nav.familie.prosessering.internal.TaskerMedStatusFeiletOgManuellOppfølging>,
+        Ressurs<TaskerMedStatusFeiletOgManuellOppfølging>,
     > =
         ResponseEntity.ok(api.finnAntallTaskerMedStatusFeiletOgManuellOppfølging())
 
@@ -51,7 +52,7 @@ class TaskControllerSpringSecurity(
     fun tasklogg(
         @PathVariable id: Long,
         @RequestParam(required = false) page: Int?,
-    ): ResponseEntity<Ressurs<List<TaskloggDto>>> = ResponseEntity.ok(api.hentTaskLogg(id, page))
+    ): ResponseEntity<Ressurs<List<TaskloggDto>>> = ResponseEntity.ok(api.hentTaskLogg(id))
 
     @PutMapping(path = ["/task/rekjor"])
     fun rekjørTask(

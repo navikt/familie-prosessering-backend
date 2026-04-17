@@ -45,9 +45,7 @@ class TaskApiFasade(
     fun finnAntallTaskerMedStatusFeiletOgManuellOppfølging(): Ressurs<TaskerMedStatusFeiletOgManuellOppfølging> =
         restTaskService.finnAntallTaskerMedStatusFeiletOgManuellOppfølging()
 
-    fun hentTaskLogg(
-        id: Long,
-    ): Ressurs<List<TaskloggDto>> = restTaskService.hentTaskLogg(id, brukernavn())
+    fun hentTaskLogg(id: Long): Ressurs<List<TaskloggDto>> = restTaskService.hentTaskLogg(id, brukernavn())
 
     fun rekjørTask(taskId: Long): Ressurs<String> = restTaskService.rekjørTask(taskId, brukernavn())
 

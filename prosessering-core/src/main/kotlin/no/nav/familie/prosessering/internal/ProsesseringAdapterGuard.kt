@@ -14,20 +14,15 @@ internal class ProsesseringAdapterGuard {
                 javaClass.classLoader,
             )
 
-        val navTokenSuppertErTilstede =
+        val navTokenSupportErTilstede =
             ClassUtils.isPresent(
                 "no.nav.familie.prosessering.rest.TaskControllerNavTokenSupport",
                 javaClass.classLoader,
             )
 
-        check(!(springSecurityErTilstede && navTokenSuppertErTilstede)) {
+        check(!(springSecurityErTilstede && navTokenSupportErTilstede)) {
             "Både prosessering-web-spring-security og prosessering-web-nav-token-support er i classpathen. " +
-                    "Velg nøyaktig én adapter-dependency."
-        }
-
-        check(springSecurityErTilstede || navTokenSuppertErTilstede) {
-            "Hverken prosessering-web-spring-security eller prosessering-web-nav-token-support er i classpathen. " +
-                    "Velg nøyaktig én adapter-dependency."
+                "Velg nøyaktig én adapter-dependency."
         }
     }
 }
