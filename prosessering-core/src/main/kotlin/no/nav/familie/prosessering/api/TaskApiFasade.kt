@@ -47,7 +47,6 @@ class TaskApiFasade(
 
     fun hentTaskLogg(
         id: Long,
-        page: Int?,
     ): Ressurs<List<TaskloggDto>> = restTaskService.hentTaskLogg(id, brukernavn())
 
     fun rekjørTask(taskId: Long): Ressurs<String> = restTaskService.rekjørTask(taskId, brukernavn())

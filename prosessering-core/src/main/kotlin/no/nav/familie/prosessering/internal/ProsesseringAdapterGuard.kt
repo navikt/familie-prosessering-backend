@@ -22,7 +22,12 @@ internal class ProsesseringAdapterGuard {
 
         check(!(springSecurityErTilstede && navTokenSuppertErTilstede)) {
             "Både prosessering-web-spring-security og prosessering-web-nav-token-support er i classpathen. " +
-                "Velg nøyaktig én adapter-dependency."
+                    "Velg nøyaktig én adapter-dependency."
+        }
+
+        check(springSecurityErTilstede || navTokenSuppertErTilstede) {
+            "Hverken prosessering-web-spring-security eller prosessering-web-nav-token-support er i classpathen. " +
+                    "Velg nøyaktig én adapter-dependency."
         }
     }
 }

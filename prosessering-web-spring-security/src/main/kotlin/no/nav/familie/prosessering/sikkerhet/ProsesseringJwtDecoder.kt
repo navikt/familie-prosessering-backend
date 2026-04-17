@@ -20,7 +20,6 @@ internal class ProsesseringJwtDecoder(
     private val secureLogger = LoggerFactory.getLogger("secureLogger")
 
     private val delegate: JwtDecoder by lazy {
-        println("kom til dekoderen")
         val decoder = JwtDecoders.fromIssuerLocation(issuerUri) as NimbusJwtDecoder
         decoder.setJwtValidator(
             DelegatingOAuth2TokenValidator(
