@@ -35,6 +35,8 @@
 
     <modules>
         <module>prosessering-core</module>
+        <module>prosessering-web-nav-token-support</module>
+        <module>prosessering-web-spring-security</module>
     </modules>
 
     <dependencyManagement>
@@ -45,11 +47,6 @@
                 <version>${spring.boot.version}</version>
                 <scope>import</scope>
                 <type>pom</type>
-            </dependency>
-            <dependency>
-                <groupId>no.nav.security</groupId>
-                <artifactId>token-validation-core</artifactId>
-                <version>${nav.security.token.version}</version>
             </dependency>
             <dependency>
                 <groupId>io.opentelemetry.instrumentation</groupId>
