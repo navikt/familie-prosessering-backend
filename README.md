@@ -207,4 +207,10 @@ fun prosesseringInfoProvider() = object : ProsesseringInfoProvider {
 }
 ```
 
+### Web moduler prosessering-web-spring-security og prosessering-web-nav-token-support
+* [prosessering-web-spring-security](prosessering-web-spring-security/README.md)
+* [prosessering-web-nav-token-support](prosessering-web-nav-token-support/README.md)
+Web-laget er trukket ut i egne moduler. Det er opp til konsumenter av familie-prosessering hvilken av disse de skal bruke.
+Token-validering blir gjort automatisk med disse. Les mer spesifikt i de tilhørende modulene. 
+
 ![](https://github.com/navikt/familie-prosessering-backend/workflows/Build-Deploy/badge.svg)
