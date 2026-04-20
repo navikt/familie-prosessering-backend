@@ -41,7 +41,7 @@ Kort sagt:
 
 ```xml
 <dependency>
-    <groupId>no.nav.familie.prosessering</groupId>
+    <groupId>no.nav.familie</groupId>
     <artifactId>prosessering-web-nav-token-support</artifactId>
 </dependency>
 ```

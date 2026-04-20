@@ -38,7 +38,7 @@ For å bruke modulen må konsumenten fortsatt gjøre tre ting.
 
 ```xml
 <dependency>
-    <groupId>no.nav.familie.prosessering</groupId>
+    <groupId>no.nav.familie</groupId>
     <artifactId>prosessering-web-spring-security</artifactId>
 </dependency>
 ```
