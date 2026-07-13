@@ -66,7 +66,7 @@ internal interface TaskRepository :
         SELECT DISTINCT t.* 
         FROM task t 
         JOIN task_logg tl ON t.id = tl.task_id 
-        WHERE t.status = 'FERDIG' AND tl.type IN ('FEILET', 'MANUELL_OPPFØLGNING')""",
+        WHERE t.status = 'FERDIG' AND tl.type IN ('FEILET', 'MANUELL_OPPFØLGING')""",
     )
     fun finnTasksSomErFerdigNåMenFeiletFør(page: Pageable): List<Task>
 
