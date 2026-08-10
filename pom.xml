@@ -14,12 +14,12 @@
 
     <properties>
         <java.version>21</java.version>
-        <flyway.version>12.10.0</flyway.version>
+        <flyway.version>13.1.0</flyway.version>
         <maven.compiler.release>21</maven.compiler.release>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <kotlin.version>2.4.0</kotlin.version>
+        <kotlin.version>2.4.10</kotlin.version>
         <spring.boot.version>4.1.0</spring.boot.version>
         <mockk.version>1.14.11</mockk.version>
 
@@ -51,7 +51,7 @@
             <dependency>
                 <groupId>io.opentelemetry.instrumentation</groupId>
                 <artifactId>opentelemetry-instrumentation-annotations</artifactId>
-                <version>2.29.0</version>
+                <version>2.30.0</version>
             </dependency>
 
             <!--Test-->
@@ -115,7 +115,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-jar-plugin</artifactId>
-                    <version>3.5.0</version>
+                    <version>3.5.1</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -177,7 +177,7 @@
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>flatten-maven-plugin</artifactId>
-                    <version>1.7.3</version>
+                    <version>1.8.0</version>
                 </plugin>
             </plugins>
         </pluginManagement>
