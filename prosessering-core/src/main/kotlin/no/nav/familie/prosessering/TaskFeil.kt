@@ -33,7 +33,7 @@ data class TaskFeil(
     var exceptionCauseMessage: String? = null,
     @JsonProperty("feilmelding")
     var feilmelding: String? = null,
-    @JsonProperty("stacktrace")
+    @JsonProperty("stackTrace")
     var stackTrace: String? = null,
     @JsonProperty("callId")
     val callId: String? = null,
