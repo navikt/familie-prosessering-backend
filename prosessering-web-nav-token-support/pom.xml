@@ -63,7 +63,7 @@
                     </dependency>
                 </dependencies>
                 <configuration>
-                    <jvmTarget>21</jvmTarget>
+                    <jvmTarget>${java.version}</jvmTarget>
                     <compilerPlugins>
                         <plugin>spring</plugin>
                     </compilerPlugins>

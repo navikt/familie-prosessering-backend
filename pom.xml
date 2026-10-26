@@ -13,11 +13,11 @@
     <url>https://github.com/navikt/familie-prosessering-backend</url>
 
     <properties>
-        <java.version>21</java.version>
+        <java.version>25</java.version>
         <flyway.version>13.3.0</flyway.version>
-        <maven.compiler.release>21</maven.compiler.release>
-        <maven.compiler.source>21</maven.compiler.source>
-        <maven.compiler.target>21</maven.compiler.target>
+        <maven.compiler.release>${java.version}</maven.compiler.release>
+        <maven.compiler.source>${java.version}</maven.compiler.source>
+        <maven.compiler.target>${java.version}</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <kotlin.version>2.4.10</kotlin.version>
         <spring.boot.version>4.1.0</spring.boot.version>
@@ -121,9 +121,6 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>3.15.0</version>
-                    <configuration>
-                        <release>11</release>
-                    </configuration>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
