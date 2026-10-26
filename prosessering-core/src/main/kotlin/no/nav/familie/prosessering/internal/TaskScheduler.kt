@@ -28,7 +28,9 @@ class TaskScheduler(
     @Scheduled(cron = CRON_DAILY_1000)
     fun settPermanentPlukketTilKlarTilPlukk() {
         try {
-            taskMaintenanceService.settPermanentPlukketTilKlarTilPlukk()
+            if (prosesseringInfoProvider.isLeader() != false) {
+                taskMaintenanceService.settPermanentPlukketTilKlarTilPlukk()
+            }
         } catch (e: Exception) {
             loggFeil(e, "settPermanentPlukketTilKlarTilPlukk")
         }
