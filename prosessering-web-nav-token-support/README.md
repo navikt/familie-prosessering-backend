@@ -10,7 +10,7 @@ Modulen leverer:
 
 * en ferdig `TaskControllerNavTokenSupport` med endepunkter under `/api/task/**`
 * tokenvalidering via `@ProtectedWithClaims(issuer = "azuread")`
-* et ekstra autorisasjonsfilter som sjekker `ProsesseringInfoProvider.harTilgang()`
+* en ekstra tilgangssjekk mot `ProsesseringInfoProvider.harTilgang()`
 
 Det betyr at modulen både beskytter task-API-et med tokenvalidering og legger på en eksplisitt tilgangssjekk for brukeren som kaller API-et.
 
@@ -24,11 +24,13 @@ Controlleren er annotert med:
 
 Det innebærer at `token-support` validerer innkommende token før requesten får treffe controlleren.
 
-I tillegg har modulen et `OncePerRequestFilter` (`ProsesseringUserAuthorizationFilter`) som kjører for kall til `/api/task/**` og gjør følgende:
+I tillegg registrerer modulen en `HandlerInterceptor` (`ProsesseringTaskApiTilgangInterceptor`) som kjører for alle kall som Spring ruter til `TaskControllerNavTokenSupport`, og gjør følgende:
 
 1. Kaller `ProsesseringInfoProvider.harTilgang()`.
 2. Hvis svaret er `true`, får requesten gå videre.
 3. Hvis svaret er `false`, returneres `401 Unauthorized`.
+
+Sjekken er knyttet til controlleren og ikke til URL-en i requesten, og den kjører etter tokenvalideringen. Egne endepunkter under `/api/task` i konsumenten er ikke dekket av sjekken.
 
 Kort sagt:
 
