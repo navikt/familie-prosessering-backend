@@ -14,14 +14,14 @@
 
     <properties>
         <java.version>25</java.version>
-        <flyway.version>13.11.1</flyway.version>
+        <flyway.version>13.12.1</flyway.version>
         <maven.compiler.release>${java.version}</maven.compiler.release>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <kotlin.version>2.4.21</kotlin.version>
         <spring.boot.version>4.1.2</spring.boot.version>
-        <mockk.version>1.14.11</mockk.version>
+        <mockk.version>1.14.12</mockk.version>
 
         <nav.security.token.version>7.0.1</nav.security.token.version>
 
@@ -174,7 +174,7 @@
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>flatten-maven-plugin</artifactId>
-                    <version>1.8.0</version>
+                    <version>1.9.0</version>
                 </plugin>
             </plugins>
         </pluginManagement>
